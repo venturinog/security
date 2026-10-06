@@ -36,5 +36,15 @@ $arrLangModule=array(
 "Country" => "کشور",
 "The following fields contain errors" => "فیلد های زیر دارای خطا هستند",
 "Validation Error" => "خطا در اعتبار سنجی",
+"Public address" => "آدرس عمومی",
+"Private network" => "شبکه خصوصی",
+"Loopback" => "Loopback",
+"Link local" => "پیوند محلی",
+"Carrier Grade NAT" => "Carrier Grade NAT",
+"Documentation" => "مستندات",
+"Benchmarking" => "Benchmarking",
+"Multicast" => "چندپخشی",
+"Reserved" => "رزرو شده",
+"IPv6 address" => "آدرس IPv6",
 );
 ?>

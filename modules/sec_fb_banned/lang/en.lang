@@ -29,5 +29,15 @@ $arrLangModule=array(
 "Country" => "Country",
 "The following fields contain errors" => "The following fields contain errors",
 "Validation Error" => "Validation Error",
+"Public address" => "Public address",
+"Private network" => "Private network",
+"Loopback" => "Loopback",
+"Link local" => "Link local",
+"Carrier Grade NAT" => "Carrier Grade NAT",
+"Documentation" => "Documentation",
+"Benchmarking" => "Benchmarking",
+"Multicast" => "Multicast",
+"Reserved" => "Reserved",
+"IPv6 address" => "IPv6 address",
 );
 ?>

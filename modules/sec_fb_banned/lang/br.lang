@@ -30,5 +30,15 @@ $arrLangModule=array(
 "Country" => "País",
 "The following fields contain errors" => "Os campos a seguir contêm erros",
 "Validation Error" => "Erro de Validação",
+"Public address" => "Endereço público",
+"Private network" => "Rede privada",
+"Loopback" => "Loopback",
+"Link local" => "Local de enlace",
+"Carrier Grade NAT" => "Carrier Grade NAT",
+"Documentation" => "Documentação",
+"Benchmarking" => "Benchmarking",
+"Multicast" => "Multicast",
+"Reserved" => "Reservado",
+"IPv6 address" => "Endereço IPv6",
 );
 ?>

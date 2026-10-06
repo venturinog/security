@@ -119,15 +119,10 @@ function reportBloqueados($smarty, $module_name, $local_templates_dir, &$pDB, $a
     $oGrid->setColumns($arrColumns);
     if( is_array($arrResult) && $total>0 ){
         foreach($arrResult as $key => $value){
-            $country = geoip_country_name_by_name($value['ip']);
-            $code    = geoip_country_code_by_name($value['ip']);
             $arrTmp[0] = "<input type='checkbox' name='".$value['id']."' id='".$value['id']."'>";
             $arrTmp[1] = $value['jail'];
             $arrTmp[2] = $value['ip'];
-            $bandera = "<div class='flag ".strtolower($code)."'></div>";
-            $arrTmp[3] = $country." ".$bandera;
-
-
+            $arrTmp[3] = _getCountryLabel($value['ip']);
 
             $arrData[] = $arrTmp;
         }
@@ -139,8 +134,63 @@ function reportBloqueados($smarty, $module_name, $local_templates_dir, &$pDB, $a
         $contenidoModulo = "<form  method='POST' style='margin-bottom:0;' action=$url>$contenidoModulo</form>";
     //end grid parameters
 
-    $attribution="<div style='font-size:8px;'>Geolocation data provided either by <a href='https://db-ip.com'>DB-IP</a> or <a href='https://www.maxmind.com'>MaxMind</a></div>";
-    return $contenidoModulo.$attribution;
+    return $contenidoModulo;
+}
+
+/**
+ * Clasifica una IP por rangos reservados (RFC 1918/5737/6598/3927 y CICNet).
+ *
+ * La geolocalización por IP se retiró en Issabel 6: la extensión PHP que la
+ * resolvía (php-pecl-geoip) depende de libGeoIP, retirada upstream en 2019 y
+ * sin reemplazo para PHP 8.4. Para los IPs rechazados por fail2ban el dato
+ * útil es distinguir red privada de pública.
+ *
+ * @param  string $ip
+ * @return string
+ */
+function _getCountryLabel($ip)
+{
+    if ( ! filter_var($ip, FILTER_VALIDATE_IP) ) {
+        return "";
+    }
+
+    // ip2long() no maneja IPv6: se resuelve antes de convertir.
+    if ( filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ) {
+        return _tr("IPv6 address");
+    }
+
+    $n = ip2long($ip);
+    if ( $n === false ) {
+        return "";
+    }
+
+    // Rango[CIDR, etiqueta].
+    $ranges = array(
+        array("0.0.0.0/8",        "Reserved"),
+        array("10.0.0.0/8",       "Private network"),
+        array("100.64.0.0/10",    "Carrier Grade NAT"),
+        array("127.0.0.0/8",      "Loopback"),
+        array("169.254.0.0/16",   "Link local"),
+        array("172.16.0.0/12",    "Private network"),
+        array("192.0.2.0/24",     "Documentation"),
+        array("192.168.0.0/16",   "Private network"),
+        array("198.18.0.0/15",    "Benchmarking"),
+        array("198.51.100.0/24",  "Documentation"),
+        array("203.0.113.0/24",   "Documentation"),
+        array("224.0.0.0/4",      "Multicast"),
+        array("240.0.0.0/4",      "Reserved"),
+    );
+
+    foreach ( $ranges as $r ) {
+        list ( $net, $label ) = $r;
+        list ( $netaddr, $prefix ) = explode( "/", $net );
+        $mask = -1 << ( 32 - (int) $prefix );
+        if ( ( $n & $mask ) === ( ip2long($netaddr) & $mask ) ) {
+            return _tr($label);
+        }
+    }
+
+    return _tr("Public address");
 }
 
 function deleteBloqueados($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)

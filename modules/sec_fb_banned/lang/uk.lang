@@ -36,5 +36,15 @@ $arrLangModule=array(
 	"Country" => "Країна",
 	"The following fields contain errors" => "Наступні поля містять помилки",
 	"Validation Error" => "Помилка Валідації",
+	"Public address" => "Публічна адреса",
+	"Private network" => "Приватна мережа",
+	"Loopback" => "Loopback",
+	"Link local" => "Локальна адреса",
+	"Carrier Grade NAT" => "Carrier Grade NAT",
+	"Documentation" => "Документація",
+	"Benchmarking" => "Benchmarking",
+	"Multicast" => "Multicast",
+	"Reserved" => "Зарезервовано",
+	"IPv6 address" => "Адреса IPv6",
 );
 ?>
