@@ -26,7 +26,7 @@ class IssabelF2BService {
      *  .
      * @param string    $pDB     object of the class paloDB    
      */
-    function IssabelF2BService(&$pDB)
+    function __construct(&$pDB)
     {
         // Se recibe como parámetro una referencia a una conexión paloDB
         if (is_object($pDB)) {

@@ -26,7 +26,7 @@ class Issabelwhitelist{
     var $_DB;
     var $errMsg;
 
-    function Issabelwhitelist(&$pDB)
+    function __construct(&$pDB)
     {
         // Se recibe como parámetro una referencia a una conexión paloDB
         if (is_object($pDB)) {
