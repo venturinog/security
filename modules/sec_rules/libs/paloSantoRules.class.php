@@ -62,8 +62,8 @@ class paloSantoRules {
         $hasfield=0;
         $query = "PRAGMA table_info($table)";
         $result = $this->_DB->fetchTable($query, true);
-        foreach($result as $idx=>$field) {
-            if($field['name']==$field) {
+        foreach($result as $idx=>$reg) {
+            if($reg['name']==$field) {
                $hasfield=1;
             }
          }
@@ -551,7 +551,6 @@ class paloSantoRules {
         }
 
         $query = "UPDATE filter SET rule_order = rule_order  * -1 WHERE rule_order < 0";
-        fputs($fp,"$query\n");
         $result = $this->_DB->genQuery($query);
 
         return $this->updateNotExecutedInSystem();
