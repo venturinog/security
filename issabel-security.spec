@@ -20,7 +20,6 @@ Requires: net-tools
 Requires: fail2ban-server
 Requires: fail2ban-sendmail
 Requires: ipset-service
-Requires: php-pecl-geoip
 Requires: sqlite
 Requires: certbot
 Requires: python3-certbot-apache
