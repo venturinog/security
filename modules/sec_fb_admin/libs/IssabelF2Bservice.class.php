@@ -59,7 +59,7 @@ class IssabelF2BService {
                 $this->errMsg = $this->_DB->errMsg;
                 return false;
             }
-            $jails = array('asterisk','sshd','postfix','apache','cyrus');
+            $jails = array('asterisk','sshd','postfix','apache');
             foreach($jails as $jail) {
                 $query = "INSERT INTO jails (name,maxretry,bantime,ignoreip,enabled) VALUES ('$jail','5','12','127.0.0.1',1)";
                 $result = $this->_DB->genQuery($query,array());
