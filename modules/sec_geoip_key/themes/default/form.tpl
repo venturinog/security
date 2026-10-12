@@ -1,33 +1,31 @@
-<table width="99%" border="0" cellspacing="0" cellpadding="4" align="center">
-    <tr class="letra12">
+<div class="iss-form">
+    <div class="iss-form__toolbar">
+        <span class="iss-form__hint"><span class="iss-required">*</span> {$REQUIRED_FIELD}</span>
+        <div class="iss-form__buttons">
         {if $mode eq 'input'}
-        <td align="left">
-            <input class="button" type="submit" name="save_new" value="{$SAVE}">&nbsp;&nbsp;
+            <input class="button" type="submit" name="save_new" value="{$SAVE}">
             <input class="button" type="submit" name="cancel" value="{$CANCEL}">
-        </td>
         {elseif $mode eq 'view'}
-        <td align="left">
             <input class="button" type="submit" name="cancel" value="{$CANCEL}">
-        </td>
         {elseif $mode eq 'edit'}
-        <td align="left">
-            <input class="button" type="submit" name="save_edit" value="{$EDIT}">&nbsp;&nbsp;
+            <input class="button" type="submit" name="save_edit" value="{$EDIT}">
             <input class="button" type="submit" name="cancel" value="{$CANCEL}">
-        </td>
         {/if}
-        <td align="right" nowrap><span class="letra12"><span  class="required">*</span> {$REQUIRED_FIELD}</span></td>
-    </tr>
-</table>
-<table class="tabForm" style="font-size: 16px;" width="99%" >
-    <tr class="letra12">
-        <td align="left"><b>{$key.LABEL}: <span  class="required">*</span></b>
-        {$key.INPUT}</td>
-    </tr>
-</table>
-<input class="button" type="hidden" name="id" value="{$ID}" />
-<br>
-<a href="https://www.maxmind.com/en/geolite2/signup" target="_blank">
-{php}
-echo _tr("maxmind signup");
-{/php}
-</a>
+        </div>
+    </div>
+    <section class="iss-card">
+        <div class="iss-card__body iss-formgrid">
+            <div class="iss-field">
+                <span class="iss-field__label">{$key.LABEL}&nbsp;<span class="iss-required">*</span></span>
+                <span class="iss-field__control">{$key.INPUT}</span>
+            </div>
+        </div>
+    </section>
+    <input class="button" type="hidden" name="id" value="{$ID}" />
+    <br>
+    <a href="https://www.maxmind.com/en/geolite2/signup" target="_blank">
+    {php}
+    echo _tr("maxmind signup");
+    {/php}
+    </a>
+</div>

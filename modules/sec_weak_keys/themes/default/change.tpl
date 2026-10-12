@@ -1,28 +1,29 @@
-<table width="99%" border="0" cellspacing="0" cellpadding="4" align="center">
-    <tr class="letra12">
-        <td align="left"><input class="button" type="submit" name="save" value="{$SAVE}">&nbsp; <input class="button" type="submit" name="cancel" value="{$CANCEL}"></td>
-        <td align="right" nowrap><span class="letra12"><span  class="required">*</span> {$REQUIRED_FIELD}</span></td>
-    </tr>
-</table>
-<br />
-<div class="tabForm" style="font-size: 16px; height: 110px" width="100%">
-    <table style="font-size: 16px;" width="100%" cellspacing="0" cellpadding="8">
-            <!--*****************************************-->
-            <tr class="letra12">
-                <td align="left" width="11%"><b>{$Extension.LABEL}: </b></td>
-                <td align="left">{$Extension.INPUT}</td>
-            </tr>
-            <tr style = '{$DISPLAY}' class="letra12">
-                <td align="left"><b>{$Current_Secret.LABEL}: <span  class="required">*</span></b></td>
-                <td align="left">{$Current_Secret.INPUT}</td>
-            </tr>
-            <tr class="letra12">
-                <td align="left"><b>{$New_Secret.LABEL}: <span  class="required">*</span></b></td>
-                <td align="left">{$New_Secret.INPUT}</td>
-            </tr>
-            <tr class="letra12">
-                <td align="left"><b>{$Confirm_New_Secret.LABEL}: <span  class="required">*</span></b></td>
-                <td align="left">{$Confirm_New_Secret.INPUT}</td>
-            </tr>
-    </table>
+<div class="iss-form">
+    <div class="iss-form__toolbar">
+        <span class="iss-form__hint"><span class="iss-required">*</span> {$REQUIRED_FIELD}</span>
+        <div class="iss-form__buttons">
+            <input class="button" type="submit" name="save" value="{$SAVE}">
+            <input class="button" type="submit" name="cancel" value="{$CANCEL}">
+        </div>
+    </div>
+    <section class="iss-card">
+        <div class="iss-card__body iss-formgrid">
+            <div class="iss-field">
+                <span class="iss-field__label">{$Extension.LABEL}</span>
+                <span class="iss-field__control">{$Extension.INPUT}</span>
+            </div>
+            <div class="iss-field" {$DISPLAY}>
+                <span class="iss-field__label">{$Current_Secret.LABEL}&nbsp;<span class="iss-required">*</span></span>
+                <span class="iss-field__control">{$Current_Secret.INPUT}</span>
+            </div>
+            <div class="iss-field">
+                <span class="iss-field__label">{$New_Secret.LABEL}&nbsp;<span class="iss-required">*</span></span>
+                <span class="iss-field__control">{$New_Secret.INPUT}</span>
+            </div>
+            <div class="iss-field">
+                <span class="iss-field__label">{$Confirm_New_Secret.LABEL}&nbsp;<span class="iss-required">*</span></span>
+                <span class="iss-field__control">{$Confirm_New_Secret.INPUT}</span>
+            </div>
+        </div>
+    </section>
 </div>

@@ -1,20 +1,23 @@
 <form  method='POST' style='margin-bottom:0;' action='?menu={$MODULE_NAME}&amp;action=setport'>
-<table width="99%" border="0" cellspacing="0" cellpadding="4" align="center">
-    <tr class="letra12">
-        <td align="left">
-            <input class="button" type="submit" name="save" value="{$SAVE}">&nbsp;
-            <input class="button" type="submit" name="cancel" value="{$CANCEL}"></td>
-        <td align="right" nowrap><span class="letra12"><span  class="required">*</span> {$REQUIRED_FIELD}</span></td>
-    </tr>
-</table>
-<table class="tabForm" style="font-size: 16px;" width="99%" >
-    <tr class="letra12" id="name">
-        <td align="left" width="15%"><b>{$eth_in.LABEL}: <span  class="required">*</span></b></td>
-        <td align="left">{$eth_in.INPUT}</td>
-    </tr>
-    <tr class="letra12">
-        <td align="left"><b>{$port.LABEL}: <span  class="required">*</span></b></td>
-        <td align="left">{$port.INPUT}</td>
-    </tr>
-</table>
+<div class="iss-form">
+    <div class="iss-form__toolbar">
+        <span class="iss-form__hint"><span class="iss-required">*</span> {$REQUIRED_FIELD}</span>
+        <div class="iss-form__buttons">
+            <input class="button" type="submit" name="save" value="{$SAVE}">
+            <input class="button" type="submit" name="cancel" value="{$CANCEL}">
+        </div>
+    </div>
+    <section class="iss-card">
+        <div class="iss-card__body iss-formgrid">
+            <div class="iss-field" id="name">
+                <span class="iss-field__label">{$eth_in.LABEL}&nbsp;<span class="iss-required">*</span></span>
+                <span class="iss-field__control">{$eth_in.INPUT}</span>
+            </div>
+            <div class="iss-field">
+                <span class="iss-field__label">{$port.LABEL}&nbsp;<span class="iss-required">*</span></span>
+                <span class="iss-field__control">{$port.INPUT}</span>
+            </div>
+        </div>
+    </section>
+</div>
 </form>
