@@ -12,109 +12,57 @@ $(document).ready(function(){
             $('input[name=port]').val("587");
         }
     });
-    $('input[name=chkoldhanguponpolarityswitch]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#hanguponpolarityswitch").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldhanguponpolarityswitch]').on('change', function (){
+            $("#hanguponpolarityswitch").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 
-    $('input[name=chkoldenddialkey]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#enddialkey").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldenddialkey]').on('change', function (){
+            $("#enddialkey").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 
 
-    $('input[name=chkoldsendpolarityrev]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#sendpolarityrev").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldsendpolarityrev]').on('change', function (){
+            $("#sendpolarityrev").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 
 
-    $('input[name=chkoldchecksipbinded]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#checksipbinded").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldchecksipbinded]').on('change', function (){
+            $("#checksipbinded").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 
-    $('input[name=chkoldflashwink]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#flashwink").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldflashwink]').on('change', function (){
+            $("#flashwink").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 
-    $('input[name=chkoldciddisplay]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#ciddisplay").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldciddisplay]').on('change', function (){
+            $("#ciddisplay").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 
-    $('input[name=chkoldusecallerid]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#usecallerid").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldusecallerid]').on('change', function (){
+            $("#usecallerid").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 
-    $('input[name=chkoldhidecallerid]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#hidecallerid").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldhidecallerid]').on('change', function (){
+            $("#hidecallerid").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 
-    $('input[name=chkoldbusydetect]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#busydetect").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldbusydetect]').on('change', function (){
+            $("#busydetect").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 
-    $('input[name=chkoldsilencedetect]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#silencedetect").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldsilencedetect]').on('change', function (){
+            $("#silencedetect").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 
-    $('input[name=chkoldfaxecm]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#faxecm").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldfaxecm]').on('change', function (){
+            $("#faxecm").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 
-    $('input[name=chkoldecho]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#echo").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldecho]').on('change', function (){
+            $("#echo").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
-    $('input[name=chkoldhandleirregularcid]').iButton({                                  
-        labelOn: "On",                                                     
-        labelOff: "Off",                                                   
-        change: function ($input){                                         
-            $("#handleirregularcid").val($input.is(":checked") ? "on" : "off");          
-        }                                                                  
+    $('input[name=chkoldhandleirregularcid]').on('change', function (){                                         
+            $("#handleirregularcid").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change"); 
 
 //	changeActivateDefault();

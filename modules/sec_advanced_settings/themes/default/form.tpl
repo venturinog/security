@@ -18,11 +18,11 @@
 		    <td align="left" >
                         <b>{$status_ipbx_frontend.LABEL}:</b>
                     </td>
-		    <td align="left" ><input type="hidden" name="oldstatus_ipbx_frontend" id="oldstatus_ipbx_frontend" value="{if $value_ipbx_frontend}1{else}0{/if}" /><input type="checkbox" name="status_ipbx_frontend" id="status_ipbx_frontend" {if $value_ipbx_frontend}checked="checked"{/if} /></td>
+		    <td align="left" ><input type="hidden" name="oldstatus_ipbx_frontend" id="oldstatus_ipbx_frontend" value="{if $value_ipbx_frontend}1{else}0{/if}" /><div class="form-check form-switch"><input type="checkbox" class="form-check-input" role="switch" name="status_ipbx_frontend" id="status_ipbx_frontend" {if $value_ipbx_frontend}checked="checked"{/if} /></div></td>
 		</tr>
         <tr class="letra12">
             <td align="left" ><b>{$status_anonymous_sip.LABEL}:</b></td>
-            <td align="left" ><input type="hidden" name="oldstatus_anonymous_sip" id="oldstatus_anonymous_sip" value="{if $value_anonymous_sip}1{else}0{/if}" /><input type="checkbox" name="status_anonymous_sip" id="status_anonymous_sip" {if $value_anonymous_sip}checked="checked"{/if} /></td>
+            <td align="left" ><input type="hidden" name="oldstatus_anonymous_sip" id="oldstatus_anonymous_sip" value="{if $value_anonymous_sip}1{else}0{/if}" /><div class="form-check form-switch"><input type="checkbox" class="form-check-input" role="switch" name="status_anonymous_sip" id="status_anonymous_sip" {if $value_anonymous_sip}checked="checked"{/if} /></div></td>
         </tr>
 	    </table>
 	</td>

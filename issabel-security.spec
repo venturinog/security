@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 2
+Release: 3
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -233,6 +233,10 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Mon Oct 12 2026 Issabel Foundation <info@issabel.org> - 6.0.0-3
+- sec_advanced_settings, sec_fb_admin and sec_fb_banned: drop the jQuery iButton
+  plugin (and its assets); the toggles now use the theme's Bootstrap 5 switch.
+
 * Fri Oct 09 2026 Issabel Foundation <info@issabel.org> - 6.0.0-2
 - Drop the legacy cyrus jail from the fail2ban seed: Issabel 6 no longer ships
   a local mail server.

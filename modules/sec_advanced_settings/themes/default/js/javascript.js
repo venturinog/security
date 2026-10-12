@@ -1,9 +1,7 @@
 function prepararBoton(s)
 {
-	$("#" + s).iButton({
-		labelOn:	"On",
-		labelOff:	"Off",
-		change: function ($input) {
+	$("#" + s).on('change', function () {
+		var $input = $(this);
 			var arrAction = {
 				menu:		'sec_advanced_settings',
 				rawmode:	'yes',
@@ -57,8 +55,7 @@ function prepararBoton(s)
 					}
 				});
 			}
-		}
-	});
+		});
 }
 
 $(document).ready(function () {

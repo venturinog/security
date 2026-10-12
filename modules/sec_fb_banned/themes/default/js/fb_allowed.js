@@ -1,9 +1,5 @@
 $(document).ready(function(){
-    $('input[name=chkoldavailability]').iButton({
-        labelOn: "On",
-        labelOff: "Off",
-        change: function ($input){
-            $("#availability").val($input.is(":checked") ? "on" : "off");
-        }
+    $('input[name=chkoldavailability]').on('change', function (){
+            $("#availability").val($(this).is(":checked") ? "on" : "off");
     }).trigger("change");
 });
