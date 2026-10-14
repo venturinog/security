@@ -57,7 +57,7 @@ $(document).ready(function(){
     // new event handler for cancel as form is inside a modal now
     $(document).on('click',"[name*='cancel']", function(e) {
         e.preventDefault();
-        $('#editRule').modal('hide');
+        issabelRuleModal('hide');
         return false;
     });
 
@@ -370,7 +370,7 @@ function dt() {
             { 
                data: 'id', 
                render: function(data,type,row,meta) {
-                   return "<input type=\"checkbox\" class=\"form-control selcheck\" name=\"selectedRow[]\" value=\""+row.id+"\" >";
+                   return "<input type=\"checkbox\" class=\"selcheck\" name=\"selectedRow[]\" value=\""+row.id+"\" >";
                }
              },
             { 
@@ -515,7 +515,7 @@ function dt() {
             { 
                data: 'id', 
                render: function(data,type,row,meta) {
-                   return "<input type=\"checkbox\" class=\"form-control selcheck\" name=\"selectedRowGeo[]\" value=\""+row.id+"\" >";
+                   return "<input type=\"checkbox\" class=\"selcheck\" name=\"selectedRowGeo[]\" value=\""+row.id+"\" >";
                }
              },
             { 
@@ -826,6 +826,42 @@ function checkExecute() {
     }, 500);
 }
 
+/* El tema Modern usa Tabler (Bootstrap 5) y no expone el plugin jQuery
+ * .modal() de Bootstrap 3/4. El bundle UMD de Tabler publica su API en
+ * window.tabler (tabler.Modal / tabler.bootstrap.Modal), no en
+ * window.bootstrap; se prueban ambas y, como último recurso, se muestra
+ * el modal a mano (mismo criterio que el módulo storage). */
+function issabelRuleModal(action) {
+    var el = document.getElementById('editRule');
+    if (!el) return;
+
+    var modalApi = null;
+    if (window.bootstrap && bootstrap.Modal) {
+        modalApi = bootstrap.Modal;
+    } else if (window.tabler && tabler.bootstrap && tabler.bootstrap.Modal) {
+        modalApi = tabler.bootstrap.Modal;
+    } else if (window.tabler && tabler.Modal) {
+        modalApi = tabler.Modal;
+    }
+
+    if (modalApi) {
+        var inst = modalApi.getOrCreateInstance(el);
+        if (action === 'hide') inst.hide(); else inst.show();
+        return;
+    }
+    if ($.fn.modal) {
+        $(el).modal(action);
+        return;
+    }
+    if (action === 'hide') {
+        el.classList.remove('show');
+        el.style.display = 'none';
+    } else {
+        el.classList.add('show');
+        el.style.display = 'block';
+    }
+}
+
 function styleForm() {
 
      showElementByTraffic();
@@ -850,7 +886,8 @@ function styleForm() {
      $('#geoipcountries___chosen').find('.chosen-choices > li > input').css('width','300px');
 
      mainContentWidth = $('.main-content').css('width');
-     $('#editRule').modal('show').css('top',$(window).scrollTop());
+     issabelRuleModal('show');
+     $('#editRule').css('top',$(window).scrollTop());
 }
 
 $(document).on('submit','form', function(e) {
@@ -867,7 +904,7 @@ $(document).on('submit','form', function(e) {
                  toastr['error'](_tr(data.message),_tr(data.title)).css('top',$(window).scrollTop());
               } else {
                  toastr['success'](_tr(data.message),_tr(data.title)).css('top',$(window).scrollTop());
-                 $('#editRule').modal('hide');
+                 issabelRuleModal('hide');
                  table.ajax.reload();
                  geoiptable.ajax.reload();
               }
