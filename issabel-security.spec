@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 6
+Release: 7
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz

@@ -878,12 +878,10 @@ function styleForm() {
      $("SELECT[name='geoipcountries[]']").chosen({group_selectable:true});
      $("SELECT[name='geoipcontinents[]']").chosen({group_selectable:true});
      $('.chosen-container').css({"width": "200px"});
-     $('#geoipcontinents___chosen').css({"width": "300px"});
-     $('#geoipcontinents___chosen').find('.chosen-drop').css({"width": "300px"});
-     $('#geoipcontinents___chosen').find('.chosen-choices > li > input').css('width','300px');
-     $('#geoipcountries___chosen').css({"width": "300px"});
-     $('#geoipcountries___chosen').find('.chosen-drop').css({"width": "300px"});
-     $('#geoipcountries___chosen').find('.chosen-choices > li > input').css('width','300px');
+     /* Los multiselect de GeoIP iban a 300px fijos y se salían de la columna
+      * del formulario; se ajustan al ancho disponible de su celda. */
+     $('#geoipcontinents___chosen, #geoipcountries___chosen').css({"width": "100%"});
+     $('#geoipcontinents___chosen .chosen-drop, #geoipcountries___chosen .chosen-drop').css({"width": "100%"});
 
      mainContentWidth = $('.main-content').css('width');
      issabelRuleModal('show');
