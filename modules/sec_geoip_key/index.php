@@ -101,6 +101,7 @@ function viewFormGeoIP_KEY($smarty, $module_name, $local_templates_dir, &$pDB, $
     $smarty->assign("EDIT", _tr("Edit"));
     $smarty->assign("CANCEL", _tr("Cancel"));
     $smarty->assign("REQUIRED_FIELD", _tr("Required field"));
+    $smarty->assign("MAXMIND_SIGNUP", _tr("maxmind signup"));
     $smarty->assign("icon", "images/list.png");
 
     $htmlForm = $oForm->fetchForm("$local_templates_dir/form.tpl",_tr("GeoIP KEY"), $_DATA);

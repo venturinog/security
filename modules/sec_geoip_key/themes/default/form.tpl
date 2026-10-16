@@ -24,8 +24,6 @@
     <input class="button" type="hidden" name="id" value="{$ID}" />
     <br>
     <a href="https://www.maxmind.com/en/geolite2/signup" target="_blank">
-    {php}
-    echo _tr("maxmind signup");
-    {/php}
+    {$MAXMIND_SIGNUP}
     </a>
 </div>
