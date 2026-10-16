@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 8
+Release: 9
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -107,7 +107,7 @@ mv menu.xml $RPM_BUILD_ROOT%{_datadir}/issabel/module_installer/%{name}-%{versio
 mkdir -p %{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
 touch %{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/preversion_%{modname}.info
 if [ $1 -eq 2 ]; then
-    rpm -q --queryformat='%{VERSION}-%{RELEASE}' %{name} > %{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/preversion_%{modname}.info
+    rpm -q --queryformat='%%{VERSION}-%%{RELEASE}' %{name} > %{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/preversion_%{modname}.info
 fi
 
 %post
@@ -233,6 +233,12 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Fri Oct 16 2026 Issabel Foundation <info@issabel.org> - 6.0.0-9
+- Escape the rpm queryformat used to record the pre-version on upgrade.
+  The VERSION and RELEASE macros were expanded at build time, so %pre always
+  wrote the new version and issabel-dbprocess skipped every version_sql
+  migration. They are now escaped so rpm expands them at run time.
+
 * Thu Oct 15 2026 Issabel Foundation <info@issabel.org> - 6.0.0-8
 - GeoIP Key: replace the removed Smarty {php} tag with a value assigned from
   PHP, so the form compiles under Smarty 4 and no longer returns a 500 error.
