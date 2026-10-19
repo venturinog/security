@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 9
+Release: 10
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -233,6 +233,11 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Mon Oct 19 2026 Issabel Foundation <info@issabel.org> - 6.0.0-10
+- Let's Encrypt: use the theme alert primitives. The page used the Bootstrap 3
+  "alert alert-*" classes, which Tabler does not have, so the notices showed
+  without any style.
+
 * Fri Oct 16 2026 Issabel Foundation <info@issabel.org> - 6.0.0-9
 - Escape the rpm queryformat used to record the pre-version on upgrade.
   The VERSION and RELEASE macros were expanded at build time, so %pre always

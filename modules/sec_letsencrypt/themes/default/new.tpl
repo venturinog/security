@@ -1,6 +1,6 @@
 {if $NO_HOSTNAME_NOTICE ne ''}
 <br/>
-<div class="alert alert-danger">
+<div class="iss-alert iss-alert--error">
 {$NO_HOSTNAME_NOTICE}
 </div>
 
@@ -11,7 +11,7 @@
 {if $valueemail eq ''}
     <h3>{$INSTALLNEW}</h3>
 {else}
-       <div id="varstat" class="alert alert-success" align="center">
+       <div id="varstat" class="iss-alert iss-alert--success" align="center">
            <strong>{$HASDATA}</strong>
        </div>
 {/if}
