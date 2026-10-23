@@ -2,10 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0.2                                               |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,29 +17,29 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
+  | The Initial Developer of the Original Code is Issabel Foundation     |
   +----------------------------------------------------------------------+
-  $Id: paloSantoPortKnockUsers.class.php,v 1.1 2010-12-13 03:09:33  Exp $ */
-
+*/
 global $arrLangModule;
 $arrLangModule = array(
-'ERROR' => 'ERROR',
-'Message' => 'Message',
-'Revocation successful' => 'Revocation successful',
-'PortKnock Users' => 'PortKnock Users',
-'User' => 'User',
-'Authorized ports' => 'Authorized ports',
-'Revoke authorizations' => 'Revoke authorizations',
-'Are you sure you wish to revoke the user authorizations?' => 'Are you sure you wish to revoke the user authorizations?',
-'Authorize new user' => 'Authorize new user',
-'Add/Remove Ports' => 'Add/Remove Ports',
-'Port' => 'Port',
-'Ports' => 'Ports',
-'Type' => 'Type',
-'Code' => 'Code',
-'Protocol Number' => 'Protocol Number',
-'Add/remove ports for user' => 'Add/remove ports for user',
-'Protocol' => 'Protocol',
-'Details' => 'Details',
+    'Add/Remove Ports' => 'Add/Remove Ports',
+    'Add/remove ports for user' => 'Add/remove ports for user',
+    'Apply changes' => 'Apply changes',
+    'Are you sure you wish to revoke the user authorizations?' => 'Are you sure you wish to revoke the user authorizations?',
+    'Authorize new user' => 'Authorize new user',
+    'Authorized ports' => 'Authorized ports',
+    'Code' => 'Code',
+    'Details' => 'Details',
+    'ERROR' => 'ERROR',
+    'Message' => 'Message',
+    'Options' => 'Options',
+    'Port' => 'Port',
+    'PortKnock Users' => 'PortKnock Users',
+    'Ports' => 'Ports',
+    'Protocol' => 'Protocol',
+    'Protocol Number' => 'Protocol Number',
+    'Revocation successful' => 'Revocation successful',
+    'Revoke authorizations' => 'Revoke authorizations',
+    'Type' => 'Type',
+    'User' => 'User',
 );
-?>

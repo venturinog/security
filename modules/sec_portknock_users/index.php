@@ -63,18 +63,17 @@ function listPortKnockUsers(&$smarty, $module_name, $local_templates_dir, &$pDB,
 
     // Manejar la operación de borrar todas las autorizaciones de un usuario
     if (isset($_POST['delete']) && isset($_POST['id_user'])) {
-    	$r = $pk->deleteUserAuthorizations($_POST['id_user']);
+        $id_user_del = (int)$_POST['id_user'];
+        $r = $pk->deleteUserAuthorizations($id_user_del);
         if (!$r) {
-            $smarty->assign("mb_title", _tr("ERROR"));
-            $smarty->assign("mb_message", $pk->errMsg);
+            $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pk->errMsg));
         } else {
             // Ejecutar iptables para revocar las reglas del usuario
             require_once "modules/sec_rules/libs/paloSantoRules.class.php";
             $pr = new paloSantoRules($pDB);
             $pr->activateRules();
 
-            $smarty->assign("mb_title", _tr("Message"));
-            $smarty->assign("mb_message", _tr("Revocation successful"));
+            $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("Revocation successful")));
         }
     }
 
@@ -94,11 +93,12 @@ function listPortKnockUsers(&$smarty, $module_name, $local_templates_dir, &$pDB,
     		$userinfo = $pACL->getUsers($id_user);
             $protocols = array();
             foreach ($auths as $a) { $protocols[] = $a['name']; }
+            $login = isset($userinfo[0][1]) ? $userinfo[0][1] : '';
             $data[] = array(
-                '<input type="radio" name="id_user" value="'.$id_user.'" />',
-                $userinfo[0][1],    // Nombre de login del usuario
-                implode(' ', $protocols),
-                "<a href=\"?menu=$module_name&amp;action=edit&amp;id_user=$id_user\">["._tr('Add/Remove Ports')."]</a>"
+                '<input type="radio" name="id_user" value="'.(int)$id_user.'" />',
+                htmlspecialchars($login, ENT_COMPAT, 'UTF-8'),
+                htmlspecialchars(implode(' ', $protocols), ENT_COMPAT, 'UTF-8'),
+                "<a href=\"?menu=$module_name&amp;action=edit&amp;id_user=".(int)$id_user."\">["._tr('Add/Remove Ports')."]</a>"
             );
     	}
     }
@@ -110,7 +110,7 @@ function listPortKnockUsers(&$smarty, $module_name, $local_templates_dir, &$pDB,
     );    
     $oGrid->setURL($url);
     $oGrid->setData($data);
-    return $oGrid->fetchGrid();
+    return $smarty->getTemplateVars('SECURITY_ALERT').$oGrid->fetchGrid();
 }
 
 function addRemovePortsUser($smarty, $module_name, $local_templates_dir, $pDB, $arrConf)
@@ -158,8 +158,7 @@ function addRemovePortsUser($smarty, $module_name, $local_templates_dir, $pDB, $
         foreach ($portauths as $id_port => $id_auth) {
         	if (!in_array($id_port, $listaNuevosPuertos)) {
         		if (!$pk->deleteAuthorization($id_auth)) {
-                    $smarty->assign("mb_title", _tr("ERROR"));
-                    $smarty->assign("mb_message", $pk->errMsg);
+                    $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pk->errMsg));
         			$bExito = FALSE;
                     break;
         		} else {
@@ -175,8 +174,7 @@ function addRemovePortsUser($smarty, $module_name, $local_templates_dir, $pDB, $
         	if (in_array($id_port, $listaIdPuertos) && !isset($portauths[$id_port])) {
         		$id_nueva_auth = $pk->insertAuthorization($id_user, $id_port);
                 if (is_null($id_nueva_auth)) {
-                    $smarty->assign("mb_title", _tr("ERROR"));
-                    $smarty->assign("mb_message", $pk->errMsg);
+                    $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pk->errMsg));
                     $bExito = FALSE;
                     break;
         		} else {
@@ -242,6 +240,6 @@ function addRemovePortsUser($smarty, $module_name, $local_templates_dir, $pDB, $
     );    
     $oGrid->setURL($url);
     $oGrid->setData($data);
-    return $oGrid->fetchGrid();
+    return $smarty->getTemplateVars('SECURITY_ALERT').$oGrid->fetchGrid();
 }
 ?>

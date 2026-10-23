@@ -1,0 +1,43 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Add/Remove Ports' => '添加/删除端口',
+    'Add/remove ports for user' => '为用户添加/删除端口',
+    'Apply changes' => '改变生效',
+    'Are you sure you wish to revoke the user authorizations?' => '您确定要撤销用户授权吗？',
+    'Authorize new user' => '授权新用户',
+    'Authorized ports' => '授权港口',
+    'Code' => '代码',
+    'Details' => '详情',
+    'ERROR' => 'Error',
+    'Message' => '留言',
+    'Options' => '选项',
+    'Port' => '端口',
+    'PortKnock Users' => '端口敲门用户',
+    'Ports' => '港口',
+    'Protocol' => '协议',
+    'Protocol Number' => '协议号',
+    'Revocation successful' => '撤销成功',
+    'Revoke authorizations' => '撤销授权',
+    'Type' => '类型',
+    'User' => '用户',
+);

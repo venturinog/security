@@ -1,0 +1,43 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Add/Remove Ports' => 'Ajouter/Supprimer des ports',
+    'Add/remove ports for user' => 'Ajouter/supprimer des ports pour l\'utilisateur',
+    'Apply changes' => 'Appliquer les changements',
+    'Are you sure you wish to revoke the user authorizations?' => 'Êtes-vous sûr de vouloir révoquer les autorisations des utilisateurs ?',
+    'Authorize new user' => 'Autoriser un nouvel utilisateur',
+    'Authorized ports' => 'Ports autorisés',
+    'Code' => 'Coder',
+    'Details' => 'Détails',
+    'ERROR' => 'Erreur',
+    'Message' => 'Message',
+    'Options' => 'Options',
+    'Port' => 'Port',
+    'PortKnock Users' => 'Utilisateurs de PortKnock',
+    'Ports' => 'Ports',
+    'Protocol' => 'Protocole',
+    'Protocol Number' => 'Numéro de protocole',
+    'Revocation successful' => 'Révocation réussie',
+    'Revoke authorizations' => 'Révoquer les autorisations',
+    'Type' => 'Type',
+    'User' => 'Utilisateur',
+);

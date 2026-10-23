@@ -1,0 +1,43 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Add/Remove Ports' => 'Dodaj/ukloni priključke',
+    'Add/remove ports for user' => 'Dodaj/ukloni priključke za korisnika',
+    'Apply changes' => 'Primjeni izmjene',
+    'Are you sure you wish to revoke the user authorizations?' => 'Jeste li sigurni da želite opozvati korisnička ovlaštenja?',
+    'Authorize new user' => 'Ovlasti novog korisnika',
+    'Authorized ports' => 'Ovlaštene luke',
+    'Code' => 'Šifra',
+    'Details' => 'pojedinosti',
+    'ERROR' => 'Error',
+    'Message' => 'Poruka',
+    'Options' => 'Opcije',
+    'Port' => 'Port',
+    'PortKnock Users' => 'PortKnock korisnici',
+    'Ports' => 'luke',
+    'Protocol' => 'Protokol',
+    'Protocol Number' => 'Broj protokola',
+    'Revocation successful' => 'Opoziv uspješan',
+    'Revoke authorizations' => 'Opozvati ovlaštenja',
+    'Type' => 'Vrsta',
+    'User' => 'Korisnik',
+);

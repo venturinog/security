@@ -1,0 +1,43 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Add/Remove Ports' => 'Добавяне/премахване на портове',
+    'Add/remove ports for user' => 'Добавяне/премахване на портове за потребителя',
+    'Apply changes' => 'Приложи Промените',
+    'Are you sure you wish to revoke the user authorizations?' => 'Сигурни ли сте, че искате да отмените потребителските права?',
+    'Authorize new user' => 'Упълномощаване на нов потребител',
+    'Authorized ports' => 'Оторизирани пристанища',
+    'Code' => 'Код',
+    'Details' => 'Подробности',
+    'ERROR' => 'Error',
+    'Message' => 'Съобщение',
+    'Options' => 'Опции',
+    'Port' => 'Порт',
+    'PortKnock Users' => 'Потребители на PortKnock',
+    'Ports' => 'Портове',
+    'Protocol' => 'протокол',
+    'Protocol Number' => 'Номер на протокола',
+    'Revocation successful' => 'Отмяната е успешна',
+    'Revoke authorizations' => 'Отмяна на разрешения',
+    'Type' => 'Тип',
+    'User' => 'Потребител',
+);

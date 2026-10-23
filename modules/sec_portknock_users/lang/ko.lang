@@ -1,0 +1,43 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Add/Remove Ports' => '포트 추가/제거',
+    'Add/remove ports for user' => '사용자용 포트 추가/제거',
+    'Apply changes' => '수정사항 적용',
+    'Are you sure you wish to revoke the user authorizations?' => '사용자 인증을 취소하시겠습니까?',
+    'Authorize new user' => '새 사용자 승인',
+    'Authorized ports' => '승인된 포트',
+    'Code' => '코드',
+    'Details' => '세부정보',
+    'ERROR' => 'Error',
+    'Message' => '메시지',
+    'Options' => '옵션',
+    'Port' => '포트',
+    'PortKnock Users' => '포트노크 사용자',
+    'Ports' => '포트',
+    'Protocol' => '프로토콜',
+    'Protocol Number' => '프로토콜 번호',
+    'Revocation successful' => '취소 성공',
+    'Revoke authorizations' => '승인 취소',
+    'Type' => '유형',
+    'User' => '사용자',
+);

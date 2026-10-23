@@ -1,0 +1,43 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Add/Remove Ports' => 'Προσθήκη/Αφαίρεση θυρών',
+    'Add/remove ports for user' => 'Προσθήκη/αφαίρεση θυρών για τον χρήστη',
+    'Apply changes' => 'Εφαρμογή Αλλαγών',
+    'Are you sure you wish to revoke the user authorizations?' => 'Είστε βέβαιοι ότι θέλετε να ανακαλέσετε τις εξουσιοδοτήσεις χρηστών;',
+    'Authorize new user' => 'Εξουσιοδότηση νέου χρήστη',
+    'Authorized ports' => 'Εξουσιοδοτημένα λιμάνια',
+    'Code' => 'Κωδικός',
+    'Details' => 'Λεπτομέρειες',
+    'ERROR' => 'Error',
+    'Message' => 'Μήνυμα',
+    'Options' => 'Επιλογές',
+    'Port' => 'Θύρα',
+    'PortKnock Users' => 'Χρήστες PortKnock',
+    'Ports' => 'λιμάνια',
+    'Protocol' => 'Πρωτόκολλο',
+    'Protocol Number' => 'Αριθμός πρωτοκόλλου',
+    'Revocation successful' => 'Επιτυχής ανάκληση',
+    'Revoke authorizations' => 'Ανάκληση εξουσιοδοτήσεων',
+    'Type' => 'Τύπος',
+    'User' => 'Χρήστης',
+);
