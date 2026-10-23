@@ -104,11 +104,7 @@ function action_flushFirewall($opt)
 function action_loadFirewall($opt)
 {
 
-    $dispGEOIP = FALSE;
-    exec("/usr/sbin/modprobe xt_geoip", $output, $return);
-    if ($return == 0) {
-        $dispGEOIP = TRUE;
-    }
+    $dispGEOIP = geoip_available();
 
     $bExito = TRUE;
     $bFirewallActivo = FALSE;
@@ -220,7 +216,18 @@ PETICION_PK;
                     'sport, dport, target, state, countries, continents ' .
                 'FROM  filter WHERE activated = 1 ORDER BY rule_order');
             $rules = array_merge($rules, $sth->fetchAll(PDO::FETCH_ASSOC));
-        } 
+        }
+
+        $geoRules = 0;
+        foreach ($rules as $r) {
+            if (isset($r['protocol']) && $r['protocol'] === 'GEOIP') $geoRules++;
+        }
+        if ($geoRules > 0 && !$dispGEOIP) {
+            fputs(STDERR, "GeoIP rules are configured but the geoip match is unavailable.\n"
+                . "Install xtables-addons (>= 3.27 for kernel 6.12) and generate /usr/share/xt_geoip "
+                . "(/etc/cron.daily/geoip_update.sh), then retry.\n");
+            return FALSE;
+        }
     } catch (PDOException $e) {            
         $bExito = FALSE;
         fprintf(STDERR, "ERR: failed to query firewall rules - %s\n", $e->getMessage());
@@ -400,7 +407,7 @@ PETICION_PK;
             $cuantos_paises = count($countries);
     
             if($cuantos_paises<10) {
-                $commandParams[] = "-m geoip --src-cc ".implode($countries,',')." -j ".escapeshellarg('RETURN');
+                $commandParams[] = "-m geoip --src-cc ".implode(',', $countries)." -j ".escapeshellarg('RETURN');
             } else {
                 // split countries in multiple commands because of limit in geoip matching
                 $subsetcommand = array();
@@ -437,7 +444,7 @@ PETICION_PK;
             $cuantos_paises = count($countries);
 
             if($cuantos_paises<10) {
-                $commandParams[] = "-m geoip --src-cc ".implode($countries,',')." -m state --state NEW -j ".escapeshellarg($rule['target']);
+                $commandParams[] = "-m geoip --src-cc ".implode(',', $countries)." -m state --state NEW -j ".escapeshellarg($rule['target']);
             } else {
                 // split countries in multiple commands because of limit in geoip matching
                 $subsetcommand = array();
@@ -547,13 +554,47 @@ function manageF2B($opt)
     }
 }
 
+/**
+ * Comprueba las tres piezas necesarias para -m geoip: librería de usuarios,
+ * módulo del kernel y datos binarios. `modprobe` a secas no basta: si el
+ * módulo ya está cargado devuelve 0 aunque falte libxt_geoip.so.
+ */
+function geoip_available() {
+    $hasLib = FALSE;
+    foreach (array('/usr/lib64/xtables/libxt_geoip.so', '/usr/lib/xtables/libxt_geoip.so') as $lib) {
+        if (is_file($lib)) { $hasLib = TRUE; break; }
+    }
+    if (!$hasLib) return FALSE;
+
+    exec('/usr/sbin/modprobe xt_geoip 2>&1', $output, $return);
+    if ($return != 0) return FALSE;
+
+    $data = glob('/usr/share/xt_geoip/BE/*.iv4');
+    if (!$data) $data = glob('/usr/share/xt_geoip/LE/*.iv4');
+    if (!$data) $data = glob('/usr/share/xt_geoip/BE/*.iv6');
+    if (!$data) $data = glob('/usr/share/xt_geoip/LE/*.iv6');
+    if (empty($data)) return FALSE;
+
+    // Comprobación final: que iptables pueda cargar el match (backend nft
+    // incluido). Si falla aquí, tampoco funcionará en --load.
+    exec('/sbin/iptables -w -m geoip -h 2>&1', $out, $ret);
+    return $ret == 0;
+}
+
 function isactivegeoip() {
-    exec("/usr/sbin/lsmod | grep xt_geoip", $output, $return);
-    if ($return != 0) {
-        echo "xt_geoip module not installed";
+    if (!geoip_available()) {
+        echo "GeoIP match unavailable: install xtables-addons and generate /usr/share/xt_geoip\n";
         return FALSE;
     }
     return TRUE;
+}
+
+function geoip_country_code($ip) {
+    exec('/usr/bin/geoiplookup ' . escapeshellarg($ip) . ' 2>/dev/null', $output, $return);
+    if ($return == 0 && isset($output[0]) && preg_match('/:\s*([A-Z]{2})\b/', $output[0], $m)) {
+        return $m[1];
+    }
+    return 'ZZ';
 }
 
 function listgeopass() {
@@ -592,7 +633,7 @@ function fail2banblocked() {
         exec("iptables -nL $line | grep 'DROP\|REJECT' | awk '{ print \$4 }'", $output2, $return2);
         if(count($output2)>0) {
             foreach($output2 as $ip) {
-                $country = geoip_country_code_by_name($ip);
+                $country = geoip_country_code($ip);
                 if(!isset($blocked[$country])) { $blocked[$country]=0; }
                 $blocked[$country]++;
             }
@@ -602,18 +643,17 @@ function fail2banblocked() {
 }
 
 function homecountry() {
-   $ch = curl_init();
-   curl_setopt($ch, CURLOPT_URL, 'http://myip.issabel.org:5060/whatismyip.php'); 
-   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
-   curl_setopt($ch, CURLOPT_HEADER, 0); 
-   $publicIP = curl_exec($ch); 
-   curl_close($ch); 
-   if ($publicIP=='') {
-       echo 'ZZ';
-   } else {
-      $country = geoip_country_code_by_name($publicIP);
-      echo "$country,$publicIP";
-   }
+    // Sin consultas externas: se usa la IP de origen de la ruta por defecto.
+    $ip = '';
+    exec("/usr/sbin/ip -4 route get 1.1.1.1 2>/dev/null", $output, $return);
+    if ($return == 0 && isset($output[0]) && preg_match('/\bsrc (\S+)/', $output[0], $m)) {
+        $ip = $m[1];
+    }
+    if ($ip === '') {
+        echo 'ZZ';
+        return;
+    }
+    echo geoip_country_code($ip) . "," . $ip;
 }
 
 function action_isactive() {
@@ -662,7 +702,7 @@ function generate_save_file() {
 
 function reorder_geoip($db) {
 
-    $query="SELECT rowid,rule_order FROM filter WHERE protocol='GEOIP' ORDER BY rule_order";
+    $query="SELECT rowid AS id,rule_order FROM filter WHERE protocol='GEOIP' ORDER BY rule_order";
     $res = $db->query($query);
     $neworder=100000;
     while($row = $res->fetchArray()) {
@@ -671,86 +711,96 @@ function reorder_geoip($db) {
         $db->exec($query);
     }
 
-    $query="SELECT rowid,rule_order FROM filter WHERE protocol='GEOIP' ORDER BY rule_order";
-    $res = $db->query($query);
-    $neworder=100000;
-    while($row = $res->fetchArray()) {
-        print_r($row);
+}
+
+function _ipt_exists($chain, $rule)
+{
+    exec('/sbin/iptables -w -C '.$chain.' '.$rule.' 2>/dev/null', $out, $ret);
+    return $ret == 0;
+}
+
+function _ipt_delete($chain, $rule)
+{
+    if (_ipt_exists($chain, $rule)) {
+        exec('/sbin/iptables -w -D '.$chain.' '.$rule.' 2>&1', $out, $ret);
     }
 }
 
-function block_country($country) {
+function _ipt_insert($chain, $rule)
+{
+    exec('/sbin/iptables -w -I '.$chain.' '.$rule.' 2>&1', $out, $ret);
+    if ($ret != 0) {
+        fwrite(STDERR, implode("\n", $out)."\n");
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Aplica un cambio de país de forma atómica: primero valida que el match
+ * GeoIP exista, luego modifica la BD y sólo confirma si iptables aceptó las
+ * reglas. Si algo falla, la BD vuelve atrás.
+ */
+function _geoip_change($country, $mode)
+{
+    if (!geoip_available() || !preg_match('/^[A-Z]{2}$/', $country)) {
+        fwrite(STDERR, "GeoIP match unavailable or invalid country code\n");
+        return false;
+    }
 
     $db = new SQLite3('/var/www/db/iptables.db');
+    $db->busyTimeout(5000);
+    $iso = SQLite3::escapeString($country);
+    $db->exec('BEGIN');
 
-    $query = "DELETE FROM filter WHERE protocol='GEOIP' AND countries='$country' AND (target='DROP' OR target='REJECT')";
-    $db->exec($query);
+    $db->exec("DELETE FROM filter WHERE protocol='GEOIP' AND countries='$iso' AND (target='DROP' OR target='REJECT')");
+    $db->exec("DELETE FROM filter WHERE protocol='GEOIP' AND countries='$iso' AND target='ACCEPT'");
 
-    $query = "DELETE FROM filter WHERE protocol='GEOIP' AND countries='$country' AND target='ACCEPT'";
-    $db->exec($query);
-        
-    $query = "INSERT INTO filter (protocol,countries,target,rule_order,traffic,eth_in,eth_out,ip_source,ip_destiny,continents) VALUES ('GEOIP','$country','DROP',100000,'INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','')";
-    $db->exec($query);
-
+    if ($mode === 'block') {
+        $db->exec("INSERT INTO filter (protocol,countries,target,rule_order,traffic,eth_in,eth_out,ip_source,ip_destiny,continents) VALUES ('GEOIP','$iso','DROP',100000,'INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','')");
+    } elseif ($mode === 'whitelist') {
+        $db->exec("INSERT INTO filter (protocol,countries,target,rule_order,traffic,eth_in,eth_out,ip_source,ip_destiny,continents) VALUES ('GEOIP','$iso','ACCEPT',100000,'INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','')");
+    }
     reorder_geoip($db);
 
-    exec("iptables -D ISSABEL_INPUT_GEOIP -m geoip --src-cc $country -j RETURN", $output, $return);
-    exec("iptables -D ISSABEL_INPUT_GEOIP -m geoip --src-cc $country -m state --state NEW -j DROP", $output, $return);
-    exec("iptables -I ISSABEL_INPUT_GEOIP -m geoip --src-cc $country -m state --state NEW -j DROP", $output, $return);
+    $cc = escapeshellarg($country);
+    $chain = 'ISSABEL_INPUT_GEOIP';
+    $dropRule   = "-m geoip --src-cc $cc -m state --state NEW -j DROP";
+    $returnRule = "-m geoip --src-cc $cc -j RETURN";
 
-    if($return==1) { 
-        return FALSE; 
-    } else { 
-        return TRUE; 
+    _ipt_delete($chain, $dropRule);
+    _ipt_delete($chain, $returnRule);
+
+    $ok = true;
+    if ($mode === 'block') {
+        $ok = _ipt_insert($chain, $dropRule);
+    } elseif ($mode === 'whitelist') {
+        $ok = _ipt_insert($chain, $returnRule);
     }
+
+    if (!$ok) {
+        $db->exec('ROLLBACK');
+        $db->close();
+        return false;
+    }
+
+    $db->exec('COMMIT');
+    $db->close();
+    return true;
 }
 
-function whitelist_country($country) {
-    $db = new SQLite3('/var/www/db/iptables.db');
-
-    $query = "DELETE FROM filter WHERE protocol='GEOIP' AND countries='$country' AND (target='DROP' OR target='REJECT')";
-    $db->exec($query);
-
-    $query = "DELETE FROM filter WHERE protocol='GEOIP' AND countries='$country' AND target='ACCEPT'";
-    $db->exec($query);
-        
-    $query = "INSERT INTO filter (protocol,countries,target,rule_order,traffic,eth_in,eth_out,ip_source,ip_destiny,continents) VALUES ('GEOIP','$country','ACCEPT',100000,'INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','')";
-    $db->exec($query);
-
-    reorder_geoip($db);
-
-    exec("iptables -D ISSABEL_INPUT_GEOIP -m geoip --src-cc $country -m state --state NEW -j DROP", $output, $return);
-    exec("iptables -D ISSABEL_INPUT_GEOIP -m geoip --src-cc $country -j RETURN", $output, $return);
-    exec("iptables -I ISSABEL_INPUT_GEOIP -m geoip --src-cc $country -j RETURN", $output, $return);
-
-    if($return==1) { 
-        return FALSE; 
-    } else { 
-        return TRUE; 
-    }
+function block_country($country)
+{
+    return _geoip_change($country, 'block');
 }
 
-function none_country($country) {
-
-    $db = new SQLite3('/var/www/db/iptables.db');
-
-    $query = "DELETE FROM filter WHERE protocol='GEOIP' AND countries='$country' AND (target='DROP' OR target='REJECT')";
-    $db->exec($query);
-
-    $query = "DELETE FROM filter WHERE protocol='GEOIP' AND countries='$country' AND target='ACCEPT'";
-    $db->exec($query);
-
-    reorder_geoip($db);
- 
-    exec("iptables -D ISSABEL_INPUT_GEOIP -m geoip --src-cc $country -m state --state NEW -j DROP", $output, $return);
-    exec("iptables -D ISSABEL_INPUT_GEOIP -m geoip --src-cc $country -j RETURN", $output, $return);
-
-    if($return==1) { 
-        return FALSE; 
-    } else { 
-        return TRUE; 
-    }
+function whitelist_country($country)
+{
+    return _geoip_change($country, 'whitelist');
 }
 
-
+function none_country($country)
+{
+    return _geoip_change($country, 'none');
+}
 ?>
