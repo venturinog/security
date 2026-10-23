@@ -1,0 +1,54 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s није исправно',
+    'Back' => 'Назад',
+    'Ban Time (hours)' => 'Време забране (сати)',
+    'Cancel' => 'Откажи',
+    'Count Failed Attempts' => 'Број неуспешних покушаја',
+    'Disable fail2ban' => 'Онемогући фаил2бан',
+    'ERROR' => 'Error',
+    'Edit' => 'Уреди',
+    'Edit Jail' => 'Уреди затвор',
+    'Enable fail2ban' => 'Омогући фаил2бан',
+    'Enabled' => 'Омогућено',
+    'Error' => 'Грешка',
+    'Fail2Ban Jails' => 'Фаил2Бан Јаилс',
+    'Fail2ban has been activated' => 'Фаил2бан је активиран',
+    'Fail2ban has been deactivated' => 'Фаил2бан је деактивиран',
+    'Jails' => 'Затвори',
+    'Message' => 'Порука',
+    'Name' => 'Име',
+    'New Jail' => 'Нови затвор',
+    'No' => 'Не',
+    'Options' => 'Opcije',
+    'Required field' => 'Obavezno polje',
+    'Save' => 'Сачувај',
+    'Save correctly' => 'Сачувај исправно',
+    'The following fields contain errors' => 'Sledeca polja sadrze greske',
+    'Update correctly' => 'Ажурирајте исправно',
+    'Validation Error' => 'Validacijona greska',
+    'View' => 'Прикажи',
+    'View Jail' => 'Погледај затвор',
+    'Whitelist' => 'Бела листа',
+    'Yes' => 'Да',
+);

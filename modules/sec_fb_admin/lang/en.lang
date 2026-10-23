@@ -2,9 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0.0                                                |
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -16,25 +17,40 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
+  | The Initial Developer of the Original Code is Issabel Foundation     |
+  +----------------------------------------------------------------------+
 */
-
 global $arrLangModule;
-$arrLangModule=array(
-"Fail2Ban Jails" => "Fail2Ban Jails",
-"Edit Jail" => "Edit Jail",
-"View Jail" => "View Jail",
-"Name" => "Name",
-"Whitelist" => "Whitelist",
-"Enabled" => "Enabled",
-"View" => "View",
-"Edit" => "Edit",
-"Ban Time (hours)" => "Ban Time (hours)",
-"Count Failed Attempts" => "Count Failed Attempts",
-"Save correctly" => "Changes saved",
-"Update correctly" => "Updated correctly",
-"Message" => "Message",
-"Error" => "Error",
-"The following fields contain errors" => "The following fields contain errors",
-"Validation Error" => "Validation Error",
+$arrLangModule = array(
+    '%s is invalid' => '%s is invalid',
+    'Back' => 'Back',
+    'Ban Time (hours)' => 'Ban Time (hours)',
+    'Cancel' => 'Cancel',
+    'Count Failed Attempts' => 'Count Failed Attempts',
+    'Disable fail2ban' => 'Disable fail2ban',
+    'ERROR' => 'ERROR',
+    'Edit' => 'Edit',
+    'Edit Jail' => 'Edit Jail',
+    'Enable fail2ban' => 'Enable fail2ban',
+    'Enabled' => 'Enabled',
+    'Error' => 'Error',
+    'Fail2Ban Jails' => 'Fail2Ban Jails',
+    'Fail2ban has been activated' => 'Fail2ban has been activated',
+    'Fail2ban has been deactivated' => 'Fail2ban has been deactivated',
+    'Jails' => 'Jails',
+    'Message' => 'Message',
+    'Name' => 'Name',
+    'New Jail' => 'New Jail',
+    'No' => 'No',
+    'Options' => 'Options',
+    'Required field' => 'Required field',
+    'Save' => 'Save',
+    'Save correctly' => 'Changes saved',
+    'The following fields contain errors' => 'The following fields contain errors',
+    'Update correctly' => 'Updated correctly',
+    'Validation Error' => 'Validation Error',
+    'View' => 'View',
+    'View Jail' => 'View Jail',
+    'Whitelist' => 'Whitelist',
+    'Yes' => 'Yes',
 );
-?>

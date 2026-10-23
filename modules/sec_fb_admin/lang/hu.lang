@@ -1,0 +1,54 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s érvénytelen',
+    'Back' => 'Vissza',
+    'Ban Time (hours)' => 'kitiltási idő (óra)',
+    'Cancel' => 'Mégse',
+    'Count Failed Attempts' => 'Sikertelen kísérletek számlálása',
+    'Disable fail2ban' => 'A fail2ban letiltása',
+    'ERROR' => 'Error',
+    'Edit' => 'Szerkesztés',
+    'Edit Jail' => 'Börtön szerkesztése',
+    'Enable fail2ban' => 'A fail2ban engedélyezése',
+    'Enabled' => 'Engedélyezve',
+    'Error' => 'Hiba',
+    'Fail2Ban Jails' => 'Fail2Ban börtönök',
+    'Fail2ban has been activated' => 'A Fail2ban aktiválva lett',
+    'Fail2ban has been deactivated' => 'A Fail2ban deaktiválva lett',
+    'Jails' => 'Börtönök',
+    'Message' => 'Üzenet',
+    'Name' => 'Név',
+    'New Jail' => 'Új börtön',
+    'No' => 'Nem',
+    'Options' => 'Opciók',
+    'Required field' => 'Szükséges mező',
+    'Save' => 'Mentés',
+    'Save correctly' => 'Mentse el helyesen',
+    'The following fields contain errors' => 'A következő mezők hibásak',
+    'Update correctly' => 'Frissítse helyesen',
+    'Validation Error' => 'Érvényesítési hiba',
+    'View' => 'Megtekintés',
+    'View Jail' => 'Börtön megtekintése',
+    'Whitelist' => 'Fehérlista',
+    'Yes' => 'Igen',
+);

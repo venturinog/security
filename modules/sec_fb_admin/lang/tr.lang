@@ -1,0 +1,54 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s geçersizdir',
+    'Back' => 'Geri',
+    'Ban Time (hours)' => 'Yasaklanma Süresi (saat)',
+    'Cancel' => 'İptal',
+    'Count Failed Attempts' => 'Başarısız Denemeleri Say',
+    'Disable fail2ban' => 'Fail2ban\'ı devre dışı bırak',
+    'ERROR' => 'Hata',
+    'Edit' => 'Düzenle',
+    'Edit Jail' => 'Hapishaneyi Düzenle',
+    'Enable fail2ban' => 'Fail2ban\'ı etkinleştir',
+    'Enabled' => 'Etkin',
+    'Error' => 'Hata',
+    'Fail2Ban Jails' => 'Fail2Ban Hapishaneleri',
+    'Fail2ban has been activated' => 'Fail2ban etkinleştirildi',
+    'Fail2ban has been deactivated' => 'Fail2ban devre dışı bırakıldı',
+    'Jails' => 'Hapishaneler',
+    'Message' => 'Mesaj',
+    'Name' => 'İsim',
+    'New Jail' => 'Yeni Hapishane',
+    'No' => 'Hayır',
+    'Options' => 'Seçenekler',
+    'Required field' => 'Gerekli alan',
+    'Save' => 'Kaydet',
+    'Save correctly' => 'Doğru şekilde kaydet',
+    'The following fields contain errors' => 'Şu alanlar hatalı',
+    'Update correctly' => 'Doğru şekilde güncelleyin',
+    'Validation Error' => 'Geçerli değil',
+    'View' => 'Görüntüle',
+    'View Jail' => 'Hapishaneyi Görüntüle',
+    'Whitelist' => 'Beyaz liste',
+    'Yes' => 'Evet',
+);

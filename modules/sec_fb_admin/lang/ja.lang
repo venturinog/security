@@ -1,0 +1,54 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s が無効です',
+    'Back' => '戻る',
+    'Ban Time (hours)' => '禁止時間 (時間)',
+    'Cancel' => 'キャンセル',
+    'Count Failed Attempts' => '失敗した試行をカウントする',
+    'Disable fail2ban' => 'フェイル2バンを無効にする',
+    'ERROR' => 'Error',
+    'Edit' => '編集',
+    'Edit Jail' => '刑務所の編集',
+    'Enable fail2ban' => 'フェイル 2 バンを有効にする',
+    'Enabled' => '有効',
+    'Error' => 'エラー',
+    'Fail2Ban Jails' => 'Fail2Ban 刑務所',
+    'Fail2ban has been activated' => 'Fail2ban が有効になりました',
+    'Fail2ban has been deactivated' => 'Fail2ban は無効化されました',
+    'Jails' => '刑務所',
+    'Message' => 'メッセージ',
+    'Name' => '名前',
+    'New Jail' => '新しい刑務所',
+    'No' => 'いいえ',
+    'Options' => 'オプション',
+    'Required field' => '必須フィールド',
+    'Save' => '保存',
+    'Save correctly' => '正しく保存する',
+    'The following fields contain errors' => '以下の内容に間違いがあります',
+    'Update correctly' => '正しくアップデートする',
+    'Validation Error' => '検証エラー',
+    'View' => '表示',
+    'View Jail' => '刑務所を見る',
+    'Whitelist' => 'ホワイトリスト',
+    'Yes' => 'はい',
+);

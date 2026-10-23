@@ -41,6 +41,8 @@ function _moduleContent(&$smarty, $module_name)
     //conexion
     $pDB = new paloDB($arrConf['dsn_conn_database']);
 
+    $smarty->assign('SECURITY_ALERT', '');
+
     //actions
     $accion = getAction();
     $content = "";
@@ -48,7 +50,6 @@ function _moduleContent(&$smarty, $module_name)
     switch($accion){
         case 'save':
             $content = saveJail($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
-            $pDB =NULL;
             break;
         case 'new': case 'view': case 'edit':
             $content = NewViewZone($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $accion);
@@ -58,14 +59,12 @@ function _moduleContent(&$smarty, $module_name)
             break;
         case 'start':
             exec('/usr/bin/issabel-helper fb_client start', $respuesta, $retorno);
-            $smarty->assign("mb_title", "Message");
-            $smarty->assign("mb_message", _tr("Fail2ban has been activated"));
+            $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("Fail2ban has been activated")));
             $content = reportJails($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
             break;
         case 'stop':
             exec('/usr/bin/issabel-helper fb_client stop', $respuesta, $retorno);
-            $smarty->assign("mb_title", "Message");
-            $smarty->assign("mb_message", _tr("Fail2ban has been deactivated"));
+            $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("Fail2ban has been deactivated")));
             $content = reportJails($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
             break;
         default:
@@ -104,18 +103,17 @@ function reportJails($smarty, $module_name, $local_templates_dir, &$pDB, $arrCon
 
     $arrData = null;
     $arrResult = $iJails->obtainJails($limit, $offset);
-    $button_eliminar = "";
-    $arrColumns = array(_tr("Name"),_tr("Count Failed Attempts"),_tr("Ban Time (hours)"),_tr("Whitelist"),_tr("Enabled"),'');
+    $arrColumns = array(_tr("Name"),_tr("Count Failed Attempts"),_tr("Ban Time (hours)"),_tr("Whitelist"),_tr("Enabled"),_tr("Options"));
     $oGrid->setColumns($arrColumns);
     if( is_array($arrResult) && $total>0 ){
         foreach($arrResult as $key => $value){
-            //$arrTmp[0] = "<input type='checkbox' name='".$value['id']."' id='".$value['id']."'>";
-            $arrTmp[0] = $value['name'];
-            $arrTmp[1] = $value['maxretry'];
-            $arrTmp[2] = $value['bantime'];
-            $arrTmp[3] = $value['ignoreip'];
-            $arrTmp[4] = $value['enabled'];
-            $arrTmp[5] = "&nbsp;<a href='?menu=$module_name&action=view&id=".$value['id']."'>"._tr('View')."</a>";
+            $id = (int)$value['id'];
+            $arrTmp[0] = htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[1] = htmlspecialchars((string)$value['maxretry'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[2] = htmlspecialchars((string)$value['bantime'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[3] = htmlspecialchars((string)$value['ignoreip'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[4] = ($value['enabled'] ? _tr('Yes') : _tr('No'));
+            $arrTmp[5] = "&nbsp;<a href='?menu=$module_name&action=view&id=".$id."'>"._tr('View')."</a>";
             $arrData[] = $arrTmp;
         }
     }
@@ -123,89 +121,72 @@ function reportJails($smarty, $module_name, $local_templates_dir, &$pDB, $arrCon
     if($iJails->isactive()) {
         // if systemctl status is off (1) then offer option to enable
         $oGrid->customAction("start",_tr("Enable fail2ban"));
-
-
     } else {
         $oGrid->customAction("stop",_tr("Disable fail2ban"));
     }
 
     $oGrid->setData($arrData);
 
-    $contenidoModulo = $oGrid->fetchGrid();
-
-    if (strpos($contenidoModulo, '<form') === FALSE) {
-        $contenidoModulo = "<form method='POST' style='margin-bottom:0;' action=$url>$contenidoModulo</form>";
-    }
-
- 
-
-
-
-    return $contenidoModulo;
+    // La grilla ya emite su propio <form> con el token CSRF inyectado por
+    // paloSantoGrid; no hay que envolverla otra vez.
+    return $smarty->getTemplateVars('SECURITY_ALERT').$oGrid->fetchGrid();
 }
 
-function NewViewZone($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, $action)
+function NewViewZone($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, $action, $errors = array(), $data = array())
 {
     $arrFormNew = createFieldFormNew();
-    $oForm      = new paloForm($smarty, $arrFormNew);
-    $titulo     = "";
+    $iJails = new IssabelF2BService($pDB);
+
+    if (($action === 'view' || $action === 'edit') && count($data) === 0) {
+        $id = getParameter('id');
+        if ($id === null || $id === '') $id = getParameter('idtemp');
+        $result = $iJails->loadJail($id);
+        if (is_array($result)) {
+            $data = array(
+                'id'        => $result['id'],
+                'name'      => $result['name'],
+                'maxretry'  => $result['maxretry'],
+                'bantime'   => $result['bantime'],
+                'ignoreip'  => $result['ignoreip'],
+                'enabled'   => $result['enabled'] == '1' ? 'on' : 'off',
+            );
+        }
+    }
+
+    foreach (array('maxretry','bantime','ignoreip') as $f) {
+        if (!isset($errors[$f])) continue;
+        if (!isset($arrFormNew[$f]['INPUT_EXTRA_PARAM']) || !is_array($arrFormNew[$f]['INPUT_EXTRA_PARAM']))
+            $arrFormNew[$f]['INPUT_EXTRA_PARAM'] = array();
+        $cls = isset($arrFormNew[$f]['INPUT_EXTRA_PARAM']['class'])
+            ? $arrFormNew[$f]['INPUT_EXTRA_PARAM']['class'].' ' : 'form-control ';
+        $arrFormNew[$f]['INPUT_EXTRA_PARAM']['class'] = $cls.'is-invalid';
+    }
+
+    $oForm = new paloForm($smarty, $arrFormNew);
+
+    $titulo = '';
+    if( $action == 'edit' ) $titulo = _tr('Edit Jail');
+    if( $action == 'view' ) $titulo = _tr('View Jail');
+    if( $action == 'new' )  $titulo = _tr('New Jail');
 
     $smarty->assign("CANCEL", _tr("Cancel"));
+    $smarty->assign("BACK", _tr("Back"));
+    $smarty->assign("EDIT", _tr("Edit"));
     $smarty->assign("REQUIRED_FIELD", _tr("Required field"));
     $smarty->assign("icon", "images/list.png");
-    $smarty->assign("EDIT", _tr("Edit"));
     $smarty->assign("SAVE", _tr('Save'));
-
-    if( $action == 'edit' ) {
-
-        $id = $_POST['idtemp'];
-        $smarty->assign("IDTEMP", $id);
-
-        $titulo = _tr('Edit Jail');
-        $iJails  = new IssabelF2BService($pDB);
-        $result = $iJails->loadJail($id);
-
-        $_POST['name']      = $result['name'];
-        $_POST['maxretry']  = $result['maxretry'];
-        $_POST['bantime']   = $result['bantime'];
-        $_POST['ignoreip'] = $result['ignoreip'];
-        $_POST['enabled']   = $result['enabled'];
- 
-        if($result['enabled'] == '1') {
-            $_POST['enabled'] = 'on';
-        } else {
-            $_POST['enabled'] = 'off';    
-        }
-
-    } else if( $action == 'view' ) {
-
-        $id = $_GET['id'];
-        $smarty->assign("IDTEMP", $id);
-
-        $titulo = _tr('View Jail');
-        $iJails = new IssabelF2BService($pDB);
-        $result = $iJails->loadJail($id);
-
-        $_POST['name']      = $result['name'];
-        $_POST['maxretry']  = $result['maxretry'];
-        $_POST['bantime']   = $result['bantime'];
-        $_POST['ignoreip'] = $result['ignoreip'];
-        $_POST['enabled']   = $result['enabled'];
-        
-        if($result['enabled'] == '1') {
-            $_POST['enabled'] = 'on';
-        } else {
-            $_POST['enabled'] = 'off';    
-        }
-            
-        $oForm->setViewMode();
-    }
-  
+    $smarty->assign("YES", _tr('Yes'));
+    $smarty->assign("NO", _tr('No'));
     $smarty->assign("MODE", $action);
-    $htmlForm = $oForm->fetchForm("$local_templates_dir/form.tpl", $titulo, $_POST);
+    $smarty->assign("ERRORS", array_merge(array('maxretry' => '', 'bantime' => '', 'ignoreip' => ''), $errors));
+    $smarty->assign("VALUES", array_merge(array(
+        'id' => '', 'name' => '', 'maxretry' => '', 'bantime' => '', 'ignoreip' => '', 'enabled' => 'off'
+    ), $data));
+
+    $htmlForm = $oForm->fetchForm("$local_templates_dir/form.tpl", $titulo, $data);
     $contenidoModulo = "<form method='POST' style='margin-bottom:0;' action='?menu=$module_name'>".$htmlForm."</form>";
 
-    return $contenidoModulo;
+    return $smarty->getTemplateVars('SECURITY_ALERT').$contenidoModulo;
 }
 
 function createFieldFormNew() {
@@ -215,40 +196,40 @@ function createFieldFormNew() {
             "LABEL"                  => _tr("Name"),
             "REQUIRED"               => "yes",
             "INPUT_TYPE"             => "TEXT",
-            "INPUT_EXTRA_PARAM"      => array("style" => "width:162px"),
-            "EDITABLE       "        => "no",
+            "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "readonly" => "readonly"),
+            "EDITABLE"               => "no",
             "VALIDATION_TYPE"        => "text",
-            "VALIDATION_EXTRA_PARAM" => "" 
+            "VALIDATION_EXTRA_PARAM" => ""
         ),
         "maxretry" => array(
             "LABEL"                  => _tr("Count Failed Attempts"),
             "REQUIRED"               => "yes",
             "INPUT_TYPE"             => "TEXT",
-            "INPUT_EXTRA_PARAM"      => array("style" => "width:162px"),
-            "EDITABLE       "        => "yes",
-            "VALIDATION_TYPE"        => "text",
-            "VALIDATION_EXTRA_PARAM" => "" 
+            "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
+            "EDITABLE"               => "yes",
+            "VALIDATION_TYPE"        => "numeric",
+            "VALIDATION_EXTRA_PARAM" => ""
         ),
         "bantime" => array(
             "LABEL"                  => _tr("Ban Time (hours)"),
             "REQUIRED"               => "yes",
             "INPUT_TYPE"             => "TEXT",
-            "INPUT_EXTRA_PARAM"      => array("style" => "width:162px"),
-            "EDITABLE       "        => "yes",
-            "VALIDATION_TYPE"        => "text",
-            "VALIDATION_EXTRA_PARAM" => "" 
+            "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
+            "EDITABLE"               => "yes",
+            "VALIDATION_TYPE"        => "numeric",
+            "VALIDATION_EXTRA_PARAM" => ""
         ),
-        "ignoreip" => array(   
+        "ignoreip" => array(
             "LABEL"                  => _tr("Whitelist"),
             "REQUIRED"               => "no",
             "INPUT_TYPE"             => "TEXTAREA",
-            "INPUT_EXTRA_PARAM"      => array("style" => "width:162px", "id"=>"ignoreipfield"),
+            "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "id" => "ignoreipfield", "placeholder" => "127.0.0.1 192.168.0.0/24"),
             "VALIDATION_TYPE"        => "",
-            "VALIDATION_EXTRA_PARAM" => "" 
+            "VALIDATION_EXTRA_PARAM" => ""
         ),
-        "enabled"    => array(        
+        "enabled"    => array(
             "LABEL"                  => _tr("Enabled"),
-            "REQUIRED"               => "yes",
+            "REQUIRED"               => "no",
             "INPUT_TYPE"             => "CHECKBOX",
             "INPUT_EXTRA_PARAM"      => "",
             "VALIDATION_TYPE"        => "text",
@@ -258,93 +239,95 @@ function createFieldFormNew() {
     return $arrFields;
 }
 
+/**
+ * Valida una lista de IPs/CIDR separadas por espacios o comas.
+ */
+function validIpList($value)
+{
+    $value = trim((string)$value);
+    if ($value === '') return true;
+    foreach (preg_split('/[\s,]+/', $value) as $item) {
+        if ($item === '') continue;
+        if (strpos($item, '/') !== false) {
+            list($ip, $mask) = explode('/', $item, 2);
+            $max = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 128 : 32;
+            if (!filter_var($ip, FILTER_VALIDATE_IP) || !preg_match('/^[0-9]{1,3}$/', $mask) || (int)$mask > $max)
+                return false;
+        } elseif (!filter_var($item, FILTER_VALIDATE_IP)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function saveJail($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
     $arrFormNew = createFieldFormNew();
-    $oForm      = new paloForm($smarty, $arrFormNew);
     $mode       = getParameter("mode");
-    $maxretry   = getParameter("maxretry");
-    $bantime    = getParameter("bantime");
-    $ignoreip   = getParameter("ignoreip");
+    $maxretry   = trim((string)getParameter("maxretry"));
+    $bantime    = trim((string)getParameter("bantime"));
+    $ignoreip   = trim((string)getParameter("ignoreip"));
     $enabled    = getParameter("enabled");
 
     $id_except  = getParameter('idtemp');
-    $isError    = false;
 
     // Be sure ignoreip in fail2ban is separated with spaces (and one space) only
     $ignoreip = str_replace(","," ",$ignoreip);
     $ignoreip = preg_replace('/\s+/', ' ', $ignoreip);
-    
+
+    $errors = array();
+    if ($maxretry === '' || !preg_match('/^[0-9]+$/', $maxretry) || (int)$maxretry < 1)
+        $errors['maxretry'] = sprintf(_tr('%s is invalid'), _tr('Count Failed Attempts'));
+    if ($bantime === '' || !preg_match('/^[0-9]+$/', $bantime) || (int)$bantime < 1)
+        $errors['bantime'] = sprintf(_tr('%s is invalid'), _tr('Ban Time (hours)'));
+    if (!validIpList($ignoreip))
+        $errors['ignoreip'] = sprintf(_tr('%s is invalid'), _tr('Whitelist'));
+
+    $enabled = ($enabled == 'on' || $enabled == 'On' || $enabled == 'ON') ? '1' : '0';
+
+    if (count($errors) > 0) {
+        return NewViewZone($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $mode, $errors, array(
+            'id' => $id_except, 'name' => getParameter('name'), 'maxretry' => $maxretry,
+            'bantime' => $bantime, 'ignoreip' => $ignoreip,
+            'enabled' => $enabled == '1' ? 'on' : 'off',
+        ));
+    }
+
     $iJails = new IssabelF2BService($pDB);
-
-    if($maxretry == null){
-            $strErrorMsg = _tr("The following fields contain errors".":</b><br/>");
-            $strErrorMsg .= "IP:[Is Empty]";
-            $isError = true;
-    }else if($bantime == null){
-            $strErrorMsg = _tr("The following fields contain errors".":</b><br/>");
-            $strErrorMsg .= "Netmask:[Is Empty]";
-            $isError = true;
+    if($iJails->updateJail($id_except, $maxretry, $bantime, $ignoreip, $enabled)) {
+        $iJails->F2BUpdateJails($pDB);
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("Update correctly")));
     }
-    
-    if($enabled == 'on' || $enabled == 'On' || $enabled == 'ON') {
-        $enabled = '1';
-    } else {
-        $enabled = '0';
-    }
-
-    if(!$oForm->validateForm($_POST)) {
-        // Falla la validación básica del formulario
-        $strErrorMsg = "<b>"._tr('The following fields contain errors').":</b><br/>";
-        $arrErrores = $oForm->arrErroresValidacion;
-        if(is_array($arrErrores) && count($arrErrores) > 0){
-            foreach($arrErrores as $k=>$v) {
-                $strErrorMsg .= "$k: [$v[mensaje]] <br /> ";
-            }
-        }
-        $isError = true;
-    }
-
-    if($isError){ // validation errors
-        $smarty->assign("mb_title", _tr("Validation Error"));
-        $smarty->assign("mb_message", $strErrorMsg);
+    else{
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $iJails->errMsg));
         return NewViewZone($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $mode);
     }
 
-    if($iJails->updateJail($id_except, $maxretry, $bantime, $ignoreip, $enabled)) {
-
-        $iJails->F2BUpdateJails($pDB);
-    
-        $smarty->assign("mb_title", _tr("Message"));
-            $smarty->assign("mb_message", _tr("Update correctly"));
-        }
-        else{
-           $smarty->assign("mb_title", _tr("Error"));
-            $smarty->assign("mb_message", $iJails->errMsg);
-            return NewViewZone($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $mode);
-        }
-    
     return reportJails($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
 }
 
 function getAction()
 {
+    $isPost = ($_SERVER['REQUEST_METHOD'] === 'POST');
     if(getParameter("show")) //Get parameter by POST (submit)
         return "show";
-    else if(getParameter("save"))
+    else if($isPost && getParameter("save"))
         return "save";
     else if(getParameter("edit"))
         return "edit";
     else if(getParameter("cancel"))
         return "cancel";
-    else if(getParameter("action")=="show") //Get parameter by GET (command pattern, links)
+    else if(getParameter("action")=="show")
         return "show";
-    else if(getParameter("action")=="view") //Get parameter by GET (command pattern, links)
+    else if(getParameter("action")=="view")
         return "view";
-    else if(getParameter("start")) //Get parameter by GET (command pattern, links)
+    // start/stop cambian estado: sólo se aceptan por POST (botón de la grilla).
+    else if($_SERVER['REQUEST_METHOD'] === 'POST' && getParameter("start"))
         return "start";
-    else if(getParameter("stop")) //Get parameter by GET (command pattern, links)
+    else if($_SERVER['REQUEST_METHOD'] === 'POST' && getParameter("stop"))
         return "stop";
+    else if(getParameter("start") || getParameter("stop"))
+        return "report";
     else
         return "report";
 }

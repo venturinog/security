@@ -1,0 +1,54 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s δεν είναι έγκυρο',
+    'Back' => 'Πίσω',
+    'Ban Time (hours)' => 'Απαγόρευση χρόνου (ώρες)',
+    'Cancel' => 'Ακύρωση',
+    'Count Failed Attempts' => 'Καταμέτρηση αποτυχημένων προσπαθειών',
+    'Disable fail2ban' => 'Απενεργοποιήστε το fail2ban',
+    'ERROR' => 'Error',
+    'Edit' => 'Επεξεργασία',
+    'Edit Jail' => 'Επεξεργασία φυλακή',
+    'Enable fail2ban' => 'Ενεργοποίηση fail2ban',
+    'Enabled' => 'Ενεργό',
+    'Error' => 'Σφάλμα',
+    'Fail2Ban Jails' => 'Φυλακές Fail2Ban',
+    'Fail2ban has been activated' => 'Το Fail2ban έχει ενεργοποιηθεί',
+    'Fail2ban has been deactivated' => 'Το Fail2ban έχει απενεργοποιηθεί',
+    'Jails' => 'Φυλακές',
+    'Message' => 'Μήνυμα',
+    'Name' => 'Όνομα',
+    'New Jail' => 'Νέα φυλακή',
+    'No' => 'Όχι',
+    'Options' => 'Επιλογές',
+    'Required field' => 'Απαιτούμενα Πεδία',
+    'Save' => 'Αποθήκευση',
+    'Save correctly' => 'Αποθηκεύστε σωστά',
+    'The following fields contain errors' => 'Τα ακόλουθα πεδία περιέχουν λάθη',
+    'Update correctly' => 'Ενημερώστε σωστά',
+    'Validation Error' => 'Σφάλμα Πιστοποίησης',
+    'View' => 'Προβολή',
+    'View Jail' => 'Δείτε τη φυλακή',
+    'Whitelist' => 'Λευκή λίστα',
+    'Yes' => 'Ναι',
+);

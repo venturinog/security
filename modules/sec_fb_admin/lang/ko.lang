@@ -1,0 +1,54 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s이(가) 유효하지 않습니다',
+    'Back' => '뒤로',
+    'Ban Time (hours)' => '금지 시간(시간)',
+    'Cancel' => '취소',
+    'Count Failed Attempts' => '실패한 시도 횟수 계산',
+    'Disable fail2ban' => 'Fail2ban 비활성화',
+    'ERROR' => 'Error',
+    'Edit' => '편집',
+    'Edit Jail' => '감옥 편집',
+    'Enable fail2ban' => 'Fail2ban 활성화',
+    'Enabled' => '사용',
+    'Error' => '오류',
+    'Fail2Ban Jails' => 'Fail2Ban 감옥',
+    'Fail2ban has been activated' => 'Fail2ban이 활성화되었습니다',
+    'Fail2ban has been deactivated' => 'Fail2ban이 비활성화되었습니다.',
+    'Jails' => '감옥',
+    'Message' => '메시지',
+    'Name' => '이름',
+    'New Jail' => '새로운 감옥',
+    'No' => '아니요',
+    'Options' => '옵션',
+    'Required field' => '요구된 필드',
+    'Save' => '저장',
+    'Save correctly' => '올바르게 저장하세요',
+    'The following fields contain errors' => '다음 필드는 에러을 나타냅니다.',
+    'Update correctly' => '올바르게 업데이트하세요',
+    'Validation Error' => '유효 에러',
+    'View' => '보기',
+    'View Jail' => '감옥 보기',
+    'Whitelist' => '허용 목록',
+    'Yes' => '예',
+);

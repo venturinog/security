@@ -2,9 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0.0                                                |
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,28 +18,37 @@
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
 */
-
 global $arrLangModule;
-$arrLangModule=array(
-"Fail2Ban Jails" => "Jaulas Fail2Ban",
-"Edit Jail" => "Modificar Jaula",
-"View Jail" => "Ver Jaula",
-"Name" => "Nombre",
-"Whitelist" => "Lista Blanca",
-"Enabled" => "Activada",
-"View" => "Ver",
-"Edit" => "Modificar",
-"Ban Time (hours)" => "Tiempo de Bloqueo (horas)",
-"Count Failed Attempts" => "Nro Intentos Fallidos",
-"Save correctly" => "Guardado Correctamente",
-"Update correctly" => "Modificado correctamente",
-"Message" => "Mensaje",
-"Error" => "Error",
-"The following fields contain errors" => "Los siguientes campos contienen errores",
-"Validation Error" => "Error de Validación",
-"Enable fail2ban" => "Activar fail2ban",
-"Disable fail2ban" => "Desactivar fail2ban",
-"Fail2ban has been activated" => "Fail2ban ha sido activado",
-"Fail2ban has been deactivated" => "Fail2ban ha sido desactivado"
+$arrLangModule = array(
+    '%s is invalid' => '%s no es válido',
+    'Back' => 'Atrás',
+    'Ban Time (hours)' => 'Tiempo de Bloqueo (horas)',
+    'Cancel' => 'Cancelar',
+    'Count Failed Attempts' => 'Nro Intentos Fallidos',
+    'Disable fail2ban' => 'Desactivar fail2ban',
+    'ERROR' => 'Error',
+    'Edit' => 'Modificar',
+    'Edit Jail' => 'Modificar Jaula',
+    'Enable fail2ban' => 'Activar fail2ban',
+    'Enabled' => 'Activada',
+    'Error' => 'Error',
+    'Fail2Ban Jails' => 'Jaulas Fail2Ban',
+    'Fail2ban has been activated' => 'Fail2ban ha sido activado',
+    'Fail2ban has been deactivated' => 'Fail2ban ha sido desactivado',
+    'Jails' => 'cárceles',
+    'Message' => 'Mensaje',
+    'Name' => 'Nombre',
+    'New Jail' => 'Nueva cárcel',
+    'No' => 'No',
+    'Options' => 'Opciones',
+    'Required field' => 'Campo requerido',
+    'Save' => 'Guardar',
+    'Save correctly' => 'Guardado Correctamente',
+    'The following fields contain errors' => 'Los siguientes campos contienen errores',
+    'Update correctly' => 'Modificado correctamente',
+    'Validation Error' => 'Error de Validación',
+    'View' => 'Ver',
+    'View Jail' => 'Ver Jaula',
+    'Whitelist' => 'Lista Blanca',
+    'Yes' => 'si',
 );
-?>

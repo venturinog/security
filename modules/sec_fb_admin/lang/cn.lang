@@ -1,0 +1,54 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s 无效',
+    'Back' => '返回',
+    'Ban Time (hours)' => '禁令时间（小时）',
+    'Cancel' => '取消',
+    'Count Failed Attempts' => '计算失败的尝试次数',
+    'Disable fail2ban' => '禁用fail2ban',
+    'ERROR' => 'Error',
+    'Edit' => '编辑',
+    'Edit Jail' => '编辑监狱',
+    'Enable fail2ban' => '启用fail2ban',
+    'Enabled' => '已启用',
+    'Error' => '错误',
+    'Fail2Ban Jails' => '禁止监狱',
+    'Fail2ban has been activated' => 'Fail2ban 已激活',
+    'Fail2ban has been deactivated' => 'Fail2ban 已停用',
+    'Jails' => '监狱',
+    'Message' => '留言',
+    'Name' => '名称',
+    'New Jail' => '新监狱',
+    'No' => '否',
+    'Options' => '选项',
+    'Required field' => '必填项',
+    'Save' => '保存',
+    'Save correctly' => '正确保存',
+    'The following fields contain errors' => '以下项目有误',
+    'Update correctly' => '正确更新',
+    'Validation Error' => '确认出错',
+    'View' => '查看',
+    'View Jail' => '查看监狱',
+    'Whitelist' => '白名单',
+    'Yes' => '是',
+);

@@ -1,0 +1,54 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s é inválido',
+    'Back' => 'Voltar',
+    'Ban Time (hours)' => 'Tempo de proibição (horas)',
+    'Cancel' => 'Cancelar',
+    'Count Failed Attempts' => 'Contar tentativas fracassadas',
+    'Disable fail2ban' => 'Desativar fail2ban',
+    'ERROR' => 'Error',
+    'Edit' => 'Editar',
+    'Edit Jail' => 'Editar prisão',
+    'Enable fail2ban' => 'Habilitar fail2ban',
+    'Enabled' => 'Ativado',
+    'Error' => 'Erro',
+    'Fail2Ban Jails' => 'Prisões Fail2Ban',
+    'Fail2ban has been activated' => 'Fail2ban foi ativado',
+    'Fail2ban has been deactivated' => 'Fail2ban foi desativado',
+    'Jails' => 'Prisões',
+    'Message' => 'Mensagem',
+    'Name' => 'Nome',
+    'New Jail' => 'Nova prisão',
+    'No' => 'Não',
+    'Options' => 'Opções',
+    'Required field' => 'Campo Requerido',
+    'Save' => 'Salvar',
+    'Save correctly' => 'Salve corretamente',
+    'The following fields contain errors' => 'Os seguintes campos contém erros',
+    'Update correctly' => 'Atualizar corretamente',
+    'Validation Error' => 'Erro de Validação',
+    'View' => 'Visualizar',
+    'View Jail' => 'Ver prisão',
+    'Whitelist' => 'Lista de permissões',
+    'Yes' => 'Sim',
+);
