@@ -1,0 +1,72 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s er ugyldig',
+    '%s is required' => '%s er påkrævet',
+    'Are you sure you wish to delete the port(s).' => 'Er du sikker på, at du vil slette portene.',
+    'Are you sure you wish to delete the port(s)?' => 'Er du sikker på, at du vil slette porten/portene?',
+    'Back' => 'Tilbage',
+    'Cancel' => 'Annuller',
+    'Code' => 'Kode',
+    'Comment' => 'Kommentar',
+    'Define Port' => 'Definer port',
+    'Define Ports' => 'Definer porte',
+    'Delete' => 'Slet',
+    'Delete correctly' => 'Slet korrekt',
+    'Details' => 'Detaljer',
+    'ERROR' => 'Error',
+    'Edit' => 'Rediger',
+    'Edit Port' => 'Rediger port',
+    'Error' => 'Fejl',
+    'Filter applied: ' => 'Filter anvendt:',
+    'Filter by' => 'Filtrer efter',
+    'Message' => 'Besked',
+    'Name' => 'Navn',
+    'New Port' => 'Ny havn',
+    'No records were selected' => 'Ingen poster blev valgt',
+    'Option' => 'Mulighed',
+    'Port' => 'Port',
+    'Port used in a firewall rule' => 'Port brugt i en firewall-regel',
+    'Port(s)' => 'Port(e)',
+    'Port- Service' => 'Havne- Service',
+    'Ports' => 'Havne',
+    'Protocol' => 'Protokol',
+    'Protocol Number' => 'Protokolnummer',
+    'Required field' => 'Feltet skal udfyldes',
+    'Save' => 'Gem',
+    'Save correctly' => 'Gem korrekt',
+    'Search' => 'Søg',
+    'Show' => 'Vis',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'Nogle regler kan blive deaktiveret på grund af disse ændringer. Tjek venligst firewall-reglerne',
+    'The following fields contain errors' => 'Følgende felter indeholder fejl',
+    'The name and the port can not be empty fields' => 'Navnet og porten må ikke være tomme felter',
+    'The name and the protocol number can not be empty fields' => 'Navnet og protokolnummeret må ikke være tomme felter',
+    'The name, type and code can not be empty fields' => 'Navn, type og kode må ikke være tomme felter',
+    'This port had already been defined' => 'Denne port var allerede blevet defineret',
+    'To' => 'Til',
+    'Type' => 'Type',
+    'Update correctly' => 'Opdater korrekt',
+    'Validation Error' => 'Valideringsfejl',
+    'View' => 'Vis',
+    'View Port' => 'Se havn',
+    'You have to delete the rule related in order to delete this port' => 'Du skal slette den relaterede regel for at slette denne port',
+);

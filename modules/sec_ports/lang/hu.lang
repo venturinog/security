@@ -1,0 +1,72 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s érvénytelen',
+    '%s is required' => '%s kötelező',
+    'Are you sure you wish to delete the port(s).' => 'Biztos benne, hogy törölni kívánja a port(oka)t?',
+    'Are you sure you wish to delete the port(s)?' => 'Biztos benne, hogy törölni kívánja a port(oka)t?',
+    'Back' => 'Vissza',
+    'Cancel' => 'Mégse',
+    'Code' => 'kód',
+    'Comment' => 'Megjegyzés',
+    'Define Port' => 'Port meghatározása',
+    'Define Ports' => 'Portok meghatározása',
+    'Delete' => 'Törlés',
+    'Delete correctly' => 'Törölje helyesen',
+    'Details' => 'Részletek',
+    'ERROR' => 'Error',
+    'Edit' => 'Szerkesztés',
+    'Edit Port' => 'Port szerkesztése',
+    'Error' => 'Hiba',
+    'Filter applied: ' => 'Alkalmazott szűrő:',
+    'Filter by' => 'Szűrés szerint',
+    'Message' => 'Üzenet',
+    'Name' => 'Név',
+    'New Port' => 'Új kikötő',
+    'No records were selected' => 'Nincsenek rekordok kiválasztva',
+    'Option' => 'Opció',
+    'Port' => 'Port',
+    'Port used in a firewall rule' => 'A tűzfalszabályban használt port',
+    'Port(s)' => 'Port(ok)',
+    'Port- Service' => 'Kikötői szolgáltatás',
+    'Ports' => 'Portok',
+    'Protocol' => 'Protokoll',
+    'Protocol Number' => 'Protokoll száma',
+    'Required field' => 'Szükséges mező',
+    'Save' => 'Mentés',
+    'Save correctly' => 'Mentse el helyesen',
+    'Search' => 'Keresés',
+    'Show' => 'Mutat',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'A változtatások miatt egyes szabályok deaktiválhatók. Kérjük, ellenőrizze a tűzfalszabályokat',
+    'The following fields contain errors' => 'A következő mezők hibásak',
+    'The name and the port can not be empty fields' => 'A név és a port nem lehet üres mező',
+    'The name and the protocol number can not be empty fields' => 'A név és a protokollszám nem lehet üres mező',
+    'The name, type and code can not be empty fields' => 'A név, típus és kód nem lehet üres mező',
+    'This port had already been defined' => 'Ez a port már meghatározásra került',
+    'To' => 'Címzett',
+    'Type' => 'Írja be',
+    'Update correctly' => 'Frissítse helyesen',
+    'Validation Error' => 'Érvényesítési hiba',
+    'View' => 'Megtekintés',
+    'View Port' => 'Port megtekintése',
+    'You have to delete the rule related in order to delete this port' => 'A port törléséhez törölnie kell a kapcsolódó szabályt',
+);

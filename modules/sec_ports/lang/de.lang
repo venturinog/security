@@ -1,0 +1,72 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s ist ungültig',
+    '%s is required' => '%s ist erforderlich',
+    'Are you sure you wish to delete the port(s).' => 'Sind Sie sicher, dass Sie die Ports löschen möchten?',
+    'Are you sure you wish to delete the port(s)?' => 'Sind Sie sicher, dass Sie die Ports löschen möchten?',
+    'Back' => 'Zurück',
+    'Cancel' => 'Abbrechen',
+    'Code' => 'Code',
+    'Comment' => 'Kommentar',
+    'Define Port' => 'Port definieren',
+    'Define Ports' => 'Ports definieren',
+    'Delete' => 'Löschen',
+    'Delete correctly' => 'Korrekt löschen',
+    'Details' => 'Details',
+    'ERROR' => 'Error',
+    'Edit' => 'Bearbeiten',
+    'Edit Port' => 'Port bearbeiten',
+    'Error' => 'Fehler',
+    'Filter applied: ' => 'Angewendeter Filter:',
+    'Filter by' => 'Filtern nach',
+    'Message' => 'Nachricht',
+    'Name' => 'Name',
+    'New Port' => 'Neuer Hafen',
+    'No records were selected' => 'Es wurden keine Datensätze ausgewählt',
+    'Option' => 'Option',
+    'Port' => 'Port',
+    'Port used in a firewall rule' => 'Port, der in einer Firewall-Regel verwendet wird',
+    'Port(s)' => 'Hafen(s)',
+    'Port- Service' => 'Hafendienst',
+    'Ports' => 'Häfen',
+    'Protocol' => 'Protokoll',
+    'Protocol Number' => 'Protokollnummer',
+    'Required field' => 'erforderliche Felder',
+    'Save' => 'Speichern',
+    'Save correctly' => 'Richtig speichern',
+    'Search' => 'Suchen',
+    'Show' => 'Anzeigen',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'Aufgrund dieser Änderungen können einige Regeln deaktiviert werden. Bitte überprüfen Sie die Firewall-Regeln',
+    'The following fields contain errors' => 'folgende Felder enthalten Fehler',
+    'The name and the port can not be empty fields' => 'Der Name und der Port dürfen keine leeren Felder sein',
+    'The name and the protocol number can not be empty fields' => 'Der Name und die Protokollnummer dürfen keine leeren Felder sein',
+    'The name, type and code can not be empty fields' => 'Name, Typ und Code dürfen keine leeren Felder sein',
+    'This port had already been defined' => 'Dieser Port war bereits definiert',
+    'To' => 'Zu',
+    'Type' => 'Typ',
+    'Update correctly' => 'Korrekt aktualisieren',
+    'Validation Error' => 'Gültigkeitssfehler',
+    'View' => 'Anzeigen',
+    'View Port' => 'Hafen anzeigen',
+    'You have to delete the rule related in order to delete this port' => 'Um diesen Port zu löschen, müssen Sie die zugehörige Regel löschen',
+);

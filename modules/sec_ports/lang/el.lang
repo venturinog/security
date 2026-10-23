@@ -1,0 +1,72 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s δεν είναι έγκυρο',
+    '%s is required' => '%s είναι υποχρεωτικό',
+    'Are you sure you wish to delete the port(s).' => 'Είστε βέβαιοι ότι θέλετε να διαγράψετε τις θύρες.',
+    'Are you sure you wish to delete the port(s)?' => 'Είστε βέβαιοι ότι θέλετε να διαγράψετε τις θύρες;',
+    'Back' => 'Πίσω',
+    'Cancel' => 'Ακύρωση',
+    'Code' => 'Κωδικός',
+    'Comment' => 'Σχόλιο',
+    'Define Port' => 'Ορισμός λιμένα',
+    'Define Ports' => 'Ορισμός λιμένων',
+    'Delete' => 'Διαγραφή',
+    'Delete correctly' => 'Διαγραφή σωστά',
+    'Details' => 'Λεπτομέρειες',
+    'ERROR' => 'Error',
+    'Edit' => 'Επεξεργασία',
+    'Edit Port' => 'Επεξεργασία θύρας',
+    'Error' => 'Σφάλμα',
+    'Filter applied: ' => 'Εφαρμόστηκε φίλτρο:',
+    'Filter by' => 'Φιλτράρισμα κατά',
+    'Message' => 'Μήνυμα',
+    'Name' => 'Όνομα',
+    'New Port' => 'Νέο Λιμάνι',
+    'No records were selected' => 'Δεν επιλέχθηκαν εγγραφές',
+    'Option' => 'Επιλογή',
+    'Port' => 'Θύρα',
+    'Port used in a firewall rule' => 'Θύρα που χρησιμοποιείται σε κανόνα τείχους προστασίας',
+    'Port(s)' => 'Λιμάνι',
+    'Port- Service' => 'Λιμάνι- Service',
+    'Ports' => 'λιμάνια',
+    'Protocol' => 'Πρωτόκολλο',
+    'Protocol Number' => 'Αριθμός πρωτοκόλλου',
+    'Required field' => 'Απαιτούμενα Πεδία',
+    'Save' => 'Αποθήκευση',
+    'Save correctly' => 'Αποθηκεύστε σωστά',
+    'Search' => 'Αναζήτηση',
+    'Show' => 'Εμφάνιση',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'Ορισμένοι κανόνες θα μπορούσαν να απενεργοποιηθούν λόγω αυτών των αλλαγών, ελέγξτε τους κανόνες του τείχους προστασίας',
+    'The following fields contain errors' => 'Τα ακόλουθα πεδία περιέχουν λάθη',
+    'The name and the port can not be empty fields' => 'Το όνομα και η θύρα δεν μπορούν να είναι κενά πεδία',
+    'The name and the protocol number can not be empty fields' => 'Το όνομα και ο αριθμός πρωτοκόλλου δεν μπορούν να είναι κενά πεδία',
+    'The name, type and code can not be empty fields' => 'Το όνομα, ο τύπος και ο κωδικός δεν μπορούν να είναι κενά πεδία',
+    'This port had already been defined' => 'Αυτό το λιμάνι είχε ήδη καθοριστεί',
+    'To' => 'προς',
+    'Type' => 'Τύπος',
+    'Update correctly' => 'Ενημερώστε σωστά',
+    'Validation Error' => 'Σφάλμα Πιστοποίησης',
+    'View' => 'Προβολή',
+    'View Port' => 'Προβολή λιμένα',
+    'You have to delete the rule related in order to delete this port' => 'Πρέπει να διαγράψετε τον κανόνα που σχετίζεται για να διαγράψετε αυτήν τη θύρα',
+);

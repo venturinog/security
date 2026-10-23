@@ -1,0 +1,72 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s no és vàlid',
+    '%s is required' => '%s és obligatori',
+    'Are you sure you wish to delete the port(s).' => 'Esteu segur que voleu suprimir els ports?',
+    'Are you sure you wish to delete the port(s)?' => 'Esteu segur que voleu suprimir els ports?',
+    'Back' => 'Torna',
+    'Cancel' => 'Cancel·la',
+    'Code' => 'Codi',
+    'Comment' => 'Comenta',
+    'Define Port' => 'Definiu el port',
+    'Define Ports' => 'Definir Ports',
+    'Delete' => 'Elimina',
+    'Delete correctly' => 'Eliminar correctament',
+    'Details' => 'Detalls',
+    'ERROR' => 'Error',
+    'Edit' => 'Edita',
+    'Edit Port' => 'Edita el port',
+    'Error' => 'Error',
+    'Filter applied: ' => 'Filtre aplicat:',
+    'Filter by' => 'Filtra per',
+    'Message' => 'Missatge',
+    'Name' => 'Nom',
+    'New Port' => 'Port Nou',
+    'No records were selected' => 'No s\'ha seleccionat cap registre',
+    'Option' => 'Opció',
+    'Port' => 'Port',
+    'Port used in a firewall rule' => 'Port utilitzat en una regla de tallafoc',
+    'Port(s)' => 'Port(s)',
+    'Port- Service' => 'Port- Servei',
+    'Ports' => 'Ports',
+    'Protocol' => 'Protocol',
+    'Protocol Number' => 'Número de protocol',
+    'Required field' => 'Camp requerit',
+    'Save' => 'Desa',
+    'Save correctly' => 'Desa correctament',
+    'Search' => 'Cerca',
+    'Show' => 'Mostra',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'Algunes regles es podrien desactivar a causa d\'aquests canvis; consulteu les regles del tallafoc',
+    'The following fields contain errors' => 'Els següents camps contenen errors',
+    'The name and the port can not be empty fields' => 'El nom i el port no poden ser camps buits',
+    'The name and the protocol number can not be empty fields' => 'El nom i el número de protocol no poden ser camps buits',
+    'The name, type and code can not be empty fields' => 'El nom, el tipus i el codi no poden ser camps buits',
+    'This port had already been defined' => 'Aquest port ja estava definit',
+    'To' => 'A',
+    'Type' => 'Tipus',
+    'Update correctly' => 'Actualitzar correctament',
+    'Validation Error' => 'Error de validació',
+    'View' => 'Mostra',
+    'View Port' => 'Port de visualització',
+    'You have to delete the rule related in order to delete this port' => 'Heu de suprimir la regla relacionada per eliminar aquest port',
+);

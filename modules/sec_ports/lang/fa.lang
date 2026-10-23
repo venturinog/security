@@ -2,11 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2019 Issabel Foundation                                |
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -18,47 +17,56 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  | Translate by: Haamed Kouhfallah                                      |
-  | Email: k.haamed@gmail.com                                            |
-  +----------------------------------------------------------------------+
-  $Id: fa.lang,v 1.1 2019-11-30 04:08:50 Haamed Kouhfallah k.haamed@gmail.com Exp $
 */
 global $arrLangModule;
-$arrLangModule=array(
-"Port- Service" => "پورت-سرويس",
-"Ports" => "پورت",
-"Port" => "پورت",
-"Option" => "ويژگي",
-"Name" => "نام",
-"Protocol" => "پروتكل",
-"Port(s)" => "پورت",
-"Delete" => "حذف",
-"View" => "نمايش",
-"Edit" => "ويرايش",
-"New Port" => "پورت جديد",
-"Comment" => "توضيحات",
-"Save correctly" => "به درستي ذخيره شد",
-"Delete correctly" => "به درستي حذف شد",
-"Update correctly" => "به درستي به روز رساني شد",
-"Details" => "جزئيات",
-"Message" => "پيام",
-"Error" => "خطا",
-"Are you sure you wish to delete the port(s)." => "آيا شما مطمئن به حذف پورت هستيد؟",
-"Filter by" => "فيلتر توسط",
-"Name" => "نام",
-"Define Ports" => "تعريف پورت",
-"Define Port" => "تعريف پورت",
-"Edit Port" => "ويرايش پورت",
-"View Port" => "ديدن پورت",
-"Protocol Number" => "شماره پروتكل",
-"Type" => "نوع",
-"Code" => "كد",
-"This port had already been defined" => "اين پورت قبلا تعريف شده است",
-"The name and the port can not be empty fields" => "نام و پورت نمي تواند خالي باشد",
-"The name, type and code can not be empty fields" => "نام، نوع و كد نمي تواند خالي باشد",
-"The name and the protocol number can not be empty fields" => "نام و شماره پروتكل نمي تواند خالي باشد",
-"The following fields contain errors" => "فيلد هاي زير داراي خطا هستند",
-"Validation Error" => "خطا در اعتبار سنجي",
+$arrLangModule = array(
+    '%s is invalid' => '%s نامعتبر است',
+    '%s is required' => '%s الزامی است',
+    'Are you sure you wish to delete the port(s).' => 'آيا شما مطمئن به حذف پورت هستيد؟',
+    'Are you sure you wish to delete the port(s)?' => 'آیا مطمئن هستید که می خواهید پورت(ها) را حذف کنید؟',
+    'Back' => 'برگشت',
+    'Cancel' => 'انصراف',
+    'Code' => 'كد',
+    'Comment' => 'توضيحات',
+    'Define Port' => 'تعريف پورت',
+    'Define Ports' => 'تعريف پورت',
+    'Delete' => 'حذف',
+    'Delete correctly' => 'به درستي حذف شد',
+    'Details' => 'جزئيات',
+    'ERROR' => 'خطا',
+    'Edit' => 'ويرايش',
+    'Edit Port' => 'ويرايش پورت',
+    'Error' => 'خطا',
+    'Filter applied: ' => 'فیلتر شده بر اساس:  ',
+    'Filter by' => 'فيلتر توسط',
+    'Message' => 'پيام',
+    'Name' => 'نام',
+    'New Port' => 'پورت جديد',
+    'No records were selected' => 'هیچ رکوردی انتخاب نشد',
+    'Option' => 'ويژگي',
+    'Port' => 'پورت',
+    'Port used in a firewall rule' => 'پورت مورد استفاده در قانون فایروال',
+    'Port(s)' => 'پورت',
+    'Port- Service' => 'پورت-سرويس',
+    'Ports' => 'پورت',
+    'Protocol' => 'پروتكل',
+    'Protocol Number' => 'شماره پروتكل',
+    'Required field' => 'فيلد مورد نياز',
+    'Save' => 'ذخيره',
+    'Save correctly' => 'به درستي ذخيره شد',
+    'Search' => 'جستجو',
+    'Show' => 'نمايش',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'برخی از قوانین ممکن است به دلیل این تغییرات غیرفعال شوند، لطفا قوانین فایروال را بررسی کنید',
+    'The following fields contain errors' => 'فيلد هاي زير داراي خطا هستند',
+    'The name and the port can not be empty fields' => 'نام و پورت نمي تواند خالي باشد',
+    'The name and the protocol number can not be empty fields' => 'نام و شماره پروتكل نمي تواند خالي باشد',
+    'The name, type and code can not be empty fields' => 'نام، نوع و كد نمي تواند خالي باشد',
+    'This port had already been defined' => 'اين پورت قبلا تعريف شده است',
+    'To' => 'به',
+    'Type' => 'نوع',
+    'Update correctly' => 'به درستي به روز رساني شد',
+    'Validation Error' => 'خطا در اعتبار سنجي',
+    'View' => 'نمايش',
+    'View Port' => 'ديدن پورت',
+    'You have to delete the rule related in order to delete this port' => 'برای حذف این پورت باید قانون مربوط به آن را حذف کنید',
 );
-?>

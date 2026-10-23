@@ -1,0 +1,72 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s geçersizdir',
+    '%s is required' => '%s zorunludur',
+    'Are you sure you wish to delete the port(s).' => 'Bağlantı noktalarını silmek istediğinizden emin misiniz?',
+    'Are you sure you wish to delete the port(s)?' => 'Bağlantı noktalarını silmek istediğinizden emin misiniz?',
+    'Back' => 'Geri',
+    'Cancel' => 'İptal',
+    'Code' => 'Kod',
+    'Comment' => 'Yorum',
+    'Define Port' => 'Bağlantı Noktasını Tanımla',
+    'Define Ports' => 'Bağlantı Noktalarını Tanımla',
+    'Delete' => 'Sil',
+    'Delete correctly' => 'Doğru şekilde sil',
+    'Details' => 'Ayrıntılar',
+    'ERROR' => 'Hata',
+    'Edit' => 'Düzenle',
+    'Edit Port' => 'Bağlantı Noktasını Düzenle',
+    'Error' => 'Hata',
+    'Filter applied: ' => 'Filtre uygulandı: ',
+    'Filter by' => 'Şuna göre filtrele:',
+    'Message' => 'Mesaj',
+    'Name' => 'İsim',
+    'New Port' => 'Yeni Liman',
+    'No records were selected' => 'Hiçbir kayıt seçilmedi',
+    'Option' => 'Seçenek',
+    'Port' => 'Bağlantı noktası',
+    'Port used in a firewall rule' => 'Güvenlik duvarı kuralında kullanılan bağlantı noktası',
+    'Port(s)' => 'Bağlantı noktaları',
+    'Port- Service' => 'Liman-Servis',
+    'Ports' => 'Limanlar',
+    'Protocol' => 'Protokol',
+    'Protocol Number' => 'Protokol Numarası',
+    'Required field' => 'Gerekli alan',
+    'Save' => 'Kaydet',
+    'Save correctly' => 'Doğru şekilde kaydet',
+    'Search' => 'Ara',
+    'Show' => 'Göster',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'Bu değişiklikler nedeniyle bazı kurallar devre dışı bırakılabilir, lütfen güvenlik duvarı kurallarını kontrol edin.',
+    'The following fields contain errors' => 'Şu alanlar hatalı',
+    'The name and the port can not be empty fields' => 'Ad ve bağlantı noktası boş alan olamaz',
+    'The name and the protocol number can not be empty fields' => 'İsim ve protokol numarası boş alan olamaz',
+    'The name, type and code can not be empty fields' => 'İsim, tür ve kod alanları boş olamaz',
+    'This port had already been defined' => 'Bu bağlantı noktası zaten tanımlanmıştı',
+    'To' => 'Kime',
+    'Type' => 'Tip',
+    'Update correctly' => 'Doğru şekilde güncelleyin',
+    'Validation Error' => 'Geçerli değil',
+    'View' => 'Görüntüle',
+    'View Port' => 'Bağlantı Noktasını Görüntüle',
+    'You have to delete the rule related in order to delete this port' => 'Bu portun silinmesi için ilgili kuralın silinmesi gerekmektedir.',
+);

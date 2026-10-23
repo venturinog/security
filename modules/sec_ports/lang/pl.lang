@@ -1,0 +1,72 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s jest nieprawidłowe',
+    '%s is required' => '%s jest wymagane',
+    'Are you sure you wish to delete the port(s).' => 'Czy na pewno chcesz usunąć port(y)?',
+    'Are you sure you wish to delete the port(s)?' => 'Czy na pewno chcesz usunąć port(y)?',
+    'Back' => 'Wstecz',
+    'Cancel' => 'Anuluj',
+    'Code' => 'Kod',
+    'Comment' => 'Komentarz',
+    'Define Port' => 'Zdefiniuj port',
+    'Define Ports' => 'Zdefiniuj porty',
+    'Delete' => 'Usuń',
+    'Delete correctly' => 'Usuń poprawnie',
+    'Details' => 'Szczegóły',
+    'ERROR' => 'Error',
+    'Edit' => 'Edytuj',
+    'Edit Port' => 'Edytuj port',
+    'Error' => 'Błąd',
+    'Filter applied: ' => 'Zastosowano filtr:',
+    'Filter by' => 'Filtruj według',
+    'Message' => 'Wiadomość',
+    'Name' => 'Imię',
+    'New Port' => 'Nowy Port',
+    'No records were selected' => 'Nie wybrano żadnych rekordów',
+    'Option' => 'Opcja',
+    'Port' => 'Port',
+    'Port used in a firewall rule' => 'Port używany w regule zapory sieciowej',
+    'Port(s)' => 'Port(y)',
+    'Port- Service' => 'Serwis portowy',
+    'Ports' => 'Porty',
+    'Protocol' => 'Protokół',
+    'Protocol Number' => 'Numer protokołu',
+    'Required field' => 'Wymagane pole',
+    'Save' => 'Zapisz',
+    'Save correctly' => 'Zapisz poprawnie',
+    'Search' => 'Szukaj',
+    'Show' => 'Pokaż',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'Niektóre reguły mogą zostać dezaktywowane z powodu tych zmian. Sprawdź reguły zapory sieciowej',
+    'The following fields contain errors' => 'Następujące pola zawierają błędy',
+    'The name and the port can not be empty fields' => 'Nazwa i port nie mogą być pustymi polami',
+    'The name and the protocol number can not be empty fields' => 'Nazwa i numer protokołu nie mogą być polami pustymi',
+    'The name, type and code can not be empty fields' => 'Nazwa, typ i kod nie mogą być polami pustymi',
+    'This port had already been defined' => 'Ten port został już zdefiniowany',
+    'To' => 'Do',
+    'Type' => 'Wpisz',
+    'Update correctly' => 'Aktualizuj poprawnie',
+    'Validation Error' => 'Błąd walidacji',
+    'View' => 'Zobacz',
+    'View Port' => 'Zobacz Port',
+    'You have to delete the rule related in order to delete this port' => 'Aby usunąć ten port, musisz usunąć powiązaną regułę',
+);

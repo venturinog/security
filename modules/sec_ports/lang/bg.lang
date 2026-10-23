@@ -1,0 +1,72 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s е невалидно',
+    '%s is required' => '%s е задължително',
+    'Are you sure you wish to delete the port(s).' => 'Сигурни ли сте, че искате да изтриете порта(овете).',
+    'Are you sure you wish to delete the port(s)?' => 'Сигурни ли сте, че искате да изтриете портовете?',
+    'Back' => 'Назад',
+    'Cancel' => 'Отказ',
+    'Code' => 'Код',
+    'Comment' => 'Коментирайте',
+    'Define Port' => 'Дефиниране на порт',
+    'Define Ports' => 'Дефиниране на портове',
+    'Delete' => 'Изтрий',
+    'Delete correctly' => 'Изтрийте правилно',
+    'Details' => 'Подробности',
+    'ERROR' => 'Error',
+    'Edit' => 'Редактирай',
+    'Edit Port' => 'Редактиране на порт',
+    'Error' => 'Грешка',
+    'Filter applied: ' => 'Приложен филтър:',
+    'Filter by' => 'Филтриране по',
+    'Message' => 'Съобщение',
+    'Name' => 'Име',
+    'New Port' => 'Ново пристанище',
+    'No records were selected' => 'Няма избрани записи',
+    'Option' => 'опция',
+    'Port' => 'Порт',
+    'Port used in a firewall rule' => 'Порт, използван в правило за защитна стена',
+    'Port(s)' => 'Порт(ове)',
+    'Port- Service' => 'Пристанищна услуга',
+    'Ports' => 'Портове',
+    'Protocol' => 'протокол',
+    'Protocol Number' => 'Номер на протокола',
+    'Required field' => 'Задължителни полета',
+    'Save' => 'Запази',
+    'Save correctly' => 'Запазете правилно',
+    'Search' => 'Търсене',
+    'Show' => 'Покажи',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'Някои правила може да бъдат деактивирани поради тези промени, моля, проверете правилата на защитната стена',
+    'The following fields contain errors' => 'Следните полета съдържат грешки',
+    'The name and the port can not be empty fields' => 'Името и портът не могат да бъдат празни полета',
+    'The name and the protocol number can not be empty fields' => 'Името и номерът на протокола не могат да бъдат празни полета',
+    'The name, type and code can not be empty fields' => 'Името, типът и кодът не могат да бъдат празни полета',
+    'This port had already been defined' => 'Този порт вече е дефиниран',
+    'To' => 'до',
+    'Type' => 'Тип',
+    'Update correctly' => 'Актуализирайте правилно',
+    'Validation Error' => 'Грешка при Потвърждаване',
+    'View' => 'Преглед',
+    'View Port' => 'Преглед на порт',
+    'You have to delete the rule related in order to delete this port' => 'Трябва да изтриете свързаното правило, за да изтриете този порт',
+);

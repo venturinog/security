@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0.2                                               |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,48 +17,56 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  +----------------------------------------------------------------------+
-  $Id: en.lang,v 1.2 2010-12-10 03:09:33 Alberto Santos asantos@palosanto.com Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"Port- Service" => "Port- Service",
-"Ports" => "Ports",
-"Port" => "Port",
-"Option" => "Option",
-"Name" => "Nom",
-"Protocol" => "Protocole",
-"Port(s)" => "Port(s)",
-"Delete" => "Supprimer",
-"View" => "Voir",
-"Edit" => "Modifier",
-"New Port" => "Nouveau port",
-"Comment" => "Commentaire",
-"Save correctly" => "Sauvegarde effectuée",
-"Delete correctly" => "Suppression effectuée",
-"Update correctly" => "Modification effectuée",
-"Details" => "Détails",
-"Message" => "Message",
-"Error" => "Erreur",
-"Are you sure you wish to delete the port(s)." => "Etes-vous sûr de vouloir supprimer le(s) port(s) ?",
-"Filter by" => "Filtrer par",
-"Name" => "Nom",
-"Define Ports" => "Gestion des ports",
-"Define Port" => "Ajouter",
-"Edit Port" => "Modifier port",
-"View Port" => "Voir port",
-"Protocol Number" => "Numéro de protocole",
-"Type" => "Type",
-"Code" => "Code",
-"This port had already been defined" => "Ce port existe déjà",
-"The name and the port can not be empty fields" => "Le nom et le port doivent être renseignés",
-"The name, type and code can not be empty fields" => "Le nom, type et code doivent être renseignés",
-"The name and the protocol number can not be empty fields" => "Le nom et numéro de protocole doivent être renseignés",
-"The following fields contain errors" => "Les champs suivants contiennent des erreurs",
-"Validation Error" => "Erreur de validation",
-"Port used in a firewall rule" => "Le port est utilisé dans une règle du firewall",
-"You have to delete the rule related in order to delete this port" => "Vous devez supprimer les règles qui lui sont associées afin de pouvoir supprimer le port",
-"Some rules could be deactivated due to these changes, please check the firewall rules" => "Certaines règles peuvent être désactivées à cause de ces modifications, veuillez vérifier les règles du firewall"
+$arrLangModule = array(
+    '%s is invalid' => '%s nʼest pas valide',
+    '%s is required' => '%s est obligatoire',
+    'Are you sure you wish to delete the port(s).' => 'Etes-vous sûr de vouloir supprimer le(s) port(s) ?',
+    'Are you sure you wish to delete the port(s)?' => 'Etes-vous sûr de vouloir supprimer le(s) port(s) ?',
+    'Back' => 'Retour',
+    'Cancel' => 'Annuler',
+    'Code' => 'Coder',
+    'Comment' => 'Commentaire',
+    'Define Port' => 'Ajouter',
+    'Define Ports' => 'Gestion des ports',
+    'Delete' => 'Supprimer',
+    'Delete correctly' => 'Suppression effectuée',
+    'Details' => 'Détails',
+    'ERROR' => 'Erreur',
+    'Edit' => 'Modifier',
+    'Edit Port' => 'Modifier port',
+    'Error' => 'Erreur',
+    'Filter applied: ' => 'Filtre appliqué :',
+    'Filter by' => 'Filtrer par',
+    'Message' => 'Message',
+    'Name' => 'Nom',
+    'New Port' => 'Nouveau port',
+    'No records were selected' => 'Aucun enregistrement n\'a été sélectionné',
+    'Option' => 'Options',
+    'Port' => 'Port',
+    'Port used in a firewall rule' => 'Le port est utilisé dans une règle du firewall',
+    'Port(s)' => 'Port(s)',
+    'Port- Service' => 'Service portuaire',
+    'Ports' => 'Ports',
+    'Protocol' => 'Protocole',
+    'Protocol Number' => 'Numéro de protocole',
+    'Required field' => 'Champ requis',
+    'Save' => 'Sauver',
+    'Save correctly' => 'Sauvegarde effectuée',
+    'Search' => 'Rechercher',
+    'Show' => 'Montrer',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'Certaines règles peuvent être désactivées à cause de ces modifications, veuillez vérifier les règles du firewall',
+    'The following fields contain errors' => 'Les champs suivants contiennent des erreurs',
+    'The name and the port can not be empty fields' => 'Le nom et le port doivent être renseignés',
+    'The name and the protocol number can not be empty fields' => 'Le nom et numéro de protocole doivent être renseignés',
+    'The name, type and code can not be empty fields' => 'Le nom, type et code doivent être renseignés',
+    'This port had already been defined' => 'Ce port existe déjà',
+    'To' => 'À',
+    'Type' => 'Type',
+    'Update correctly' => 'Modification effectuée',
+    'Validation Error' => 'Erreur de validation',
+    'View' => 'Voir',
+    'View Port' => 'Voir port',
+    'You have to delete the rule related in order to delete this port' => 'Vous devez supprimer les règles qui lui sont associées afin de pouvoir supprimer le port',
 );
-?>
-

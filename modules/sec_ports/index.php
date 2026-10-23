@@ -46,6 +46,8 @@ function _moduleContent(&$smarty, $module_name)
     //conexion
     $pDB = new paloDB($arrConf['dsn_conn_database']);
 
+    $smarty->assign('SECURITY_ALERT', '');
+
     //actions
     $accion = getAction();
     $content = "";
@@ -79,7 +81,7 @@ function reportPuertos($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     //begin grid parameters
     $oGrid  = new paloSantoGrid($smarty);
     $oGrid->addNew("new",_tr("Define Port"));
-    $oGrid->deleteList("Are you sure you wish to delete the port(s).?","delete",_tr("Delete"));
+    $oGrid->deleteList(_tr("Are you sure you wish to delete the port(s)?"),"delete",_tr("Delete"));
 
     $totalPuertos = $pPuertos->ObtainNumPuertos($field_type, $field_pattern);
 
@@ -100,35 +102,35 @@ function reportPuertos($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
 
     $arrData = null;
     $arrResult = $pPuertos->ObtainPuertos($limit, $offset, $field_type, $field_pattern);
-    $button_eliminar = "";
-    $arrColumns = array($button_eliminar,_tr("Name"),_tr("Protocol"),_tr("Details"),_tr("Option"));
+    $arrColumns = array('',_tr("Name"),_tr("Protocol"),_tr("Details"),_tr("Option"));
     $oGrid->setColumns($arrColumns);
     if( is_array($arrResult) && $total>0 ){
         foreach($arrResult as $key => $value){
-            $arrTmp[0] = "<input type='checkbox' name='".$value['id']."' id='".$value['id']."'>";
-            $arrTmp[1] = htmlspecialchars($value['name']);
-            $arrTmp[2] = htmlspecialchars($value['protocol']);
+            $id = (int)$value['id'];
+            $arrTmp[0] = "<input type='checkbox' name='del_x[]' value='".$id."'>";
+            $arrTmp[1] = htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[2] = htmlspecialchars((string)$value['protocol'], ENT_COMPAT, 'UTF-8');
             if($value['protocol'] == "TCP" || $value['protocol'] == "UDP"){
                 $port = $value['details'];
                 $arrTmp[3] = ( stripos($port,":") === false ) ? _tr('Port')."  ".htmlspecialchars($value['details']) : _tr('Ports')."  ".htmlspecialchars($value['details']);
             }elseif($value['protocol'] == "ICMP"){
                 $arr = explode(":",$value['details']);
                 if(isset($arr[1]))
-                    $arrTmp[3] = "Type: ".$arr[0]." Code: ".$arr[1];
+                    $arrTmp[3] = _tr('Type').": ".htmlspecialchars($arr[0])." "._tr('Code').": ".htmlspecialchars($arr[1]);
             }else
-                $arrTmp[3] = "Protocol Number: ".htmlspecialchars($value['details']);
-            $arrTmp[4] = "&nbsp;<a href='?menu=$module_name&action=view&id=".$value['id']."'>"._tr('View')."</a>";
+                $arrTmp[3] = _tr('Protocol Number').": ".htmlspecialchars($value['details']);
+            $arrTmp[4] = "&nbsp;<a href='?menu=$module_name&action=view&id=".$id."'>"._tr('View')."</a>";
             $arrData[] = $arrTmp;
         }
     }
     $oGrid->setData($arrData);
     //begin section filter
-    $arrFormFilterPuertos = createFieldForm();
+    $arrFormFilterPuertos = createFieldFilter();
     $oFilterForm = new paloForm($smarty, $arrFormFilterPuertos);
     $smarty->assign("SHOW", _tr("Show"));
 
     $_POST["filter_type"]  = $field_type;
-    $_POST["filter_txt"] = $field_pattern;
+    $_POST["filter_txt"]   = $field_pattern;
 
     if(is_null($field_type) || $field_type==""){
         $nameFieldType = "";
@@ -142,15 +144,12 @@ function reportPuertos($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     //end section filter
 
     $oGrid->showFilter(trim($htmlFilter));
-    $contenidoModulo = $oGrid->fetchGrid();
-    if (strpos($contenidoModulo, '<form') === FALSE)
-        $contenidoModulo = "<form  method='POST' style='margin-bottom:0;' action=$url>$contenidoModulo</form>";
     //end grid parameters
 
-    return $contenidoModulo;
+    return $smarty->getTemplateVars('SECURITY_ALERT').$oGrid->fetchGrid();
 }
 
-function createFieldForm()
+function createFieldFilter()
 {
     $arrType = array("name" => _tr("Name"), "protocol" => _tr("Protocol"));
 
@@ -164,132 +163,82 @@ function createFieldForm()
             "filter_txt"   => array(   "LABEL"                  => "",
                                        "REQUIRED"               => "no",
                                        "INPUT_TYPE"             => "TEXT",
-                                       "INPUT_EXTRA_PARAM"      => array("id" => "filter_value"),
+                                       "INPUT_EXTRA_PARAM"      => array("id" => "filter_value", "class" => "form-control"),
                                        "VALIDATION_TYPE"        => "text",
                                        "VALIDATION_EXTRA_PARAM" => ""),
                     );
     return $arrFormElements;
 }
 
-function NewViewPuerto($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, $action)
+function NewViewPuerto($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, $action, $errors = array(), $data = array())
 {
     $arrFormNew = createFieldFormNew();
+    $protocol = isset($data['protocol']) ? $data['protocol'] : getParameter("protocol");
+    if ($protocol === null || $protocol === '') $protocol = 'TCP';
+
+    // En vista/edición, cargar la fila desde la base.
+    if (($action === 'view' || $action === 'edit') && count($data) === 0) {
+        $id = getParameter('id');
+        if ($id === null || $id === '') $id = getParameter('idtemp');
+        $oPalo = new paloSantoPortService($pDB);
+        $result = $oPalo->loadPuerto($id);
+        if (is_array($result)) {
+            $data = array(
+                'id'       => $result['id'],
+                'name'     => $result['name'],
+                'protocol' => $result['protocol'],
+                'comment'  => $result['comment'],
+            );
+            if ($result['protocol'] == "TCP" || $result['protocol'] == "UDP") {
+                $arrPort = explode(':', $result['details']);
+                $data['port']  = $arrPort[0];
+                $data['port2'] = isset($arrPort[1]) ? $arrPort[1] : '';
+            } elseif ($result['protocol'] == "ICMP") {
+                $value = explode(":", $result['details']);
+                $data['type'] = $value[0];
+                $data['code'] = isset($value[1]) ? $value[1] : '';
+            } else {
+                $data['protocol_number'] = $result['details'];
+            }
+            $protocol = $result['protocol'];
+        }
+    }
+
+    // Marca de error por campo.
+    foreach (array('name','port','port2','type','code','protocol_number') as $f) {
+        if (!isset($errors[$f])) continue;
+        if (!isset($arrFormNew[$f]['INPUT_EXTRA_PARAM']) || !is_array($arrFormNew[$f]['INPUT_EXTRA_PARAM']))
+            $arrFormNew[$f]['INPUT_EXTRA_PARAM'] = array();
+        $cls = isset($arrFormNew[$f]['INPUT_EXTRA_PARAM']['class'])
+            ? $arrFormNew[$f]['INPUT_EXTRA_PARAM']['class'].' ' : 'form-control ';
+        $arrFormNew[$f]['INPUT_EXTRA_PARAM']['class'] = $cls.'is-invalid';
+    }
+
     $oForm = new paloForm($smarty, $arrFormNew);
-    $titulo = "";
+    $titulo = _tr('Define Port');
+    if ($action === 'edit') $titulo = _tr('Edit Port');
+    if ($action === 'view') $titulo = _tr('View Port');
+
     $smarty->assign("CANCEL", _tr("Cancel"));
+    $smarty->assign("BACK", _tr("Back"));
+    $smarty->assign("EDIT", _tr("Edit"));
     $smarty->assign("REQUIRED_FIELD", _tr("Required field"));
-    $smarty->assign("icon", "images/list.png");
-    $protocol = getParameter("protocol");
-
-    if( $action == 'new' )
-    {
-        $smarty->assign("SAVE", _tr("Save"));
-        if($protocol=="ICMP"){
-            $smarty->assign("port_style", "style = 'display:none;'");
-            $smarty->assign("protocol_style", "style = 'display:none;'");
-        }elseif($protocol=="IP"){
-            $smarty->assign("port_style", "style = 'display:none;'");
-            $smarty->assign("type_style", "style = 'display:none;'");
-            $smarty->assign("code_style", "style = 'display:none;'");
-        }else{
-            $smarty->assign("protocol_style", "style = 'display:none;'");
-            $smarty->assign("type_style", "style = 'display:none;'");
-            $smarty->assign("code_style", "style = 'display:none;'");
-        }
-        $titulo = _tr('Define Port');
-    }
-    else if( $action == 'edit' )
-    {
-        $id = $_POST['idtemp'];
-
-        $smarty->assign("IDTEMP", $id);
-        $smarty->assign("SAVE", _tr("Save"));
-
-        $oPalo = new paloSantoPortService($pDB);
-        $result = $oPalo->loadPuerto($id);
-
-        $smarty->assign("EDIT", _tr("Edit"));
-        $smarty->assign("IDTEMP", $id);
-
-        $_POST['name'] = $result['name'];
-        $_POST['protocol'] = $result['protocol'];
-
-        if($result['protocol'] == "TCP" || $result['protocol'] == "UDP"){
-            $hasGuion = 'yes';
-            $arrPort = explode(':', $result['details'] );
-            $_POST['port'] = $arrPort[0];
-            $_POST['port2'] = isset( $arrPort[1] ) ? $arrPort[1] : '';
-            $smarty->assign("type_style", "style = 'display:none;'");
-            $smarty->assign("code_style", "style = 'display:none;'");
-            $smarty->assign("protocol_style", "style = 'display:none;'");
-            if( $_POST['port2'] == '' ) $hasGuion = 'no';
-            $smarty->assign("HAS", $hasGuion);
-        }elseif($result['protocol'] == "ICMP"){
-               $smarty->assign("port_style", "style = 'display:none;'");
-               $smarty->assign("protocol_style", "style = 'display:none;'");
-               $value = explode(":",$result['details']);
-               $_POST['type'] = $value[0];
-               $_POST['code'] = $value[1];
-        }else{
-               $smarty->assign("port_style", "style = 'display:none;'");
-               $smarty->assign("type_style", "style = 'display:none;'");
-               $smarty->assign("code_style", "style = 'display:none;'");
-               $_POST['protocol_number'] = $result['details'];
-        }
-
-
-        $_POST['comment'] = $result['comment'];
-
-        $titulo = _tr('Edit Port');
-    }
-    else if( $action == 'view' )
-    {
-        $id = $_GET['id'];
-        $oPalo = new paloSantoPortService($pDB);
-        $result = $oPalo->loadPuerto($id);
-
-        $smarty->assign("EDIT", _tr("Edit"));
-        $smarty->assign("IDTEMP", $id);
-
-        $_POST['name'] = $result['name'];
-        $_POST['protocol'] = $result['protocol'];
-
-        if($result['protocol'] == "TCP" || $result['protocol'] == "UDP"){
-            $hasGuion = 'yes';
-            $arrPort = explode(':', $result['details'] );
-            $_POST['port'] = $arrPort[0];
-            $_POST['port2'] = isset( $arrPort[1] ) ? $arrPort[1] : '';
-            $smarty->assign("type_style", "style = 'display:none;'");
-            $smarty->assign("code_style", "style = 'display:none;'");
-            $smarty->assign("protocol_style", "style = 'display:none;'");
-            if( $_POST['port2'] == '' ) $hasGuion = 'no';
-            $smarty->assign("HAS", $hasGuion);
-        }elseif($result['protocol'] == "ICMP"){
-               $smarty->assign("port_style", "style = 'display:none;'");
-               $smarty->assign("protocol_style", "style = 'display:none;'");
-               $value = explode(":",$result['details']);
-               $_POST['type'] = $value[0];
-               $_POST['code'] = $value[1];
-        }else{
-               $smarty->assign("port_style", "style = 'display:none;'");
-               $smarty->assign("type_style", "style = 'display:none;'");
-               $smarty->assign("code_style", "style = 'display:none;'");
-               $_POST['protocol_number'] = $result['details'];
-        }
-        $_POST['comment'] = $result['comment'];
-
-        $oForm->setViewMode();
-        $titulo = _tr('View Port');
-
-
-    }
-
+    $smarty->assign("SAVE", _tr("Save"));
     $smarty->assign("MODE", $action);
+    $smarty->assign("PROTOCOL", $protocol);
+    $smarty->assign("icon", "images/list.png");
+    $smarty->assign("ERRORS", array_merge(array(
+        'name' => '', 'port' => '', 'port2' => '', 'type' => '', 'code' => '', 'protocol_number' => ''
+    ), $errors));
+    $smarty->assign("VALUES", array_merge(array(
+        'id' => '', 'name' => '', 'port' => '', 'port2' => '', 'type' => '', 'code' => '',
+        'protocol_number' => '', 'comment' => ''
+    ), $data));
 
-    $htmlForm = $oForm->fetchForm("$local_templates_dir/form.tpl", $titulo, $_POST);
+    $htmlForm = $oForm->fetchForm("$local_templates_dir/form.tpl", $titulo, $data);
     $contenidoModulo = "<form  method='POST' style='margin-bottom:0;' action='?menu=$module_name'>".$htmlForm."</form>";
 
-    return $contenidoModulo;
+    return $smarty->getTemplateVars('SECURITY_ALERT').$contenidoModulo;
 }
 
 function createFieldFormNew()
@@ -298,13 +247,13 @@ function createFieldFormNew()
 
     $arrFields = array(
             "name"      => array(   "LABEL"                  => _tr("Name"),
-                                    "REQUIRED"               => "no",
+                                    "REQUIRED"               => "yes",
                                     "INPUT_TYPE"             => "TEXT",
-                                    "INPUT_EXTRA_PARAM"      => array("style" => "width:162px"),
+                                    "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
                                     "VALIDATION_TYPE"        => "text",
                                     "VALIDATION_EXTRA_PARAM" => "" ),
             "protocol"  => array(   "LABEL"                  => _tr("Protocol"),
-                                    "REQUIRED"               => "no",
+                                    "REQUIRED"               => "yes",
                                     "INPUT_TYPE"             => "SELECT",
                                     "INPUT_EXTRA_PARAM"      => $arrProtocols,
                                     "VALIDATION_TYPE"        => "text",
@@ -313,37 +262,37 @@ function createFieldFormNew()
             "port"      => array(   "LABEL"                  => _tr("Port"),
                                     "REQUIRED"               => "no",
                                     "INPUT_TYPE"             => "TEXT",
-                                    "INPUT_EXTRA_PARAM"      => array("style" => "width:76px"),
+                                    "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
                                     "VALIDATION_TYPE"        => "numeric",
                                     "VALIDATION_EXTRA_PARAM" => "" ),
-            "port2"     => array(   "LABEL"                  => "",
+            "port2"     => array(   "LABEL"                  => _tr("To"),
                                     "REQUIRED"               => "no",
                                     "INPUT_TYPE"             => "TEXT",
-                                    "INPUT_EXTRA_PARAM"      => array("style" => "width:76px"),
+                                    "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
                                     "VALIDATION_TYPE"        => "numeric",
                                     "VALIDATION_EXTRA_PARAM" => "" ),
             "type"     => array(    "LABEL"                  => _tr("Type"),
                                     "REQUIRED"               => "no",
                                     "INPUT_TYPE"             => "TEXT",
-                                    "INPUT_EXTRA_PARAM"      => array("style" => "width:162px"),
-                                    "VALIDATION_TYPE"        => "ereg",
-                                    "VALIDATION_EXTRA_PARAM" => "^[a-zA-Z0-9]+$" ),
+                                    "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
+                                    "VALIDATION_TYPE"        => "numeric",
+                                    "VALIDATION_EXTRA_PARAM" => "" ),
             "code"     => array(    "LABEL"                  => _tr("Code"),
                                     "REQUIRED"               => "no",
                                     "INPUT_TYPE"             => "TEXT",
-                                    "INPUT_EXTRA_PARAM"      => array("style" => "width:162px"),
+                                    "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
                                     "VALIDATION_TYPE"        => "numeric",
                                     "VALIDATION_EXTRA_PARAM" => "" ),
     "protocol_number"  => array(    "LABEL"                  => _tr("Protocol Number"),
                                     "REQUIRED"               => "no",
                                     "INPUT_TYPE"             => "TEXT",
-                                    "INPUT_EXTRA_PARAM"      => array("style" => "width:162px"),
+                                    "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
                                     "VALIDATION_TYPE"        => "numeric",
                                     "VALIDATION_EXTRA_PARAM" => "" ),
             "comment"   => array(   "LABEL"                  => _tr("Comment"),
                                     "REQUIRED"               => "no",
                                     "INPUT_TYPE"             => "TEXTAREA",
-                                    "INPUT_EXTRA_PARAM"      => "",
+                                    "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
                                     "VALIDATION_TYPE"        => "text",
                                     "VALIDATION_EXTRA_PARAM" => "" ),
             );
@@ -351,81 +300,89 @@ function createFieldFormNew()
     return $arrFields;
 }
 
+/**
+ * Valida un puerto TCP/UDP (1-65535).
+ */
+function validPortNumber($value)
+{
+    return preg_match('/^[0-9]{1,5}$/', (string)$value) && (int)$value >= 1 && (int)$value <= 65535;
+}
+
 function savePuerto($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
-    $arrFormNew = createFieldFormNew();
-    $oForm      = new paloForm($smarty, $arrFormNew);
     $mode       = getParameter('mode');
-    $name       = getParameter("name");
+    if (!in_array($mode, array('new','edit'), true)) $mode = 'new';
+    $name       = trim((string)getParameter("name"));
     $protocol   = getParameter("protocol");
-    $port1      = getParameter("port");
-    $port2      = getParameter("port2");
-    $port       = ($port2 == "") ? $port1 : $port1.":".$port2;
-    $type       = getParameter("type");
-    $code       = getParameter("code");
-    $protocol_number = getParameter("protocol_number");
-    $comment    = getParameter("comment");
+    if (!in_array($protocol, array('TCP','UDP','ICMP','IP'), true)) $protocol = 'TCP';
+    $port1      = trim((string)getParameter("port"));
+    $port2      = trim((string)getParameter("port2"));
+    $type       = trim((string)getParameter("type"));
+    $code       = trim((string)getParameter("code"));
+    $protocol_number = trim((string)getParameter("protocol_number"));
+    $comment    = (string)getParameter("comment");
     $id_except  = ( $mode == 'new' ) ? 0 : getParameter('idtemp');
-    $isError    = false;
 
+    $errors = array();
+    if ($name === '') $errors['name'] = sprintf(_tr('%s is required'), _tr('Name'));
+
+    if ($protocol == 'TCP' || $protocol == 'UDP') {
+        if ($port1 === '') {
+            $errors['port'] = sprintf(_tr('%s is required'), _tr('Port'));
+        } elseif (!validPortNumber($port1)) {
+            $errors['port'] = sprintf(_tr('%s is invalid'), _tr('Port'));
+        }
+        if ($port2 !== '' && !validPortNumber($port2)) {
+            $errors['port2'] = sprintf(_tr('%s is invalid'), _tr('To'));
+        } elseif ($port2 !== '' && $port1 !== '' && (int)$port2 < (int)$port1) {
+            $errors['port2'] = sprintf(_tr('%s is invalid'), _tr('To'));
+        }
+    } elseif ($protocol == 'ICMP') {
+        if ($type === '') $errors['type'] = sprintf(_tr('%s is required'), _tr('Type'));
+        elseif (!preg_match('/^[0-9]{1,3}$/', $type) || (int)$type > 255) $errors['type'] = sprintf(_tr('%s is invalid'), _tr('Type'));
+        if ($code === '') $errors['code'] = sprintf(_tr('%s is required'), _tr('Code'));
+        elseif (!preg_match('/^[0-9]{1,3}$/', $code) || (int)$code > 255) $errors['code'] = sprintf(_tr('%s is invalid'), _tr('Code'));
+    } elseif ($protocol == 'IP') {
+        if ($protocol_number === '') $errors['protocol_number'] = sprintf(_tr('%s is required'), _tr('Protocol Number'));
+        elseif (!preg_match('/^[0-9]{1,3}$/', $protocol_number) || (int)$protocol_number > 255) $errors['protocol_number'] = sprintf(_tr('%s is invalid'), _tr('Protocol Number'));
+    }
+
+    $port = ($port2 == "") ? $port1 : $port1.":".$port2;
     $oPalo = new paloSantoPortService($pDB);
     $portName = "";
-    if($oPalo->hasPuerto($protocol, $port, $type, $code, $protocol_number, $portName, $id_except) == true ){
-        $strErrorMsg = _tr("This port had already been defined").": $portName";
-        $isError = true;
-    }
-    else if(($protocol == "TCP" || $protocol == "UDP") && ($name=="" || $port1=="")){
-        $strErrorMsg = _tr("The name and the port can not be empty fields");
-        $isError = true;
-    }
-    else if($protocol == "ICMP" && ($name=="" || $type=="" || $code=="")){
-        $strErrorMsg = _tr("The name, type and code can not be empty fields");
-        $isError = true;
-    }
-    else if($protocol == "IP" && ($name=="" || $protocol_number=="")){
-        $strErrorMsg = _tr("The name and the protocol number can not be empty fields");
-        $isError = true;
-    }
-    else if(!$oForm->validateForm($_POST)) {
-        // Falla la validación básica del formulario
-        $strErrorMsg = "<b>"._tr('The following fields contain errors').":</b><br/>";
-        $arrErrores = $oForm->arrErroresValidacion;
-        if(is_array($arrErrores) && count($arrErrores) > 0){
-            foreach($arrErrores as $k=>$v) {
-                $strErrorMsg .= "$k: [$v[mensaje]] <br /> ";
-            }
-        }
-        $isError = true;
+    if (count($errors) === 0 &&
+        $oPalo->hasPuerto($protocol, $port, $type, $code, $protocol_number, $portName, $id_except) == true) {
+        $errors['port'] = _tr("This port had already been defined").": ".$portName;
     }
 
-    $desactivated = false;
-    if($isError){ // validation errors
-        $smarty->assign("mb_title", _tr("Validation Error"));
-        $smarty->assign("mb_message", $strErrorMsg);
-        return NewViewPuerto($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $mode);
+    if (count($errors) > 0) {
+        $data = array(
+            'name' => $name, 'protocol' => $protocol, 'port' => $port1, 'port2' => $port2,
+            'type' => $type, 'code' => $code, 'protocol_number' => $protocol_number,
+            'comment' => $comment, 'id' => $id_except,
+        );
+        return NewViewPuerto($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $mode, $errors, $data);
     }
-    else if($mode == 'new'){
+
+    if($mode == 'new'){
         if($oPalo->savePuertos($name, $protocol, $port, $type, $code, $protocol_number, $comment)){
-            $smarty->assign("mb_title", _tr("Message"));
-            $smarty->assign("mb_message", _tr("Save correctly"));
+            $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr('Message'), _tr('Save correctly')));
         }
         else{
-            $smarty->assign("mb_title", "Error");
-            $smarty->assign("mb_message", $oPalo->errMsg);
+            $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr('ERROR'), $oPalo->errMsg));
             return NewViewPuerto($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $mode);
         }
     }
     else{//edit
+        $desactivated = false;
         if($oPalo->updatePuertos($id_except, $name, $protocol, $port, $type, $code, $protocol_number, $comment, $desactivated)){
-	    $msg = _tr("Update correctly");
-	    if($desactivated)
-		$msg .= "<br />"._tr("Some rules could be deactivated due to these changes, please check the firewall rules");
-            $smarty->assign("mb_title", _tr("Message"));
-            $smarty->assign("mb_message", $msg);
+            $msg = _tr("Update correctly");
+            if($desactivated)
+                $msg .= " "._tr("Some rules could be deactivated due to these changes, please check the firewall rules");
+            $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr('Message'), $msg));
         }
         else{
-            $smarty->assign("mb_title", _tr("Error"));
-            $smarty->assign("mb_message", $oPalo->errMsg);
+            $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr('ERROR'), $oPalo->errMsg));
             return NewViewPuerto($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $mode);
         }
     }
@@ -436,25 +393,31 @@ function deletePuertos($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
 {
     $oPalo = new paloSantoPortService($pDB);
     $str_msj_error = "";
+    $ids = isset($_POST['del_x']) && is_array($_POST['del_x']) ? $_POST['del_x'] : array();
 
-    foreach( $_POST as $key => $value ){
-        if( $value == "on" ){
-	    $port = "";
-	    if(!$oPalo->isPortInService($key, $port)){
-		if( $oPalo->deletePuerto($key) == false )
-		    $str_msj_error .= $oPalo->errMsg."<br />";
-	    }
-	    else
-		$str_msj_error .= _tr("Port used in a firewall rule").": $port[name]. "._tr("You have to delete the rule related in order to delete this port")."<br />";
+    if (count($ids) === 0) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('warning', _tr('Message'), _tr('No records were selected')));
+        return reportPuertos($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+    }
+
+    foreach( $ids as $id ){
+        $id = (int)$id;
+        $port = "";
+        if(!$oPalo->isPortInService($id, $port)){
+            if( $oPalo->deletePuerto($id) == false )
+                $str_msj_error .= htmlspecialchars((string)$oPalo->errMsg, ENT_COMPAT, 'UTF-8')."<br />";
+        } else {
+            $info = $oPalo->loadPuerto($id);
+            $portName = is_array($info) && isset($info['name']) ? $info['name'] : '';
+            $str_msj_error .= _tr("Port used in a firewall rule").": ".htmlspecialchars($portName, ENT_COMPAT, 'UTF-8').". "
+                             . _tr("You have to delete the rule related in order to delete this port")."<br />";
         }
     }
     if( strlen($str_msj_error) == 0 ){
-        $smarty->assign("mb_title", _tr("Message"));
-        $smarty->assign("mb_message", _tr("Delete correctly"));
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr('Message'), _tr('Delete correctly')));
     }
     else{
-        $smarty->assign("mb_title", _tr("ERROR"));
-        $smarty->assign("mb_message", $str_msj_error);
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr('ERROR'), $str_msj_error, array('html' => true)));
     }
 
     return reportPuertos($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
@@ -463,13 +426,14 @@ function deletePuertos($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
 
 function getAction()
 {
+    $isPost = ($_SERVER['REQUEST_METHOD'] === 'POST');
     if(getParameter("show")) //Get parameter by POST (submit)
         return "show";
-    if(getParameter("delete")) //Get parameter by POST (submit)
+    if($isPost && getParameter("delete")) //Get parameter by POST (submit)
         return "delete";
     else if(getParameter("new"))
         return "new";
-    else if(getParameter("save"))
+    else if($isPost && getParameter("save"))
         return "save";
     else if(getParameter("edit"))
         return "edit";

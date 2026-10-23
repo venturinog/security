@@ -1,0 +1,72 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s nije ispravno',
+    '%s is required' => '%s je obavezno',
+    'Are you sure you wish to delete the port(s).' => 'Jeste li sigurni da želite izbrisati port(ove).',
+    'Are you sure you wish to delete the port(s)?' => 'Jeste li sigurni da želite izbrisati port(ove)?',
+    'Back' => 'Natrag',
+    'Cancel' => 'Odustani',
+    'Code' => 'Šifra',
+    'Comment' => 'Komentirajte',
+    'Define Port' => 'Definirajte luku',
+    'Define Ports' => 'Definirajte luke',
+    'Delete' => 'Izbriši',
+    'Delete correctly' => 'Brisanje ispravno',
+    'Details' => 'pojedinosti',
+    'ERROR' => 'Error',
+    'Edit' => 'Uredi',
+    'Edit Port' => 'Uredi priključak',
+    'Error' => 'Greška',
+    'Filter applied: ' => 'Primijenjen filtar:',
+    'Filter by' => 'Filtriraj prema',
+    'Message' => 'Poruka',
+    'Name' => 'Ime',
+    'New Port' => 'Nova luka',
+    'No records were selected' => 'Nije odabran nijedan zapis',
+    'Option' => 'Opcija',
+    'Port' => 'Port',
+    'Port used in a firewall rule' => 'Port koji se koristi u pravilu vatrozida',
+    'Port(s)' => 'Luka(i)',
+    'Port- Service' => 'Lučka služba',
+    'Ports' => 'luke',
+    'Protocol' => 'Protokol',
+    'Protocol Number' => 'Broj protokola',
+    'Required field' => 'Obvezatno polje',
+    'Save' => 'Spremi',
+    'Save correctly' => 'Spremite ispravno',
+    'Search' => 'Pretraži',
+    'Show' => 'Prikaži',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'Neka bi pravila mogla biti deaktivirana zbog ovih promjena, provjerite pravila vatrozida',
+    'The following fields contain errors' => 'Slijedeće polje sadržava pogreške',
+    'The name and the port can not be empty fields' => 'Naziv i port ne mogu biti prazna polja',
+    'The name and the protocol number can not be empty fields' => 'Naziv i broj protokola ne mogu biti prazna polja',
+    'The name, type and code can not be empty fields' => 'Naziv, tip i kod ne smiju biti prazna polja',
+    'This port had already been defined' => 'Ovaj port je već definiran',
+    'To' => 'Za',
+    'Type' => 'Vrsta',
+    'Update correctly' => 'Ažurirajte ispravno',
+    'Validation Error' => 'Pogreška provjere',
+    'View' => 'Prikaži',
+    'View Port' => 'Pogled na luku',
+    'You have to delete the rule related in order to delete this port' => 'Morate izbrisati povezano pravilo kako biste izbrisali ovaj priključak',
+);

@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,53 +17,63 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  +----------------------------------------------------------------------+
-  $Id: ru.lang,v 2.5. 2016-02-12 14:48:33 Andrey Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"Port- Service" => "Port- Service",
-"Ports" => "Порты",
-"Port" => "Порт",
-"Option" => "Опции",
-"Protocol" => "Протокол",
-"Port(s)" => "Порт(ы)",
-"Delete" => "Удалить",
-"View" => "Просмотр",
-"Edit" => "Редактировать",
-"New Port" => "Новый Порт",
-"Comment" => "Коментарий",
-"Save correctly" => "Сохранено успешно",
-"Delete correctly" => "Удалено успешно",
-"Update correctly" => "Обновлено успешно",
-"Details" => "Детали",
-"Message" => "Сообщение",
-"Error" => "Ошибка",
-"Are you sure you wish to delete the port(s).?" => "Вы уверены, что хотите удалить порт(ы)?",
-"Filter by" => "Фильтровать по",
-"Name" => "Название",
-"Define Ports" => "Определение Портов",
-"Define Port" => "Определить Порт",
-"Edit Port" => "Редактировать Порт",
-"View Port" => "Просмотр Порта",
-"Protocol Number" => "Номер Протокола",
-"Type" => "Тип",
-"Code" => "Code",
-"This port had already been defined" => "Этот порт уже был определён",
-"The name and the port can not be empty fields" => "Название и порт не могут быть пустыми полями",
-"The name, type and code can not be empty fields" => "Название, тип и код не могут быть пустыми полями",
-"The name and the protocol number can not be empty fields" => "Название и номер протокола не могут быть пустыми",
-"The following fields contain errors" => "Следующие поля содержат ошибки",
-"Validation Error" => "Ошибка валидации",
-"Port used in a firewall rule" => "Порт используется в правиле Сетевого Экрана",
-"You have to delete the rule related in order to delete this port" => "Вам необходимо сначала удалить связаное правило, для того чтобы удалить этот порт",
-"Some rules could be deactivated due to these changes, please check the firewall rules" => "Некоторые правила могут быть деактивированы из-за этих изменений, пожалуйста, проверьте правила Сетевого Экрана",
-"Show Filter" => "Показать Фильтр",
-"Hide Filter" => "Скрыть Фильтр",
-"Filter applied: " => "Текущий фильтр: ",
-"Page" => "Страница",
-"records" => "записей",
-"of" => "из",
-"No records match the filter criteria" => "Нет записей, соответствующих критериям фильтра",
+$arrLangModule = array(
+    '%s is invalid' => '%s неверно',
+    '%s is required' => '%s обязательно',
+    'Are you sure you wish to delete the port(s).' => 'Вы уверены, что хотите удалить порт(ы)?',
+    'Are you sure you wish to delete the port(s).?' => 'Вы уверены, что хотите удалить порт(ы)?',
+    'Are you sure you wish to delete the port(s)?' => 'Вы уверены, что хотите удалить порт(ы)?',
+    'Back' => 'Назад',
+    'Cancel' => 'Отменить',
+    'Code' => 'Код',
+    'Comment' => 'Коментарий',
+    'Define Port' => 'Определить Порт',
+    'Define Ports' => 'Определение Портов',
+    'Delete' => 'Удалить',
+    'Delete correctly' => 'Удалено успешно',
+    'Details' => 'Детали',
+    'ERROR' => 'Ошибка',
+    'Edit' => 'Редактировать',
+    'Edit Port' => 'Редактировать Порт',
+    'Error' => 'Ошибка',
+    'Filter applied: ' => 'Текущий фильтр: ',
+    'Filter by' => 'Фильтровать по',
+    'Hide Filter' => 'Скрыть Фильтр',
+    'Message' => 'Сообщение',
+    'Name' => 'Название',
+    'New Port' => 'Новый Порт',
+    'No records match the filter criteria' => 'Нет записей, соответствующих критериям фильтра',
+    'No records were selected' => 'Никакие записи не были выбраны',
+    'Option' => 'Опции',
+    'Page' => 'Страница',
+    'Port' => 'Порт',
+    'Port used in a firewall rule' => 'Порт используется в правиле Сетевого Экрана',
+    'Port(s)' => 'Порт(ы)',
+    'Port- Service' => 'Порт-Сервис',
+    'Ports' => 'Порты',
+    'Protocol' => 'Протокол',
+    'Protocol Number' => 'Номер Протокола',
+    'Required field' => 'Обязательное поле',
+    'Save' => 'Сохранить',
+    'Save correctly' => 'Сохранено успешно',
+    'Search' => 'Искать',
+    'Show' => 'Показать',
+    'Show Filter' => 'Показать Фильтр',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'Некоторые правила могут быть деактивированы из-за этих изменений, пожалуйста, проверьте правила Сетевого Экрана',
+    'The following fields contain errors' => 'Следующие поля содержат ошибки',
+    'The name and the port can not be empty fields' => 'Название и порт не могут быть пустыми полями',
+    'The name and the protocol number can not be empty fields' => 'Название и номер протокола не могут быть пустыми',
+    'The name, type and code can not be empty fields' => 'Название, тип и код не могут быть пустыми полями',
+    'This port had already been defined' => 'Этот порт уже был определён',
+    'To' => 'Чтобы',
+    'Type' => 'Тип',
+    'Update correctly' => 'Обновлено успешно',
+    'Validation Error' => 'Ошибка валидации',
+    'View' => 'Просмотр',
+    'View Port' => 'Просмотр Порта',
+    'You have to delete the rule related in order to delete this port' => 'Вам необходимо сначала удалить связаное правило, для того чтобы удалить этот порт',
+    'of' => 'из',
+    'records' => 'записей',
 );
-?>

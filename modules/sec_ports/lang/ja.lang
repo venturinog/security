@@ -1,0 +1,72 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s が無効です',
+    '%s is required' => '%s は必須です',
+    'Are you sure you wish to delete the port(s).' => 'ポートを削除してもよろしいですか。',
+    'Are you sure you wish to delete the port(s)?' => 'ポートを削除してもよろしいですか?',
+    'Back' => '戻る',
+    'Cancel' => 'キャンセル',
+    'Code' => 'コード',
+    'Comment' => 'コメント',
+    'Define Port' => 'ポートの定義',
+    'Define Ports' => 'ポートの定義',
+    'Delete' => '削除',
+    'Delete correctly' => '正しく削除してください',
+    'Details' => '詳細',
+    'ERROR' => 'Error',
+    'Edit' => '編集',
+    'Edit Port' => 'ポートの編集',
+    'Error' => 'エラー',
+    'Filter applied: ' => '適用されたフィルター:',
+    'Filter by' => 'フィルター条件',
+    'Message' => 'メッセージ',
+    'Name' => '名前',
+    'New Port' => '新しい港',
+    'No records were selected' => 'レコードが選択されていませんでした',
+    'Option' => 'オプション',
+    'Port' => 'ポート',
+    'Port used in a firewall rule' => 'ファイアウォールルールで使用されるポート',
+    'Port(s)' => 'ポート',
+    'Port- Service' => 'ポートサービス',
+    'Ports' => 'ポート',
+    'Protocol' => 'プロトコル',
+    'Protocol Number' => 'プロトコル番号',
+    'Required field' => '必須フィールド',
+    'Save' => '保存',
+    'Save correctly' => '正しく保存する',
+    'Search' => '検索',
+    'Show' => '表示',
+    'Some rules could be deactivated due to these changes, please check the firewall rules' => 'これらの変更により一部のルールが無効になる可能性があります。ファイアウォール ルールを確認してください。',
+    'The following fields contain errors' => '以下の内容に間違いがあります',
+    'The name and the port can not be empty fields' => '名前とポートを空のフィールドにすることはできません',
+    'The name and the protocol number can not be empty fields' => '名前とプロトコル番号を空のフィールドにすることはできません',
+    'The name, type and code can not be empty fields' => '名前、タイプ、コードを空のフィールドにすることはできません',
+    'This port had already been defined' => 'このポートはすでに定義されています',
+    'To' => 'に',
+    'Type' => '種類',
+    'Update correctly' => '正しくアップデートする',
+    'Validation Error' => '検証エラー',
+    'View' => '表示',
+    'View Port' => 'ビューポート',
+    'You have to delete the rule related in order to delete this port' => 'このポートを削除するには、関連するルールを削除する必要があります',
+);
