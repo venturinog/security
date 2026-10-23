@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' Enjoy. ;)' => 'Bucurați-vă. ;)',
+    '%s is invalid' => '%s este invalid',
+    '%s is required' => '%s este obligatoriu',
+    '1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- Creați un domeniu valid cumpărându-l de la furnizorul dvs. preferat sau obțineți unul de la serviciul DDNS gratuit precum No-Ip.org',
+    '10.- Enjoy.' => '10.- Bucurați-vă.',
+    '2.- Be sure that you domain is redirected to your PBX Service.' => '2.- Asigurați-vă că domeniul dumneavoastră este redirecționat către Serviciul PBX.',
+    '3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.' => '3.- Deschideți porturile 443 și 80 din firewall și redirecționați către PBX.',
+    '4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated' => '4.- In campul DOMAIN introduceti domeniul dumneavoastra pentru a obtine un certificat valabil. Puteți adăuga mai multe domenii separate prin virgulă',
+    '5.- In the field EMAIL enter your email to register your account.' => '5.- În câmpul EMAIL introduceți adresa de e-mail pentru a vă înregistra contul.',
+    '6.- To renew your certificate press the Renew button.' => '6.- Pentru a vă reînnoi certificatul apăsați butonul Renew.',
+    '7.- For test certificates enable the Staging checkbox.' => '7.- Pentru certificatele de testare, activați caseta de selectare Staging.',
+    '8.- After the process finish, reload your window with the Domain name (make sure the DNS is set internally too).' => '8.- După terminarea procesului, reîncărcați fereastra cu numele de domeniu (asigurați-vă că DNS-ul este setat și intern).',
+    '8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).' => '8.- După terminarea procesului, reîncărcați fereastra cu numele de domeniu (asigurați-vă că DNS-ul este setat și intern).',
+    '9.- You can enable the firewall rules again for ports 443 and 80.' => '9.- Puteți activa din nou regulile firewall pentru porturile 443 și 80.',
+    '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>' => '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>',
+    'Domain' => 'Domeniul',
+    'Email' => 'E-mail',
+    'Install' => 'Instalați',
+    'Install New Certificate from Let\'s Encrypt' => 'Instalați un nou certificat din Let\'s Encrypt',
+    'Output log' => 'Jurnal de ieșire',
+    'Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let\'s Encrypt to validate the SSL certificate. You should not access the site via IP address.' => 'Asigurați-vă că accesați interfața de utilizare web printr-un nume valid configurat în DNS. Acesta ar fi același domeniu pe care îl veți transmite către Let\'s Encrypt pentru a valida certificatul SSL. Nu ar trebui să accesați site-ul prin adresa IP.',
+    'Processing' => 'Prelucrare',
+    'Renew' => 'Reînnoiește',
+    'Renew Certificate' => 'Reînnoiți certificatul',
+    'Required field' => 'Camp Obligatoriu',
+    'Staging Certificate (use this for testing)' => 'Certificat de etapa (utilizați-l pentru testare)',
+    'Staging Certificate(Use this for testing)' => 'Certificat de etapa (Folosiți acest lucru pentru testare)',
+    'The domain is invalid' => 'Domeniul este invalid',
+    'The request could not be completed' => 'Solicitarea nu a putut fi finalizată',
+    'This is your actual account and domain configuration' => 'Aceasta este configurația reală a contului și a domeniului',
+    'Usage' => 'Utilizare',
+    'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.' => 'Vizitați https://letsencrypt.org pentru a afla mai multe despre procesul de certificare gratuită, TOS și Acordul de licență. Acesta este un GUI de bază pentru APACHE CERTBOT și este furnizat ca atare și fără garanție. Dacă aveți întrebări, vă rugăm să le furnizați pe forum. Nu uitați să donați pentru Proiectul Let\'s Encrypt.',
+);

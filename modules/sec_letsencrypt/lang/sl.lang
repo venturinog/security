@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' Enjoy. ;)' => 'Uživajte. ;)',
+    '%s is invalid' => '%s ni veljavno',
+    '%s is required' => '%s je obvezno',
+    '1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- Ustvarite veljavno domeno tako, da jo kupite pri želenem prodajalcu ali jo dobite pri brezplačni storitvi DDNS, kot je No-Ip.org',
+    '10.- Enjoy.' => '10.- Uživajte.',
+    '2.- Be sure that you domain is redirected to your PBX Service.' => '2.- Prepričajte se, da je vaša domena preusmerjena na vašo PBX storitev.',
+    '3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.' => '3.- Odprite vrata 443 in 80 v požarnem zidu in preusmerite na vašo PBX.',
+    '4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated' => '4.- V polje DOMENA vnesite svojo domeno za pridobitev veljavnega certifikata. Dodate lahko veliko domen, ločenih z vejicami',
+    '5.- In the field EMAIL enter your email to register your account.' => '5.- V polje EMAIL vnesite svoj e-poštni naslov, da registrirate svoj račun.',
+    '6.- To renew your certificate press the Renew button.' => '6.- Za obnovitev potrdila pritisnite gumb Obnovi.',
+    '7.- For test certificates enable the Staging checkbox.' => '7.- Za preskusna potrdila omogočite potrditveno polje Staging.',
+    '8.- After the process finish, reload your window with the Domain name (make sure the DNS is set internally too).' => '8.- Po končanem postopku ponovno naložite svoje okno z imenom domene (prepričajte se, da je tudi DNS nastavljen interno).',
+    '8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).' => '8.- Po končanem postopku ponovno naložite svoje okno z imenom domene (prepričajte se, da je tudi DNS nastavljen interno).',
+    '9.- You can enable the firewall rules again for ports 443 and 80.' => '9.- Ponovno lahko omogočite pravila požarnega zidu za vrata 443 in 80.',
+    '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>' => '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>',
+    'Domain' => 'Domena',
+    'Email' => 'E-pošta',
+    'Install' => 'Namestite',
+    'Install New Certificate from Let\'s Encrypt' => 'Namestite novo potrdilo podjetja Let\'s Encrypt',
+    'Output log' => 'Izhodni dnevnik',
+    'Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let\'s Encrypt to validate the SSL certificate. You should not access the site via IP address.' => 'Prepričajte se, da do spletnega uporabniškega vmesnika dostopate prek veljavnega imena, konfiguriranega v vašem DNS. To bi bila ista domena, ki jo boste posredovali podjetju Let\'s Encrypt za potrditev potrdila SSL. Do spletnega mesta ne bi smeli dostopati prek naslova IP.',
+    'Processing' => 'Obdelava',
+    'Renew' => 'Obnovi',
+    'Renew Certificate' => 'Obnovi potrdilo',
+    'Required field' => 'Potrebno polje',
+    'Staging Certificate (use this for testing)' => 'Staging Certificate (uporabite ga za testiranje)',
+    'Staging Certificate(Use this for testing)' => 'Uprizoritveno potrdilo (uporabite to za testiranje)',
+    'The domain is invalid' => 'Domena je neveljavna',
+    'The request could not be completed' => 'Zahteve ni bilo mogoče dokončati',
+    'This is your actual account and domain configuration' => 'To je vaša dejanska konfiguracija računa in domene',
+    'Usage' => 'Uporaba',
+    'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.' => 'Obiščite https://letsencrypt.org, če želite izvedeti več o brezplačnem postopku certificiranja, njihovih TOS in licenčni pogodbi. To je osnovni GUI za APACHE CERTBOT in je na voljo tak kot je in brez garancije. Če imate kakršna koli vprašanja, jih navedite na forumu. Ne pozabite prispevati za projekt Let\'s Encrypt.',
+);

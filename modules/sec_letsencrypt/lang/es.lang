@@ -2,9 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0.0                                                |
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -18,27 +19,37 @@
   +----------------------------------------------------------------------+
 */
 global $arrLangModule;
-$arrLangModule=array(
-"This is your actual account and domain configuration"=>"Esta es la información de su certificado actual",
-"Install New Certificate from Let's Encrypt"=>"Instalar certificado nuevo de Let's Encrypt",
-"Domain"=>"Dominio",
-"Email"=>"Email",
-"Install"=>"Instalar",
-"Renew"=>"Renovar",
-"Usage"=>"Modo de Uso",
-"Renew Certificate"=>"Renovar Certificado",
-"Staging Certificate(Use this for testing)"=>"Certificado de Pruebas (usado para testing)",
-"1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org"=>"1.- Registre un dominio válido con cualquier registrador de domnios, u obtenga uno de un servicio DDNS como No-Ip.org",
-"2.- Be sure that you domain is redirected to your PBX Service."=>"2.- Asegúrese de apuntar el nuevo dominio a la dirección IP de su servidor Issabel.",
-"3.- Open the 443 and 80 ports in your firewall and redirect to your PBX."=>"3.- Abra los puertos 443 y 80 en el firewall y rediríjalos a su servidor.",
-"4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated"=>"4.- En el campo Dominio ingrese el dominio para el cual desea obtener un certificado SSL. Puede especificar varios dominios separándolos por coma",
-"5.- In the field EMAIL enter your email to register your account."=>"5.- En el campo Email ingrese la dirección de correo donde recibirá notificación de vencimientos de su certificado.",
-"6.- To renew your certificate press the Renew button."=>"6.- Para renovar un certificado, pulse el botón Renovar.",
-"7.- For test certificates enable the Staging checkbox."=>"7.- Para emitir certificados de prueba, marque la casilla Certificado de Pruebas.",
-"8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too)."=>"8.- Una vez finalizado el proceso, refresque la ventana de su navegador (y asegúrese de que el DNS interno está también configurado).",
-"9.- You can enable the firewall rules again for ports 443 and 80."=>"9.- Puede reactivar el firewall para los puertos 443 y 80 nuevamente.",
-" Enjoy. ;)"=>" Disfrute. ;) ",
-"<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don't forget to Donate to the Let's Encrypt Project</small>"=>"<small>Visite <strong>https://letsencrypt.org</strong> para conocer más sobre su programa de certificados gratuitos y los términos de uso del servicio y acuerdo de licencia. Esta es una interfaz básica para utilizar Certbot y es provista sin garantías de ningún tipo. Si tiene alguna pregunta realícelas en el foro. Y no olvide donar al proyecto Let's Encrypt</small>",
-"Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let's Encrypt to validate the SSL certificate. You should not access the site via IP address." => "Asegúrese de acceder a la interfaz web a través de un nombre válido configurado en sus DNS. Ese sería el mismo dominio que se pasará a Let's Encrypt para validar el certificado SSL. No debe acceder al sitio a través de la dirección IP."
+$arrLangModule = array(
+    ' Enjoy. ;)' => ' Disfrute. ;) ',
+    '%s is invalid' => '%s no es válido',
+    '%s is required' => '%s es obligatorio',
+    '1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- Registre un dominio válido con cualquier registrador de domnios, u obtenga uno de un servicio DDNS como No-Ip.org',
+    '10.- Enjoy.' => '10.- Disfruta.',
+    '2.- Be sure that you domain is redirected to your PBX Service.' => '2.- Asegúrese de apuntar el nuevo dominio a la dirección IP de su servidor Issabel.',
+    '3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.' => '3.- Abra los puertos 443 y 80 en el firewall y rediríjalos a su servidor.',
+    '4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated' => '4.- En el campo Dominio ingrese el dominio para el cual desea obtener un certificado SSL. Puede especificar varios dominios separándolos por coma',
+    '5.- In the field EMAIL enter your email to register your account.' => '5.- En el campo Email ingrese la dirección de correo donde recibirá notificación de vencimientos de su certificado.',
+    '6.- To renew your certificate press the Renew button.' => '6.- Para renovar un certificado, pulse el botón Renovar.',
+    '7.- For test certificates enable the Staging checkbox.' => '7.- Para emitir certificados de prueba, marque la casilla Certificado de Pruebas.',
+    '8.- After the process finish, reload your window with the Domain name (make sure the DNS is set internally too).' => '8.- Una vez finalizado el proceso, vuelve a cargar tu ventana con el nombre de dominio (asegúrate de que el DNS también esté configurado internamente).',
+    '8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).' => '8.- Una vez finalizado el proceso, refresque la ventana de su navegador (y asegúrese de que el DNS interno está también configurado).',
+    '9.- You can enable the firewall rules again for ports 443 and 80.' => '9.- Puede reactivar el firewall para los puertos 443 y 80 nuevamente.',
+    '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>' => '<small>Visite <strong>https://letsencrypt.org</strong> para conocer más sobre su programa de certificados gratuitos y los términos de uso del servicio y acuerdo de licencia. Esta es una interfaz básica para utilizar Certbot y es provista sin garantías de ningún tipo. Si tiene alguna pregunta realícelas en el foro. Y no olvide donar al proyecto Let\'s Encrypt</small>',
+    'Domain' => 'Dominio',
+    'Email' => 'Correo electrónico',
+    'Install' => 'Instalar',
+    'Install New Certificate from Let\'s Encrypt' => 'Instalar certificado nuevo de Let\'s Encrypt',
+    'Output log' => 'Registro de salida',
+    'Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let\'s Encrypt to validate the SSL certificate. You should not access the site via IP address.' => 'Asegúrese de acceder a la interfaz web a través de un nombre válido configurado en sus DNS. Ese sería el mismo dominio que se pasará a Let\'s Encrypt para validar el certificado SSL. No debe acceder al sitio a través de la dirección IP.',
+    'Processing' => 'Procesamiento',
+    'Renew' => 'Renovar',
+    'Renew Certificate' => 'Renovar Certificado',
+    'Required field' => 'Campo requerido',
+    'Staging Certificate (use this for testing)' => 'Certificado de preparación (utilícelo para realizar pruebas)',
+    'Staging Certificate(Use this for testing)' => 'Certificado de Pruebas (usado para testing)',
+    'The domain is invalid' => 'El dominio no es válido',
+    'The request could not be completed' => 'La solicitud no se pudo completar.',
+    'This is your actual account and domain configuration' => 'Esta es la información de su certificado actual',
+    'Usage' => 'Modo de Uso',
+    'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.' => 'Visite https://letsencrypt.org para saber más sobre el proceso de certificación gratuito, sus TOS y el acuerdo de licencia. Esta es una GUI básica para APACHE CERTBOT y se proporciona tal cual y sin garantía. Si tienes alguna pregunta por favor déjala en el foro. No olvides hacer una donación al Proyecto Let\'s Encrypt.',
 );
-?>

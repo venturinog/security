@@ -2,9 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0.0                                                |
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -18,26 +19,37 @@
   +----------------------------------------------------------------------+
 */
 global $arrLangModule;
-$arrLangModule=array(
-"This is your actual account and domain configuration"=>"This is your actual account and domain configuration",
-"Install New Certificate from Let's Encrypt"=>"Install New Certificate from Let's Encrypt",
-"Domain"=>"Domain",
-"Email"=>"Email",
-"Install"=>"Install",
-"Renew"=>"Renew",
-"Usage"=>"Usage",
-"Renew Certificate"=>"Renew Certificate",
-"Staging Certificate(Use this for testing)"=>"Staging Certificate(Use this for testing)",
-"1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org"=>"1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org",
-"2.- Be sure that you domain is redirected to your PBX Service."=>"2.- Be sure that you domain is redirected to your PBX Service.",
-"3.- Open the 443 and 80 ports in your firewall and redirect to your PBX."=>"3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.",
-"4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated"=>"4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated",
-"5.- In the field EMAIL enter your email to register your account."=>"5.- In the field EMAIL enter your email to register your account.",
-"6.- To renew your certificate press the Renew button."=>"6.- To renew your certificate press the Renew button.",
-"7.- For test certificates enable the Staging checkbox."=>"7.- For test certificates enable the Staging checkbox.",
-"8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too)."=>"8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).",
-"9.- You can enable the firewall rules again for ports 443 and 80."=>"9.- You can enable the firewall rules again for ports 443 and 80.",
-" Enjoy. ;)"=>" Enjoy. ;) ",
-"<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don't forget to Donate to the Let's Encrypt Project</small>"=>"<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don't forget to Donate to the Let's Encrypt Project</small>",
+$arrLangModule = array(
+    ' Enjoy. ;)' => ' Enjoy. ;) ',
+    '%s is invalid' => '%s が無効です',
+    '%s is required' => '%s は必須です',
+    '1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- 有効なドメインを作成するには、優先ベンダーから購入するか、No-Ip.org などの無料の DDNS サービスから取得します。',
+    '10.- Enjoy.' => '10.- 楽しんでください。',
+    '2.- Be sure that you domain is redirected to your PBX Service.' => '2.- ドメインが PBX サービスにリダイレクトされていることを確認します。',
+    '3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.' => '3.- ファイアウォールの 443 ポートと 80 ポートを開き、PBX にリダイレクトします。',
+    '4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated' => '4.- [ドメイン] フィールドにドメインを入力し、有効な証明書を取得します。カンマ区切りで多数のドメインを追加できます',
+    '5.- In the field EMAIL enter your email to register your account.' => '5.- EMAIL フィールドに、アカウントを登録するための電子メールを入力します。',
+    '6.- To renew your certificate press the Renew button.' => '6.- 証明書を更新するには、[更新] ボタンを押します。',
+    '7.- For test certificates enable the Staging checkbox.' => '7.- テスト証明書の場合は、「ステージング」チェックボックスをオンにします。',
+    '8.- After the process finish, reload your window with the Domain name (make sure the DNS is set internally too).' => '8.- プロセスが完了したら、ドメイン名を使用してウィンドウを再読み込みします (DNS も内部的に設定されていることを確認してください)。',
+    '8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).' => '8.- プロセスが完了したら、ドメイン名を使用してウィンドウをリロードします (DNS も内部的に設定されていることを確認してください)。',
+    '9.- You can enable the firewall rules again for ports 443 and 80.' => '9.- ポート 443 および 80 に対してファイアウォール ルールを再度有効にすることができます。',
+    '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>' => '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>',
+    'Domain' => 'ドメイン',
+    'Email' => '電子メール',
+    'Install' => 'インストール',
+    'Install New Certificate from Let\'s Encrypt' => 'Let\'s Encrypt から新しい証明書をインストールする',
+    'Output log' => 'ログを出力する',
+    'Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let\'s Encrypt to validate the SSL certificate. You should not access the site via IP address.' => '必ず DNS で構成された有効な名前を使用して Web UI にアクセスしてください。これは、SSL 証明書を検証するために Let\'s Encrypt に渡すドメインと同じになります。 IP アドレスを使用してサイトにアクセスしないでください。',
+    'Processing' => '処理中',
+    'Renew' => '更新する',
+    'Renew Certificate' => '証明書を更新する',
+    'Required field' => '必須フィールド',
+    'Staging Certificate (use this for testing)' => 'ステージング証明書 (これをテストに使用します)',
+    'Staging Certificate(Use this for testing)' => 'ステージング証明書 (テストに使用します)',
+    'The domain is invalid' => 'ドメインが無効です',
+    'The request could not be completed' => 'リクエストを完了できませんでした',
+    'This is your actual account and domain configuration' => 'これは実際のアカウントとドメインの構成です',
+    'Usage' => '使用法',
+    'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.' => '無料の認定プロセス、TOS、ライセンス契約の詳細については、https://letsencrypt.org にアクセスしてください。これは APACHE CERTBOT の基本的な GUI であり、現状のまま提供され、保証はありません。ご質問がございましたら、フォーラムにご記入ください。 Let\'s Encrypt プロジェクトに寄付することを忘れないでください。',
 );
-?>

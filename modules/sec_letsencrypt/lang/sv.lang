@@ -2,9 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0.0                                                |
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -18,26 +19,37 @@
   +----------------------------------------------------------------------+
 */
 global $arrLangModule;
-$arrLangModule=array(
-"This is your actual account and domain configuration"=>"This is your actual account and domain configuration",
-"Install New Certificate from Let's Encrypt"=>"Install New Certificate from Let's Encrypt",
-"Domain"=>"Domain",
-"Email"=>"Email",
-"Install"=>"Install",
-"Renew"=>"Renew",
-"Usage"=>"Usage",
-"Renew Certificate"=>"Renew Certificate",
-"Staging Certificate(Use this for testing)"=>"Staging Certificate(Use this for testing)",
-"1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org"=>"1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org",
-"2.- Be sure that you domain is redirected to your PBX Service."=>"2.- Be sure that you domain is redirected to your PBX Service.",
-"3.- Open the 443 and 80 ports in your firewall and redirect to your PBX."=>"3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.",
-"4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated"=>"4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated",
-"5.- In the field EMAIL enter your email to register your account."=>"5.- In the field EMAIL enter your email to register your account.",
-"6.- To renew your certificate press the Renew button."=>"6.- To renew your certificate press the Renew button.",
-"7.- For test certificates enable the Staging checkbox."=>"7.- For test certificates enable the Staging checkbox.",
-"8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too)."=>"8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).",
-"9.- You can enable the firewall rules again for ports 443 and 80."=>"9.- You can enable the firewall rules again for ports 443 and 80.",
-" Enjoy. ;)"=>" Enjoy. ;) ",
-"<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don't forget to Donate to the Let's Encrypt Project</small>"=>"<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don't forget to Donate to the Let's Encrypt Project</small>",
+$arrLangModule = array(
+    ' Enjoy. ;)' => ' Enjoy. ;) ',
+    '%s is invalid' => '%s är ogiltigt',
+    '%s is required' => '%s krävs',
+    '1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- Skapa en giltig domän genom att köpa den hos din föredragna leverantör eller skaffa en från gratis DDNS-tjänst som No-Ip.org',
+    '10.- Enjoy.' => '10.- Njut.',
+    '2.- Be sure that you domain is redirected to your PBX Service.' => '2.- Se till att din domän omdirigeras till din PBX-tjänst.',
+    '3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.' => '3.- Öppna 443- och 80-portarna i din brandvägg och omdirigera till din PBX.',
+    '4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated' => '4.- I fältet DOMÄN anger du din domän för att få ett giltigt certifikat. Du kan lägga till många domäner kommaseparerade',
+    '5.- In the field EMAIL enter your email to register your account.' => '5.- I fältet E-POST anger du din e-postadress för att registrera ditt konto.',
+    '6.- To renew your certificate press the Renew button.' => '6.- För att förnya ditt certifikat, tryck på knappen Förnya.',
+    '7.- For test certificates enable the Staging checkbox.' => '7.- För testcertifikat, markera kryssrutan Staging.',
+    '8.- After the process finish, reload your window with the Domain name (make sure the DNS is set internally too).' => '8.- När processen är klar, ladda om ditt fönster med domännamnet (se till att DNS är inställt internt också).',
+    '8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).' => '8.- När processen är klar, ladda om ditt fönster med domännamnet (se till att DNS är inställt internt också).',
+    '9.- You can enable the firewall rules again for ports 443 and 80.' => '9.- Du kan aktivera brandväggsreglerna igen för portarna 443 och 80.',
+    '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>' => '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>',
+    'Domain' => 'Domän',
+    'Email' => 'E-post',
+    'Install' => 'Installera',
+    'Install New Certificate from Let\'s Encrypt' => 'Installera nytt certifikat från Let\'s Encrypt',
+    'Output log' => 'Utdatalogg',
+    'Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let\'s Encrypt to validate the SSL certificate. You should not access the site via IP address.' => 'Se till att du kommer åt webbgränssnittet via ett giltigt namn som konfigurerats i din DNS. Det skulle vara samma domän som du skickar till Let\'s Encrypt för att validera SSL-certifikatet. Du bör inte komma åt sidan via IP-adress.',
+    'Processing' => 'Bearbetning',
+    'Renew' => 'Förnya',
+    'Renew Certificate' => 'Förnya certifikat',
+    'Required field' => 'Obligatoriskt fält',
+    'Staging Certificate (use this for testing)' => 'Staging Certificate (använd detta för testning)',
+    'Staging Certificate(Use this for testing)' => 'Staging Certificate (Använd detta för testning)',
+    'The domain is invalid' => 'Domänen är ogiltig',
+    'The request could not be completed' => 'Begäran kunde inte slutföras',
+    'This is your actual account and domain configuration' => 'Detta är din faktiska konto- och domänkonfiguration',
+    'Usage' => 'Användning',
+    'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.' => 'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.',
 );
-?>

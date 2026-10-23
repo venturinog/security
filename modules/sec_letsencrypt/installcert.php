@@ -1,4 +1,23 @@
 <?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
 include("/var/www/html/libs/misc.lib.php");
 include("/var/www/html/configs/default.conf.php");
 include("/var/www/html/libs/paloSantoACL.class.php");
@@ -10,20 +29,58 @@ session_start();
 
 $pDB  = new paloDB($arrConf["issabel_dsn"]["acl"]);
 $pACL = new paloACL($pDB);
-if(isset($_SESSION["issabel_user"])) {
-    $issabel_user = $_SESSION["issabel_user"];
-} else {
-    $issabel_user = "";
-}
+$issabel_user = isset($_SESSION["issabel_user"]) ? $_SESSION["issabel_user"] : "";
 
 session_commit();
 
 if(!$pACL->isUserAdministratorGroup($issabel_user)){
+    http_response_code(403);
+    die();
+}
+
+// Este endpoint vive fuera del index.php del framework, así que el guard
+// global no se ejecuta solo. csrf.js añade la cabecera X-Issabel-CSRF-Token a
+// todo AJAX de jQuery; en modo enforce un POST sin token responde 403.
+issabel_csrf_guard();
+
+// Este script no se ejecuta desde el index.php del framework: las rutas
+// relativas de load_language_module() no aplican. Se carga el idioma con
+// rutas absolutas y se conserva el inglés como respaldo.
+global $arrLang, $arrLangModule;
+$arrLang = array();
+$lang = get_language('/var/www/html/');
+include_once '/var/www/html/modules/sec_letsencrypt/lang/en.lang';
+$arrLangEN = isset($arrLangModule) ? $arrLangModule : array();
+if ($lang !== 'en') {
+    $langFile = '/var/www/html/modules/sec_letsencrypt/lang/'.$lang.'.lang';
+    if (is_readable($langFile)) {
+        include_once $langFile;
+        $arrLangModule = array_merge($arrLangEN, $arrLangModule);
+    }
+}
+$arrLang = array_merge($arrLang, $arrLangModule);
+
+header('Content-Type: application/json; charset=utf-8');
+
+/**
+ * Devuelve el log de certbot listo para insertar en el DOM, escapado.
+ */
+function cert_output_html($result)
+{
+    return '<strong>'._tr('Output log').':</strong><br><pre>'
+         . nl2br(htmlspecialchars((string)$result, ENT_COMPAT, 'UTF-8'))
+         . '</pre>';
+}
+
+function cert_json($data)
+{
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     die();
 }
 
 $pNet = new paloNetwork();
 $arrNetwork = $pNet->obtener_configuracion_red();
+$arrNetworkData = array('dns_ip_1' => '', 'dns_ip2' => '', 'host' => '', 'gateway_ip' => '');
 if(is_array($arrNetwork)) {
     $arrNetworkData['dns_ip_1'] = isset($arrNetwork['dns'][0])?$arrNetwork['dns'][0]:'';
     $arrNetworkData['dns_ip2'] = isset($arrNetwork['dns'][1])?$arrNetwork['dns'][1]:'';
@@ -31,178 +88,81 @@ if(is_array($arrNetwork)) {
     $arrNetworkData['gateway_ip'] = isset($arrNetwork['gateway'])?$arrNetwork['gateway']:'';
 }
 
-$renew=0;
+// Renovación: no requiere dominio ni email, usa la configuración guardada.
 if(isset($_POST['renew'])) {
-    $renew = 1;
-} else {
-    $staging = isset($_POST['staging'])?$_POST['staging']:'';
-    $domain  = $_POST['domain'];
-    $email   = $_POST['email'];
-    $arrNetworkData['host'] = $domain;
-}
-
-// Do a renew
-if($renew==1) {
     exec("/usr/bin/issabel-helper ssl_certbot renewcertificate", $result, $retorno);
-    $result = implode("\n",$result);
-
-    $output = "<strong>Output log: </strong><br><pre>";
-    $getvars = array();
-        
-    $result1 = str_replace("<","",$result);
-    $result2 = str_replace(">","",$result1);
-    $result3 = str_replace("\n","<br>",$result2);
-    $output .= $result3;
-
-    $getvars['result'] = $output;
-
-    echo __json_encode($getvars);
-
-    die();
+    cert_json(array(
+        'status' => $retorno == 0 ? 'success' : 'error',
+        'result' => cert_output_html(implode("\n", $result)),
+    ));
 }
 
-// Install new Cert
+// Instalación de un certificado nuevo.
+$staging = (isset($_POST['staging']) && $_POST['staging'] === '--test-cert') ? '--test-cert' : '';
+$domain  = isset($_POST['domain']) ? trim((string)$_POST['domain']) : '';
+$email   = isset($_POST['email'])  ? trim((string)$_POST['email'])  : '';
 
-// if one value is empty display the required label
-if($domain==''){
-    echo "0";
-} elseif ($email=='') {
-    echo "0";
-} else {
+$errors = array();
+$domainList = array();
+foreach (explode(',', $domain) as $d) {
+    $d = trim($d);
+    if ($d === '') continue;
+    if (!preg_match('/^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?$/', $d) || strpos($d, '..') !== false) {
+        $errors['domain'] = _tr('The domain is invalid');
+        break;
+    }
+    $domainList[] = $d;
+}
+if (count($domainList) === 0) {
+    $errors['domain'] = sprintf(_tr('%s is required'), _tr('Domain'));
+}
+if ($email === '') {
+    $errors['email'] = sprintf(_tr('%s is required'), _tr('Email'));
+} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors['email'] = sprintf(_tr('%s is invalid'), _tr('Email'));
+}
 
-    // Check to see if we have ServerName defined in ssl.conf, if not, add it
-    $modify=0;
-    $sslfile = "/etc/httpd/conf.d/ssl.conf";
+if (count($errors) > 0) {
+    cert_json(array('status' => 'error', 'errors' => $errors));
+}
 
-    // Check to see if setting is already set on file
+$arrNetworkData['host'] = $domain;
+
+// Check to see if we have ServerName defined in ssl.conf, if not, add it
+$modify=0;
+$sslfile = "/etc/httpd/conf.d/ssl.conf";
+if (is_readable($sslfile)) {
     foreach (file($sslfile) as $sLinea) {
         if (preg_match('/^[\s]*?ServerName\s*/', $sLinea)) {
             $modify=1;
         }
     }
-
-    if($modify==0) {
-        exec("/usr/bin/issabel-helper ssl_certbot insertservername ".escapeshellarg($domain), $respuesta, $retorno);
-    } else {
-        exec("/usr/bin/issabel-helper ssl_certbot editservername ".escapeshellarg($domain), $respuesta, $retorno);
-    }
-
-    exec("/usr/bin/issabel-helper ssl_certbot newcertificate ".escapeshellarg($email)." ".escapeshellarg($domain)." $staging", $result, $retorno);
-    $result = implode("\n",$result);
-
-    if($retorno==0) {
-        exec("/usr/bin/issabel-helper ssl_certbot writevars ".escapeshellarg($email)." ".escapeshellarg($domain), $out, $rtn);
-        $pNet->escribir_configuracion_red_sistema($arrNetworkData);
-    } else {
-        $getvars = array();
-        $getvars['domain'] = "";
-        $getvars['email']  = "";
-        $getvars['result']  = $result;
-        echo __json_encode($getvars);
-        die();
-    }
-
-    $output = "<strong>Output log: </strong><br><pre>";
-
-    //retrieve values to show again
-    $valuesc="/etc/letsencrypt/values";
-
-    if( file_exists($valuesc) ){
-
-        $ffvalues = file_get_contents($valuesc);
-
-        preg_match_all("/domain=(.*)/i",$ffvalues,$domain1);
-        $domainff = $domain1[1];
-
-        preg_match("/email=(.*)/i",$ffvalues,$email1);
-        $emailff = $email1[1];
-
-        $getvars = array();
-
-        $result1 = str_replace("<","",$result);
-        $result2 = str_replace(">","",$result1);
-        $result3 = str_replace("\r\n","<br>",$result2);
-        $output .= $result3;
-        $output .= "</pre>";
-
-        $getvars['domain'] = $domainff;
-        $getvars['email']  = $emailff;
-        $getvars['result'] = $output;
-
-        echo __json_encode($getvars);
-
-    } else {
-
-        $getvars = array();
-
-        $getvars['domain'] = "";
-        $getvars['email']  = "";
-        echo __json_encode($getvars);
-
-    }
-
 }
 
-//---------------------------------
-function __json_encode( $data ) {
-    if( is_array($data) || is_object($data) ) {
-        $islist = is_array($data) && ( empty($data) || array_keys($data) === range(0,count($data)-1) );
-
-        if( $islist ) {
-            $json = '[' . implode(',', array_map('__json_encode', $data) ) . ']';
-        } else {
-            $items = Array();
-            foreach( $data as $key => $value ) {
-                $items[] = __json_encode("$key") . ':' . __json_encode($value);
-            }
-            $json = '{' . implode(',', $items) . '}';
-        }
-    } elseif( is_string($data) ) {
-# Escape non-printable or Non-ASCII characters.
-# I also put the \\ character first, as suggested in comments on the 'addclashes' page.
-        $string = '"' . addcslashes($data, "\\\"\n\r\t/" . chr(8) . chr(12)) . '"';
-        $json    = '';
-        $len    = strlen($string);
-# Convert UTF-8 to Hexadecimal Codepoints.
-        for( $i = 0; $i < $len; $i++ ) {
-
-            $char = $string[$i];
-            $c1 = ord($char);
-
-# Single byte;
-            if( $c1 <128 ) {
-                $json .= ($c1 > 31) ? $char : sprintf("\\u%04x", $c1);
-                continue;
-            }
-
-# Double byte
-            $c2 = ord($string[++$i]);
-            if ( ($c1 & 32) === 0 ) {
-                $json .= sprintf("\\u%04x", ($c1 - 192) * 64 + $c2 - 128);
-                continue;
-            }
-
-# Triple
-            $c3 = ord($string[++$i]);
-            if( ($c1 & 16) === 0 ) {
-                $json .= sprintf("\\u%04x", (($c1 - 224) <<12) + (($c2 - 128) << 6) + ($c3 - 128));
-                continue;
-            }
-
-# Quadruple
-            $c4 = ord($string[++$i]);
-            if( ($c1 & 8 ) === 0 ) {
-                $u = (($c1 & 15) << 2) + (($c2>>4) & 3) - 1;
-
-                $w1 = (54<<10) + ($u<<6) + (($c2 & 15) << 2) + (($c3>>4) & 3);
-                $w2 = (55<<10) + (($c3 & 15)<<6) + ($c4-128);
-                $json .= sprintf("\\u%04x\\u%04x", $w1, $w2);
-            }
-        }
-    } else {
-# int, floats, bools, null
-        $json = strtolower(var_export( $data, true ));
-    }
-    return $json;
+if($modify==0) {
+    exec("/usr/bin/issabel-helper ssl_certbot insertservername ".escapeshellarg($domain), $respuesta, $retorno);
+} else {
+    exec("/usr/bin/issabel-helper ssl_certbot editservername ".escapeshellarg($domain), $respuesta, $retorno);
 }
 
+exec("/usr/bin/issabel-helper ssl_certbot newcertificate ".escapeshellarg($email)." ".escapeshellarg($domain)." $staging", $result, $retorno);
+$resultText = implode("\n", $result);
+
+if($retorno != 0) {
+    cert_json(array(
+        'status' => 'error',
+        'domain' => '',
+        'email'  => '',
+        'result' => cert_output_html($resultText),
+    ));
+}
+
+exec("/usr/bin/issabel-helper ssl_certbot writevars ".escapeshellarg($email)." ".escapeshellarg($domain), $out, $rtn);
+$pNet->escribir_configuracion_red_sistema($arrNetworkData);
+
+cert_json(array(
+    'status' => 'success',
+    'domain' => $domain,
+    'email'  => $email,
+    'result' => cert_output_html($resultText),
+));

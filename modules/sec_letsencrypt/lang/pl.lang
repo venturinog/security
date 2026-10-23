@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' Enjoy. ;)' => 'Ciesz się. ;)',
+    '%s is invalid' => '%s jest nieprawidłowe',
+    '%s is required' => '%s jest wymagane',
+    '1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- Utwórz ważną domenę, kupując ją u preferowanego dostawcy lub uzyskaj ją z bezpłatnej usługi DDNS, takiej jak No-Ip.org',
+    '10.- Enjoy.' => '10.- Ciesz się.',
+    '2.- Be sure that you domain is redirected to your PBX Service.' => '2.- Upewnij się, że Twoja domena została przekierowana do Twojej usługi PBX.',
+    '3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.' => '3.- Otwórz porty 443 i 80 w swojej zaporze i przekieruj do swojej centrali PBX.',
+    '4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated' => '4.- W polu DOMENA wpisz swoją domenę, aby otrzymać ważny certyfikat. Możesz dodać wiele domen oddzielonych przecinkami',
+    '5.- In the field EMAIL enter your email to register your account.' => '5.- W polu EMAIL wpisz swój adres e-mail, aby zarejestrować swoje konto.',
+    '6.- To renew your certificate press the Renew button.' => '6.- Aby odnowić swój certyfikat, naciśnij przycisk Odnów.',
+    '7.- For test certificates enable the Staging checkbox.' => '7.- W przypadku certyfikatów testowych zaznacz pole wyboru Staging.',
+    '8.- After the process finish, reload your window with the Domain name (make sure the DNS is set internally too).' => '8.- Po zakończeniu procesu załaduj ponownie okno z nazwą domeny (upewnij się, że DNS jest również ustawiony wewnętrznie).',
+    '8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).' => '8.- Po zakończeniu procesu załaduj ponownie okno z nazwą domeny (upewnij się, że DNS jest również ustawiony wewnętrznie).',
+    '9.- You can enable the firewall rules again for ports 443 and 80.' => '9.- Możesz ponownie włączyć reguły zapory sieciowej dla portów 443 i 80.',
+    '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>' => '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>',
+    'Domain' => 'Domena',
+    'Email' => 'E-mail',
+    'Install' => 'Zainstaluj',
+    'Install New Certificate from Let\'s Encrypt' => 'Zainstaluj nowy certyfikat z Let\'s Encrypt',
+    'Output log' => 'Dziennik wyjściowy',
+    'Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let\'s Encrypt to validate the SSL certificate. You should not access the site via IP address.' => 'Pamiętaj, aby uzyskać dostęp do interfejsu internetowego za pośrednictwem prawidłowej nazwy skonfigurowanej w systemie DNS. Będzie to ta sama domena, którą przekażesz Let\'s Encrypt w celu sprawdzenia poprawności certyfikatu SSL. Nie należy uzyskiwać dostępu do witryny poprzez adres IP.',
+    'Processing' => 'Przetwarzanie',
+    'Renew' => 'Odnów',
+    'Renew Certificate' => 'Odnów certyfikat',
+    'Required field' => 'Wymagane pole',
+    'Staging Certificate (use this for testing)' => 'Certyfikat pomostowy (użyj go do testowania)',
+    'Staging Certificate(Use this for testing)' => 'Certyfikat przejściowy (użyj tego do testowania)',
+    'The domain is invalid' => 'Domena jest nieprawidłowa',
+    'The request could not be completed' => 'Nie można zrealizować żądania',
+    'This is your actual account and domain configuration' => 'To jest rzeczywista konfiguracja Twojego konta i domeny',
+    'Usage' => 'Użycie',
+    'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.' => 'Odwiedź https://letsencrypt.org, aby dowiedzieć się więcej o procesie bezpłatnej certyfikacji, Warunkach korzystania i Umowie licencyjnej. Jest to podstawowy interfejs GUI dla APACHE CERTBOT, dostarczany w stanie takim, w jakim jest, bez gwarancji. Jeśli masz jakieś pytania, zadaj je na forum. Nie zapomnij przekazać datku na rzecz projektu Let\'s Encrypt.',
+);

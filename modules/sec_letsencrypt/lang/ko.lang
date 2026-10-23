@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' Enjoy. ;)' => '즐기십시오. ;)',
+    '%s is invalid' => '%s이(가) 유효하지 않습니다',
+    '%s is required' => '%s은(는) 필수입니다',
+    '1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- 선호하는 공급업체에서 구매하여 유효한 도메인을 만들거나 No-Ip.org와 같은 무료 DDNS 서비스에서 도메인을 받으세요.',
+    '10.- Enjoy.' => '10.- 즐기세요.',
+    '2.- Be sure that you domain is redirected to your PBX Service.' => '2.- 도메인이 PBX 서비스로 리디렉션되었는지 확인하세요.',
+    '3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.' => '3.- 방화벽에서 443 및 80 포트를 열고 PBX로 리디렉션합니다.',
+    '4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated' => '4.- 유효한 인증서를 얻으려면 DOMAIN 필드에 도메인을 입력하세요. 쉼표로 구분하여 여러 도메인을 추가할 수 있습니다.',
+    '5.- In the field EMAIL enter your email to register your account.' => '5.- 이메일 필드에 이메일을 입력하여 계정을 등록하세요.',
+    '6.- To renew your certificate press the Renew button.' => '6.- 인증서를 갱신하려면 갱신 버튼을 누르세요.',
+    '7.- For test certificates enable the Staging checkbox.' => '7.- 테스트 인증서의 경우 준비 확인란을 활성화합니다.',
+    '8.- After the process finish, reload your window with the Domain name (make sure the DNS is set internally too).' => '8.- 프로세스가 완료되면 도메인 이름으로 창을 다시 로드합니다(DNS도 내부적으로 설정되어 있는지 확인).',
+    '8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).' => '8.- 프로세스가 완료되면 도메인 이름으로 창을 다시 로드합니다(DNS도 내부적으로 설정되어 있는지 확인).',
+    '9.- You can enable the firewall rules again for ports 443 and 80.' => '9.- 포트 443 및 80에 대해 방화벽 규칙을 다시 활성화할 수 있습니다.',
+    '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>' => '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>',
+    'Domain' => '도메인',
+    'Email' => '이메일',
+    'Install' => '설치',
+    'Install New Certificate from Let\'s Encrypt' => 'Let\'s Encrypt에서 새 인증서 설치',
+    'Output log' => '출력 로그',
+    'Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let\'s Encrypt to validate the SSL certificate. You should not access the site via IP address.' => 'DNS에 구성된 유효한 이름을 통해 웹 UI에 액세스하십시오. 이는 SSL 인증서의 유효성을 검사하기 위해 Let\'s Encrypt에 전달할 도메인과 동일합니다. IP 주소를 통해 사이트에 접속해서는 안 됩니다.',
+    'Processing' => '처리',
+    'Renew' => '갱신',
+    'Renew Certificate' => '인증서 갱신',
+    'Required field' => '요구된 필드',
+    'Staging Certificate (use this for testing)' => '스테이징 인증서(테스트용으로 사용)',
+    'Staging Certificate(Use this for testing)' => '스테이징 인증서(테스트용으로 사용)',
+    'The domain is invalid' => '도메인이 잘못되었습니다.',
+    'The request could not be completed' => '요청을 완료할 수 없습니다.',
+    'This is your actual account and domain configuration' => '실제 계정 및 도메인 구성입니다.',
+    'Usage' => '사용법',
+    'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.' => '무료 인증 프로세스, TOS 및 라이선스 계약에 대해 자세히 알아보려면 https://letsencrypt.org를 방문하세요. APACHE CERTBOT의 기본 GUI이며 보증 없이 있는 그대로 제공됩니다. 질문이 있으시면 포럼에 올려주세요. Let\'s Encrypt 프로젝트에 기부하는 것을 잊지 마세요.',
+);

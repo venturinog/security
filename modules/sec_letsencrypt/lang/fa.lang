@@ -2,11 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2019 Issabel Foundation                                |
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -18,33 +17,40 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  | Translate by: Haamed Kouhfallah                                      |
-  | Email: k.haamed@gmail.com                                            |
-  +----------------------------------------------------------------------+
-  $Id: fa.lang,v 1.1 2019-11-30 04:08:50 Haamed Kouhfallah k.haamed@gmail.com Exp $
 */
 global $arrLangModule;
-$arrLangModule=array(
-"This is your actual account and domain configuration"=>"This is your actual account and domain configuration",
-"Install New Certificate from Let's Encrypt"=>"Install New Certificate from Let's Encrypt",
-"Domain"=>"Domain",
-"Email"=>"Email",
-"Install"=>"Install",
-"Renew"=>"Renew",
-"Usage"=>"Usage",
-"Renew Certificate"=>"Renew Certificate",
-"Staging Certificate(Use this for testing)"=>"Staging Certificate(Use this for testing)",
-"1.- Create a Valid Domian by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org"=>"1.- Create a Valid Domian by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org",
-"2.- Be sure that you domain is redirected to your PBX Service."=>"2.- Be sure that you domain is redirected to your PBX Service.",
-"3.- Open the 443 and 80 ports in your firewall and redirect to your PBX."=>"3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.",
-"4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated"=>"4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated",
-"5.- In the field EMAIL enter your email to register your account."=>"5.- In the field EMAIL enter your email to register your account.",
-"6.- To renew your certificate press the Renew button."=>"6.- To renew your certificate press the Renew button.",
-"7.- For test certificates enable the Staging checkbox."=>"7.- For test certificates enable the Staging checkbox.",
-"8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too)."=>"8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).",
-"9.- You can enable the firewall rules again for ports 443 and 80."=>"9.- You can enable the firewall rules again for ports 443 and 80.",
-" Enjoy. ;)"=>" Enjoy. ;) ",
-"<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don't forget to Donate to the Let's Encrypt Project</small>"=>"<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don't forget to Donate to the Let's Encrypt Project</small>",
+$arrLangModule = array(
+    ' Enjoy. ;)' => ' Enjoy. ;) ',
+    '%s is invalid' => '%s نامعتبر است',
+    '%s is required' => '%s الزامی است',
+    '1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- یک دامنه معتبر با خرید آن با فروشنده دلخواه خود ایجاد کنید یا از سرویس رایگان DDNS مانند No-Ip.org دریافت کنید.',
+    '1.- Create a Valid Domian by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- Create a Valid Domian by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org',
+    '10.- Enjoy.' => '10- لذت ببرید.',
+    '2.- Be sure that you domain is redirected to your PBX Service.' => '2.- مطمئن شوید که دامنه شما به سرویس PBX شما هدایت می شود.',
+    '3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.' => '3.- پورت های 443 و 80 را در فایروال خود باز کرده و به PBX خود هدایت کنید.',
+    '4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated' => '4.- در قسمت DOMAIN دامنه خود را وارد کنید تا گواهینامه معتبر دریافت کنید. شما می توانید بسیاری از دامنه ها را با کاما جدا شده اضافه کنید',
+    '5.- In the field EMAIL enter your email to register your account.' => '5.- در قسمت EMAIL ایمیل خود را وارد کنید تا حساب کاربری خود را ثبت کنید.',
+    '6.- To renew your certificate press the Renew button.' => '6- برای تمدید گواهینامه خود دکمه تمدید را فشار دهید.',
+    '7.- For test certificates enable the Staging checkbox.' => '7.- برای گواهی های آزمایشی، کادر مرحله بندی را فعال کنید.',
+    '8.- After the process finish, reload your window with the Domain name (make sure the DNS is set internally too).' => '8.- پس از اتمام فرآیند، پنجره خود را با نام دامنه بارگذاری مجدد کنید (مطمئن شوید که DNS نیز به صورت داخلی تنظیم شده است).',
+    '8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).' => '8.- پس از اتمام فرآیند، پنجره خود را با نام دامنه بارگذاری مجدد کنید (مطمئن شوید که DNS نیز به صورت داخلی تنظیم شده است).',
+    '9.- You can enable the firewall rules again for ports 443 and 80.' => '9.- می توانید قوانین فایروال را دوباره برای پورت های 443 و 80 فعال کنید.',
+    '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>' => '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>',
+    'Domain' => 'دامنه',
+    'Email' => 'ایمیل',
+    'Install' => 'نصب کنید',
+    'Install New Certificate from Let\'s Encrypt' => 'گواهی جدید را از Let\'s Encrypt نصب کنید',
+    'Output log' => 'گزارش خروجی',
+    'Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let\'s Encrypt to validate the SSL certificate. You should not access the site via IP address.' => 'لطفاً مطمئن شوید که از طریق یک نام معتبر که در DNS خود پیکربندی شده است به رابط کاربری وب دسترسی داشته باشید. این همان دامنه ای است که برای تأیید اعتبار گواهی SSL به Let\'s Encrypt ارسال می کنید. شما نباید از طریق آدرس IP به سایت دسترسی داشته باشید.',
+    'Processing' => 'پردازش',
+    'Renew' => 'تمدید کنید',
+    'Renew Certificate' => 'تمدید گواهینامه',
+    'Required field' => 'فيلد مورد نياز',
+    'Staging Certificate (use this for testing)' => 'گواهی مرحله بندی (از این برای آزمایش استفاده کنید)',
+    'Staging Certificate(Use this for testing)' => 'گواهی مرحله‌بندی (از این برای آزمایش استفاده کنید)',
+    'The domain is invalid' => 'دامنه نامعتبر است',
+    'The request could not be completed' => 'درخواست تکمیل نشد',
+    'This is your actual account and domain configuration' => 'این پیکربندی واقعی حساب و دامنه شما است',
+    'Usage' => 'استفاده',
+    'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.' => 'از https://letsencrypt.org دیدن کنید تا درباره فرآیند صدور گواهینامه رایگان، TOS و توافقنامه مجوز بیشتر بدانید. این یک رابط کاربری گرافیکی اولیه برای APACHE CERTBOT است و همانطور که هست و بدون ضمانت ارائه شده است. اگر سوالی دارید لطفا در انجمن مطرح کنید. فراموش نکنید که به پروژه Let\'s Encrypt کمک مالی کنید.',
 );
-?>

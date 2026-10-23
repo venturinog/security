@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' Enjoy. ;)' => '享受吧。 ;)',
+    '%s is invalid' => '%s 无效',
+    '%s is required' => '%s 为必填项',
+    '1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- 通过向您首选的供应商购买或从 No-Ip.org 等免费 DDNS 服务获取一个有效域名来创建有效域名',
+    '10.- Enjoy.' => '10.- 享受吧。',
+    '2.- Be sure that you domain is redirected to your PBX Service.' => '2.- 确保您的域已重定向到您的 PBX 服务。',
+    '3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.' => '3.- 打开防火墙中的 443 和 80 端口并重定向到 PBX。',
+    '4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated' => '4.- 在“域”字段中输入您的域以获取有效证书。您可以添加多个域，以逗号分隔',
+    '5.- In the field EMAIL enter your email to register your account.' => '5.- 在电子邮件字段中输入您的电子邮件以注册您的帐户。',
+    '6.- To renew your certificate press the Renew button.' => '6.- 要更新您的证书，请按“更新”按钮。',
+    '7.- For test certificates enable the Staging checkbox.' => '7.- 对于测试证书，启用暂存复选框。',
+    '8.- After the process finish, reload your window with the Domain name (make sure the DNS is set internally too).' => '8.- 该过程完成后，使用域名重新加载窗口（确保 DNS 也在内部设置）。',
+    '8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).' => '8.- 该过程完成后，使用域名重新加载窗口（确保 DNS 也已在内部设置）。',
+    '9.- You can enable the firewall rules again for ports 443 and 80.' => '9.- 您可以再次启用端口 443 和 80 的防火墙规则。',
+    '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>' => '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>',
+    'Domain' => '域名',
+    'Email' => '电子邮件',
+    'Install' => '安装',
+    'Install New Certificate from Let\'s Encrypt' => '从 Let\'s Encrypt 安装新证书',
+    'Output log' => '输出日志',
+    'Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let\'s Encrypt to validate the SSL certificate. You should not access the site via IP address.' => '请务必通过 DNS 中配置的有效名称访问 Web UI。这与您将传递给 Let\'s Encrypt 以验证 SSL 证书的域相同。您不应通过 IP 地址访问该网站。',
+    'Processing' => '加工',
+    'Renew' => '更新',
+    'Renew Certificate' => '更新证书',
+    'Required field' => '必填项',
+    'Staging Certificate (use this for testing)' => '阶段证书（用它进行测试）',
+    'Staging Certificate(Use this for testing)' => '阶段证书（用它进行测试）',
+    'The domain is invalid' => '该域名无效',
+    'The request could not be completed' => '请求无法完成',
+    'This is your actual account and domain configuration' => '这是您的实际帐户和域配置',
+    'Usage' => '用途',
+    'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.' => '请访问 https://letsencrypt.org 了解有关免费认证流程、其 TOS 和许可协议的更多信息。这是 APACHE CERTBOT 的基本 GUI，按原样提供，不提供保修。如果您有任何疑问，请在论坛中提出。不要忘记向 Let\'s Encrypt 项目捐款。',
+);

@@ -2,9 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0.0                                                |
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -18,26 +19,37 @@
   +----------------------------------------------------------------------+
 */
 global $arrLangModule;
-$arrLangModule=array(
-"This is your actual account and domain configuration"=>"This is your actual account and domain configuration",
-"Install New Certificate from Let's Encrypt"=>"Install New Certificate from Let's Encrypt",
-"Domain"=>"Domain",
-"Email"=>"Email",
-"Install"=>"Install",
-"Renew"=>"Renew",
-"Usage"=>"Usage",
-"Renew Certificate"=>"Renew Certificate",
-"Staging Certificate(Use this for testing)"=>"Staging Certificate(Use this for testing)",
-"1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org"=>"1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org",
-"2.- Be sure that you domain is redirected to your PBX Service."=>"2.- Be sure that you domain is redirected to your PBX Service.",
-"3.- Open the 443 and 80 ports in your firewall and redirect to your PBX."=>"3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.",
-"4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated"=>"4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated",
-"5.- In the field EMAIL enter your email to register your account."=>"5.- In the field EMAIL enter your email to register your account.",
-"6.- To renew your certificate press the Renew button."=>"6.- To renew your certificate press the Renew button.",
-"7.- For test certificates enable the Staging checkbox."=>"7.- For test certificates enable the Staging checkbox.",
-"8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too)."=>"8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).",
-"9.- You can enable the firewall rules again for ports 443 and 80."=>"9.- You can enable the firewall rules again for ports 443 and 80.",
-" Enjoy. ;)"=>" Enjoy. ;) ",
-"<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don't forget to Donate to the Let's Encrypt Project</small>"=>"<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don't forget to Donate to the Let's Encrypt Project</small>",
+$arrLangModule = array(
+    ' Enjoy. ;)' => ' Enjoy. ;) ',
+    '%s is invalid' => '%s no és vàlid',
+    '%s is required' => '%s és obligatori',
+    '1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- Creeu un domini vàlid comprant-lo amb el vostre proveïdor preferit o obteniu-ne un del servei DDNS gratuït com No-Ip.org',
+    '10.- Enjoy.' => '10.- Gaudir.',
+    '2.- Be sure that you domain is redirected to your PBX Service.' => '2.- Assegureu-vos que el vostre domini estigui redirigit al vostre Servei PBX.',
+    '3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.' => '3.- Obriu els ports 443 i 80 del vostre tallafoc i redirigeu a la vostra central.',
+    '4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated' => '4.- Al camp DOMINI introdueix el teu domini per obtenir un certificat vàlid. Podeu afegir molts dominis separats per comes',
+    '5.- In the field EMAIL enter your email to register your account.' => '5.- Al camp EMAIL introdueix el teu correu electrònic per registrar el teu compte.',
+    '6.- To renew your certificate press the Renew button.' => '6.- Per renovar el teu certificat prem el botó Renovar.',
+    '7.- For test certificates enable the Staging checkbox.' => '7.- Per als certificats de prova, activeu la casella de selecció Staging.',
+    '8.- After the process finish, reload your window with the Domain name (make sure the DNS is set internally too).' => '8.- Un cop finalitzat el procés, torneu a carregar la vostra finestra amb el nom de domini (assegureu-vos que el DNS també estigui configurat internament).',
+    '8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).' => '8.- Un cop finalitzat el procés, torneu a carregar la vostra finestra amb el nom de domini (assegureu-vos que el DNS també estigui configurat internament).',
+    '9.- You can enable the firewall rules again for ports 443 and 80.' => '9.- Podeu tornar a habilitar les regles del tallafoc per als ports 443 i 80.',
+    '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>' => '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>',
+    'Domain' => 'Domini',
+    'Email' => 'Correu electrònic',
+    'Install' => 'Instal·lar',
+    'Install New Certificate from Let\'s Encrypt' => 'Instal·leu el nou certificat des de Let\'s Encrypt',
+    'Output log' => 'Registre de sortida',
+    'Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let\'s Encrypt to validate the SSL certificate. You should not access the site via IP address.' => 'Assegureu-vos d\'accedir a la interfície d\'usuari web mitjançant un nom vàlid configurat al vostre DNS. Aquest seria el mateix domini que passareu a Let\'s Encrypt per validar el certificat SSL. No hauríeu d\'accedir al lloc mitjançant l\'adreça IP.',
+    'Processing' => 'Tramitació',
+    'Renew' => 'Renovar',
+    'Renew Certificate' => 'Renovar certificat',
+    'Required field' => 'Camp requerit',
+    'Staging Certificate (use this for testing)' => 'Certificat de posada en escena (utilitza-ho per fer proves)',
+    'Staging Certificate(Use this for testing)' => 'Certificat d\'escenificació (Feu servir-lo per fer proves)',
+    'The domain is invalid' => 'El domini no és vàlid',
+    'The request could not be completed' => 'La sol·licitud no s\'ha pogut completar',
+    'This is your actual account and domain configuration' => 'Aquesta és la configuració real del vostre compte i domini',
+    'Usage' => 'Ús',
+    'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.' => 'Visiteu https://letsencrypt.org per obtenir més informació sobre el procés de certificació gratuït, els seus TOS i l\'acord de llicència. Aquesta és una GUI bàsica per a l\'APACHE CERTBOT i es proporciona tal qual i sense garantia. Si teniu alguna pregunta, poseu-la al fòrum. No oblideu fer una donació al Projecte Let\'s Encrypt.',
 );
-?>

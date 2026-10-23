@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' Enjoy. ;)' => 'God fornøjelse. ;)',
+    '%s is invalid' => '%s er ugyldig',
+    '%s is required' => '%s er påkrævet',
+    '1.- Create a Valid Domain by purchasing it with you preferred Vendor or get one from free DDNS service like No-Ip.org' => '1.- Opret et gyldigt domæne ved at købe det hos din foretrukne leverandør eller få et fra gratis DDNS-tjeneste som No-Ip.org',
+    '10.- Enjoy.' => '10.- God fornøjelse.',
+    '2.- Be sure that you domain is redirected to your PBX Service.' => '2.- Sørg for, at dit domæne bliver omdirigeret til din PBX-tjeneste.',
+    '3.- Open the 443 and 80 ports in your firewall and redirect to your PBX.' => '3.- Åbn 443 og 80 portene i din firewall og omdiriger til din PBX.',
+    '4.- In the field DOMAIN enter your domain to obtain a valid certificate. You can add many domains comma separated' => '4.- Indtast dit domæne i feltet DOMÆNE for at få et gyldigt certifikat. Du kan tilføje mange domæner, kommasepareret',
+    '5.- In the field EMAIL enter your email to register your account.' => '5.- Indtast din e-mail i feltet EMAIL for at registrere din konto.',
+    '6.- To renew your certificate press the Renew button.' => '6.- For at forny dit certifikat, tryk på knappen Forny.',
+    '7.- For test certificates enable the Staging checkbox.' => '7.- Aktiver afkrydsningsfeltet Staging for testcertifikater.',
+    '8.- After the process finish, reload your window with the Domain name (make sure the DNS is set internally too).' => '8.- Når processen er færdig, genindlæs dit vindue med domænenavnet (sørg for, at DNS også er indstillet internt).',
+    '8.- After the process finish, reload your window with the Domain name(make sure the DNS is set internally too).' => '8.- Når processen er færdig, genindlæs dit vindue med domænenavnet (sørg for, at DNS også er indstillet internt).',
+    '9.- You can enable the firewall rules again for ports 443 and 80.' => '9.- Du kan aktivere firewallreglerne igen for porte 443 og 80.',
+    '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>' => '<small>Visit <strong>https://letsencrypt.org</strong> to know more about free certification process their TOS and License Agreement, this is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty.If you have any questions please provide it in the forum.Don\'t forget to Donate to the Let\'s Encrypt Project</small>',
+    'Domain' => 'Domæne',
+    'Email' => 'E-mail',
+    'Install' => 'Installer',
+    'Install New Certificate from Let\'s Encrypt' => 'Installer nyt certifikat fra Let\'s Encrypt',
+    'Output log' => 'Udgangslog',
+    'Please be sure to access the Web UI via a valid name configured in your DNS. That would be the same domain you will pass to Let\'s Encrypt to validate the SSL certificate. You should not access the site via IP address.' => 'Sørg for at få adgang til web-UI via et gyldigt navn, der er konfigureret i din DNS. Det ville være det samme domæne, som du vil videregive til Let\'s Encrypt for at validere SSL-certifikatet. Du bør ikke få adgang til webstedet via IP-adresse.',
+    'Processing' => 'Behandling',
+    'Renew' => 'Forny',
+    'Renew Certificate' => 'Forny certifikat',
+    'Required field' => 'Feltet skal udfyldes',
+    'Staging Certificate (use this for testing)' => 'Iscenesættelsescertifikat (brug dette til test)',
+    'Staging Certificate(Use this for testing)' => 'Iscenesættelsescertifikat (brug dette til test)',
+    'The domain is invalid' => 'Domænet er ugyldigt',
+    'The request could not be completed' => 'Anmodningen kunne ikke gennemføres',
+    'This is your actual account and domain configuration' => 'Dette er din faktiske konto- og domænekonfiguration',
+    'Usage' => 'Brug',
+    'Visit https://letsencrypt.org to know more about the free certification process, their TOS and License Agreement. This is a basic GUI for the APACHE CERTBOT and is provided as is and without warranty. If you have any questions please provide it in the forum. Don\'t forget to donate to the Let\'s Encrypt Project.' => 'Besøg https://letsencrypt.org for at vide mere om den gratis certificeringsproces, deres TOS og licensaftale. Dette er en grundlæggende GUI til APACHE CRERTBOT og leveres som den er og uden garanti. Hvis du har spørgsmål, bedes du stille dem i forummet. Glem ikke at donere til Let\'s Encrypt Project.',
+);
