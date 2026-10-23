@@ -62,6 +62,36 @@ jQuery(function ($) {
         $form.trigger('submit');
     }
 
+    function fwApplyStart($button) {
+        if ($button.data('applying')) return false;
+
+        $button.data('applying', true)
+            .prop('disabled', true)
+            .attr('aria-busy', 'true')
+            .find('i').removeClass('ti-check').addClass('ti-loader-2 fw-spin');
+
+        var $overlay = $('#fw_apply_overlay');
+        $('#fw_apply_status').text($overlay.data('status') || '');
+        $overlay.prop('hidden', false);
+        $('body').addClass('fw-applying');
+
+        return true;
+    }
+
+    function fwApplyReset() {
+        $('#fw_apply_overlay').prop('hidden', true);
+        $('#fw_apply_status').text('');
+        $('body').removeClass('fw-applying');
+
+        var $button = $('#fw_apply');
+        if (!$button.length) return;
+
+        $button.data('applying', false)
+            .prop('disabled', false)
+            .removeAttr('aria-busy')
+            .find('i').removeClass('ti-loader-2 fw-spin').addClass('ti-check');
+    }
+
     $('#fw_delete').on('click', function () {
         var ids = [];
         $('.fw-grid input[name="del_x[]"]:checked').each(function () {
@@ -76,8 +106,18 @@ jQuery(function ($) {
     });
 
     $('#fw_apply').on('click', function () {
-        fwSubmit({ activatefirewall: 1 });
+        var $button = $(this);
+        if ($button.data('applying')) return;
+        if (!$('#fw_action_form').length) return;
+        if (!fwApplyStart($button)) return;
+
+        // Deja que el navegador pinte el overlay antes de enviar el POST.
+        window.setTimeout(function () {
+            fwSubmit({ activatefirewall: 1 });
+        }, 50);
     });
+
+    $(window).on('pageshow', fwApplyReset);
 
     $('#fw_deactivate').on('click', function () {
         if (!confirmSubmit($(this).data('confirm'))) return;

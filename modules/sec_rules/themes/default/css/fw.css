@@ -7,6 +7,21 @@
     margin-bottom: 12px;
 }
 
+.fw-applied-chip {
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    gap: 6px;
+    color: var(--iss-text-muted);
+    font-size: .875rem;
+    white-space: nowrap;
+}
+
+.fw-applied-chip .ti {
+    color: var(--iss-sev-ok);
+    font-size: 1rem;
+}
+
 .fw-grid-title {
     margin: 18px 0 8px;
     font-size: 1.05rem;
@@ -83,10 +98,108 @@
     pointer-events: none;
 }
 
+/* Aviso bloqueante mientras se aplican las reglas. */
+.fw-apply-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(15, 23, 42, .45);
+    cursor: progress;
+}
+
+.fw-apply-overlay[hidden] {
+    display: none;
+}
+
+.fw-apply-card {
+    box-sizing: border-box;
+    width: min(22rem, 100%);
+    padding: 20px;
+    border: 1px solid var(--iss-border);
+    border-radius: 10px;
+    background: var(--iss-surface);
+    color: var(--iss-text);
+    text-align: center;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .24);
+}
+
+.fw-apply-card .fw-spin {
+    display: inline-block;
+    font-size: 1.75rem;
+    line-height: 1;
+    color: var(--iss-primary);
+}
+
+.fw-apply-title {
+    margin: 10px 0 4px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.fw-apply-hint {
+    margin: 0;
+    color: var(--iss-text-muted);
+    font-size: .875rem;
+}
+
+.fw-apply-progress {
+    height: 4px;
+    margin-top: 16px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--iss-border);
+}
+
+.fw-apply-progress span {
+    display: block;
+    width: 35%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--iss-primary);
+    animation: fw-progress 1.1s ease-in-out infinite;
+}
+
+.fw-spin {
+    animation: fw-spin 1s linear infinite;
+}
+
+body.fw-applying {
+    cursor: progress;
+}
+
+@keyframes fw-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fw-progress {
+    0% {
+        transform: translateX(-110%);
+    }
+    100% {
+        transform: translateX(320%);
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .fw-switch .form-check-input,
     .fw-drag {
         transition: none;
+    }
+
+    .fw-spin,
+    .fw-apply-progress span {
+        animation: none;
+    }
+
+    .fw-apply-progress span {
+        width: 100%;
+        opacity: .6;
     }
 }
 

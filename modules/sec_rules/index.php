@@ -102,12 +102,14 @@ function _moduleContent(&$smarty, $module_name)
 function showRulesPage($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
     $pRules = new paloSantoRules($pDB);
+    $isFirst = $pRules->isFirstTime();
+    $isExecuted = $pRules->isExecutedInSystem();
 
     $alert = (string)$smarty->getTemplateVars('SECURITY_ALERT');
-    if ($pRules->isFirstTime()) {
+    if ($isFirst) {
         $alert .= issabel_alert_html('warning', _tr("Firewall"),
             _tr("The firewall has not been activated yet"));
-    } elseif (!$pRules->isExecutedInSystem()) {
+    } elseif (!$isExecuted) {
         $alert .= issabel_alert_html('warning', _tr("Firewall"),
             _tr("There are changes pending to apply to the firewall"));
     }
@@ -121,7 +123,7 @@ function showRulesPage($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     // (_list.tpl), así que las secciones llevan su propio encabezado. La
     // grilla GeoIP va primero, como en la interfaz histórica.
     return $alert
-        . renderToolbar($smarty, $module_name, $pRules)
+        . renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted)
         . '<h4 class="fw-grid-title">'._tr('GeoIP').'</h4>'
         . '<div class="fw-grid" id="geoip_grid">'.renderRulesGrid($smarty, $module_name, $pDB, true).'</div>'
         . '<h4 class="fw-grid-title">'._tr('Rules').'</h4>'
@@ -132,12 +134,13 @@ function showRulesPage($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
  * Barra única de acciones. Sustituye a las barras que paloSantoGrid genera
  * por cada grilla para que las dos tablas compartan un solo juego de botones.
  */
-function renderToolbar($smarty, $module_name, $pRules)
+function renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted)
 {
-    $isFirst     = $pRules->isFirstTime();
-    $isExecuted  = $pRules->isExecutedInSystem();
     $hasSnapshot = $pRules->hasSnapshot();
+    $needsApply  = $isFirst || !$isExecuted;
     $applyLabel  = $isFirst ? _tr('Activate firewall') : _tr('Apply changes');
+    $applyStatus = _tr('Applying changes...').' '
+                 . _tr('The firewall rules are being applied. This may take a few seconds.');
 
     $html  = '<div class="fw-toolbar">';
     $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_delete" data-empty="'
@@ -147,8 +150,13 @@ function renderToolbar($smarty, $module_name, $pRules)
     $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_deactivate" data-confirm="'
            . htmlspecialchars(_tr('Are you sure you wish to deactivate the firewall?'), ENT_COMPAT, 'UTF-8') . '">'
            . '<i class="ti ti-power"></i> '._tr('Deactivate firewall').'</button>';
-    $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_apply">'
-           . '<i class="ti ti-check"></i> '.$applyLabel.'</button>';
+    if ($needsApply) {
+        $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_apply">'
+               . '<i class="ti ti-check" aria-hidden="true"></i> '.$applyLabel.'</button>';
+    } else {
+        $html .= '<span class="fw-applied-chip"><i class="ti ti-circle-check" aria-hidden="true"></i> '
+               . _tr('All changes applied').'</span>';
+    }
     if (!$isFirst && !$isExecuted && $hasSnapshot) {
         $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_discard" data-confirm="'
                . htmlspecialchars(_tr('Are you sure you wish to discard the changes?'), ENT_COMPAT, 'UTF-8') . '">'
@@ -163,6 +171,20 @@ function renderToolbar($smarty, $module_name, $pRules)
     $html .= '<form id="fw_action_form" method="POST" action="?menu='.$module_name.'" style="display:none;">'
            . issabel_csrf_field()
            . '<div id="fw_action_fields"></div></form>';
+
+    if ($needsApply) {
+        $html .= '<div id="fw_apply_status" class="fw-sr-only" role="status" aria-live="polite"></div>';
+        $html .= '<div id="fw_apply_overlay" class="fw-apply-overlay" hidden data-status="'
+               . htmlspecialchars($applyStatus, ENT_COMPAT, 'UTF-8') . '">'
+               . '<div class="fw-apply-card" aria-hidden="true">'
+               . '<i class="ti ti-loader-2 fw-spin" aria-hidden="true"></i>'
+               . '<p class="fw-apply-title">'._tr('Applying changes...').'</p>'
+               . '<p class="fw-apply-hint">'
+               . _tr('The firewall rules are being applied. This may take a few seconds.')
+               . '</p>'
+               . '<div class="fw-apply-progress"><span></span></div>'
+               . '</div></div>';
+    }
 
     return $html;
 }

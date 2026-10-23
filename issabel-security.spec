@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 16
+Release: 17
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -243,6 +243,11 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-17
+- Hide the firewall apply button when there is nothing pending, show an
+  "All changes applied" chip instead, and block the page with a progress
+  indicator while the rules are being applied.
+
 * Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-16
 - Fix reversed implode() arguments in fwconfig GeoIP rule generation. PHP 8
   throws a TypeError when a GeoIP rule has fewer than 10 countries, so applying
