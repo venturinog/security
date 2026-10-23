@@ -1,0 +1,43 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s 无效',
+    '%s is required' => '%s 为必填项',
+    'Back' => '返回',
+    'Cancel' => '取消',
+    'Configured' => '已配置',
+    'Create a MaxMind account' => '创建 MaxMind 帐户',
+    'ERROR' => 'Error',
+    'Edit' => '编辑',
+    'Enter a new key' => '输入新密钥',
+    'GeoIP KEY' => '地理IP密钥',
+    'Information' => '信息',
+    'Message' => '留言',
+    'Not configured' => '未配置',
+    'Required field' => '必填项',
+    'Save' => '保存',
+    'The key could not be saved' => '密钥无法保存',
+    'The key has not changed' => '密钥没有改变',
+    'key' => '钥匙',
+    'maxmind signup' => '最大思维注册',
+    'updated' => '已更新',
+);

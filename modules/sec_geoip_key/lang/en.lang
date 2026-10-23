@@ -2,10 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2020 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -19,13 +19,27 @@
   +----------------------------------------------------------------------+
   | The Initial Developer of the Original Code is Issabel Foundation     |
   +----------------------------------------------------------------------+
-  $Id: en.lang, Fri 09 Apr 2021 04:22:20 PM EDT, German Venturino german@issabel.com
 */
 global $arrLangModule;
-$arrLangModule=array(
-"GeoIP KEY" => "GeoIP KEY",
-"key" => "License Key from maxmind.com",
-"maxmind signup" => "You can sign up here for a free license key",
-"updated" => "Key updated"
+$arrLangModule = array(
+    '%s is invalid' => '%s is invalid',
+    '%s is required' => '%s is required',
+    'Back' => 'Back',
+    'Cancel' => 'Cancel',
+    'Configured' => 'Configured',
+    'Create a MaxMind account' => 'Create a MaxMind account',
+    'ERROR' => 'ERROR',
+    'Edit' => 'Edit',
+    'Enter a new key' => 'Enter a new key',
+    'GeoIP KEY' => 'GeoIP KEY',
+    'Information' => 'Information',
+    'Message' => 'Message',
+    'Not configured' => 'Not configured',
+    'Required field' => 'Required field',
+    'Save' => 'Save',
+    'The key could not be saved' => 'The key could not be saved',
+    'The key has not changed' => 'The key has not changed',
+    'key' => 'License Key from maxmind.com',
+    'maxmind signup' => 'You can sign up here for a free license key',
+    'updated' => 'Key updated',
 );
-?>

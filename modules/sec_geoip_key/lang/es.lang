@@ -2,10 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2020 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,15 +17,27 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is Issabel Foundation     |
-  +----------------------------------------------------------------------+
-  $Id: default.conf.php, Fri 09 Apr 2021 04:22:20 PM EDT, German Venturino german@issabel.com
 */
 global $arrLangModule;
-$arrLangModule=array(
-"GeoIP KEY" => "GeoIP KEY",
-"key" => "License Key obtenida de maxmind.com",
-"maxmind signup" => "Puedes registrarte aqui para obteber licencias gratuitas",
-"updated" => "Key actualizada"
+$arrLangModule = array(
+    '%s is invalid' => '%s no es válido',
+    '%s is required' => '%s es obligatorio',
+    'Back' => 'Atrás',
+    'Cancel' => 'Cancelar',
+    'Configured' => 'Configurado',
+    'Create a MaxMind account' => 'Crear una cuenta MaxMind',
+    'ERROR' => 'Error',
+    'Edit' => 'Editar',
+    'Enter a new key' => 'Introduzca una nueva clave',
+    'GeoIP KEY' => 'CLAVE GeoIP',
+    'Information' => 'Información',
+    'Message' => 'Mensaje',
+    'Not configured' => 'No configurado',
+    'Required field' => 'Campo requerido',
+    'Save' => 'Guardar',
+    'The key could not be saved' => 'No se pudo guardar la clave',
+    'The key has not changed' => 'La clave no ha cambiado.',
+    'key' => 'License Key obtenida de maxmind.com',
+    'maxmind signup' => 'Puedes registrarte aqui para obteber licencias gratuitas',
+    'updated' => 'Key actualizada',
 );
-?>

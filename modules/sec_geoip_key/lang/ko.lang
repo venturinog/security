@@ -1,0 +1,43 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s이(가) 유효하지 않습니다',
+    '%s is required' => '%s은(는) 필수입니다',
+    'Back' => '뒤로',
+    'Cancel' => '취소',
+    'Configured' => '구성됨',
+    'Create a MaxMind account' => 'MaxMind 계정 만들기',
+    'ERROR' => 'Error',
+    'Edit' => '편집',
+    'Enter a new key' => '새 키를 입력하세요',
+    'GeoIP KEY' => 'GeoIP 키',
+    'Information' => '정보',
+    'Message' => '메시지',
+    'Not configured' => '구성되지 않음',
+    'Required field' => '요구된 필드',
+    'Save' => '저장',
+    'The key could not be saved' => '키를 저장할 수 없습니다.',
+    'The key has not changed' => '키는 변경되지 않았습니다.',
+    'key' => '열쇠',
+    'maxmind signup' => '맥스마인드 가입',
+    'updated' => '업데이트됨',
+);

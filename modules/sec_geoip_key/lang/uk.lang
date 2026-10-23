@@ -1,34 +1,43 @@
 <?php
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
-   Codificación: UTF-8
+  Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
   | compliance with the License. You may obtain a copy of the License at |
   | http://www.opensource.org/licenses/gpl-license.php                   |
   |                                                                      |
-  | Software distributed under the License is distributed on "AS IS"     |
+  | Software distributed under the License is distributed on an "AS IS"  |
   | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  |                                                                      |
-  | Translated by: LLC LeNET                                             |
-  | Email: support@lenet.com.ua                                          |
-  +----------------------------------------------------------------------+
-  $Id: uk.lang,v 1.7 2023-10-30 00:30:54 LLC LENET support@lenet.ua Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-	"GeoIP KEY" => "GeoIP КЛЮЧ",
-	"key" => "Ліцензійний ключ від maxmind.com",
-	"maxmind signup" => "Ви можете зареєструватися тут для отримання безкоштовного ліцензійного ключа",
-	"updated" => "Ключ оновлено",
+$arrLangModule = array(
+    '%s is invalid' => '%s невірно',
+    '%s is required' => '%s обовʼязково',
+    'Back' => 'Назад',
+    'Cancel' => 'Скасувати',
+    'Configured' => 'Налаштовано',
+    'Create a MaxMind account' => 'Створіть обліковий запис MaxMind',
+    'ERROR' => 'Помилка',
+    'Edit' => 'Редагувати',
+    'Enter a new key' => 'Введіть новий ключ',
+    'GeoIP KEY' => 'GeoIP КЛЮЧ',
+    'Information' => 'Інформація',
+    'Message' => 'повідомлення',
+    'Not configured' => 'Не налаштовано',
+    'Required field' => 'Обов\'язкове поле',
+    'Save' => 'Зберегти',
+    'The key could not be saved' => 'Не вдалося зберегти ключ',
+    'The key has not changed' => 'Ключ не змінювався',
+    'key' => 'Ліцензійний ключ від maxmind.com',
+    'maxmind signup' => 'Ви можете зареєструватися тут для отримання безкоштовного ліцензійного ключа',
+    'updated' => 'Ключ оновлено',
 );
-?>

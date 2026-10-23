@@ -1,0 +1,43 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s geçersizdir',
+    '%s is required' => '%s zorunludur',
+    'Back' => 'Geri',
+    'Cancel' => 'İptal',
+    'Configured' => 'Yapılandırılmış',
+    'Create a MaxMind account' => 'MaxMind hesabı oluşturun',
+    'ERROR' => 'Hata',
+    'Edit' => 'Düzenle',
+    'Enter a new key' => 'Yeni bir anahtar girin',
+    'GeoIP KEY' => 'GeoIP ANAHTARI',
+    'Information' => 'Bilgi',
+    'Message' => 'Mesaj',
+    'Not configured' => 'Yapılandırılmadı',
+    'Required field' => 'Gerekli alan',
+    'Save' => 'Kaydet',
+    'The key could not be saved' => 'Anahtar kaydedilemedi',
+    'The key has not changed' => 'Anahtar değişmedi',
+    'key' => 'anahtar',
+    'maxmind signup' => 'maxmind kaydı',
+    'updated' => 'güncellendi',
+);

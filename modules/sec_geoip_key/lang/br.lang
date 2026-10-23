@@ -2,10 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2020 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,16 +17,27 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is Issabel Foundation     |
-  +----------------------------------------------------------------------+
-  $Id: en.lang, Fri 09 Apr 2021 04:22:20 PM EDT, German Venturino german@issabel.com
-  $Id: br.lang,v 1.2 2021-25-10 12:55:00 Leandro Saltori - Prisma Telecom leandro@prismatelecom.com Exp $
 */
 global $arrLangModule;
-$arrLangModule=array(
-"GeoIP KEY" => "Chave GeoIP",
-"key" => "Chave de licença de maxmind.com",
-"maxmind signup" => "Você pode se inscrever aqui para obter uma chave de licença gratuita",
-"updated" => "Chave atualizada"
+$arrLangModule = array(
+    '%s is invalid' => '%s é inválido',
+    '%s is required' => '%s é obrigatório',
+    'Back' => 'Voltar',
+    'Cancel' => 'Cancelar',
+    'Configured' => 'Configurado',
+    'Create a MaxMind account' => 'Crie uma conta MaxMind',
+    'ERROR' => 'Erro',
+    'Edit' => 'Editar',
+    'Enter a new key' => 'Insira uma nova chave',
+    'GeoIP KEY' => 'Chave GeoIP',
+    'Information' => 'Informação',
+    'Message' => 'Mensagem',
+    'Not configured' => 'Não configurado',
+    'Required field' => 'Campo obrigatório',
+    'Save' => 'Salvar',
+    'The key could not be saved' => 'A chave não pôde ser salva',
+    'The key has not changed' => 'A chave não mudou',
+    'key' => 'Chave de licença de maxmind.com',
+    'maxmind signup' => 'Você pode se inscrever aqui para obter uma chave de licença gratuita',
+    'updated' => 'Chave atualizada',
 );
-?>
