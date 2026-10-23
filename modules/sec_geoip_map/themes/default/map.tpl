@@ -1,309 +1,305 @@
-<!--script src="https://cdn.amcharts.com/lib/4/core.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/geodata/continentsLow.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/geodata/data/countries2.js"></script-->
+<div class="iss-form">
+    <div class="iss-form__toolbar">
+        <span class="iss-form__hint">{$MAP_HELP}</span>
+        <div class="iss-form__buttons">
+            <button class="button" type="button" id="map_refresh">{$REFRESH}</button>
+        </div>
+    </div>
 
-<script src="modules/sec_geoip_map/themes/default/vendor/amcharts/core.js"></script>
-<script src="modules/sec_geoip_map/themes/default/vendor/amcharts/maps.js"></script>
-<script src="modules/sec_geoip_map/themes/default/vendor/amcharts/geodata/continentsLow.js"></script>
-<script src="modules/sec_geoip_map/themes/default/vendor/amcharts/geodata/worldLow.js"></script>
-<script src="modules/sec_geoip_map/themes/default/vendor/amcharts/themes/animated.js"></script>
-<script src="modules/sec_geoip_map/themes/default/vendor/amcharts/geodata/data/countries2.js"></script>
-<script src="modules/sec_geoip_map/themes/default/vendor/amcharts/geodata/lang/{$lang}.js"></script>
+    {if $GEOIP_AVAILABLE ne 'yes'}
+    <div class="iss-alert iss-alert--error">
+        <div class="iss-alert__title">{$GEOIP_UNAVAILABLE_TITLE}</div>
+        <div class="iss-alert__content">{$GEOIP_ERROR|escape|nl2br}</div>
+    </div>
+    {/if}
 
+    <div id="map_message" class="iss-alert" style="display:none;" role="status">
+        <div class="iss-alert__content" id="map_message_text"></div>
+    </div>
+
+    <section class="iss-card">
+        <header class="iss-card__header"><i class="ti ti-world"></i> {$MAP_TITLE}
+            <span class="ms-2 small">
+                <span class="iss-legend iss-legend--blocked">{$LEGEND_BLOCKED}</span>
+                <span class="iss-legend iss-legend--pass">{$LEGEND_PASS}</span>
+                <span class="iss-legend iss-legend--none">{$LEGEND_NONE}</span>
+                <span class="iss-legend iss-legend--home">{$LEGEND_HOME}</span>
+            </span>
+        </header>
+        <div class="iss-card__body">
+            <div id="geomap" class="geo-map-wrap">
+                {if $WORLD_SVG ne ''}{$WORLD_SVG}{else}<div class="iss-alert iss-alert--error"><div class="iss-alert__content">{$MAP_ERROR}</div></div>{/if}
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <section class="iss-card">
+                <header class="iss-card__header"><i class="ti ti-ban"></i> {$BLOCKED_TITLE}</header>
+                <div class="iss-card__body">
+                    <ul class="list-unstyled mb-0" id="blocked_list"><li class="iss-field__help">{$NO_DATA}</li></ul>
+                </div>
+            </section>
+        </div>
+        <div class="col-md-6">
+            <section class="iss-card">
+                <header class="iss-card__header"><i class="ti ti-circle-check"></i> {$PASS_TITLE}</header>
+                <div class="iss-card__body">
+                    <ul class="list-unstyled mb-0" id="pass_list"><li class="iss-field__help">{$NO_DATA}</li></ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <section class="iss-card">
+        <header class="iss-card__header"><i class="ti ti-chart-bar"></i> {$CHART_TITLE}</header>
+        <div class="iss-card__body">
+            <div class="geo-chart-wrap"><canvas id="f2bchart"></canvas></div>
+        </div>
+    </section>
+</div>
+
+<script src="{$WEBPATH}themes/{$THEMENAME}/js/chart.umd.min.js"></script>
+<script src="{$WEBPATH}themes/{$THEMENAME}/js/issabel-charts.js"></script>
 <script>
-
-var lang={};
-{foreach key=key item=item from=$LANG}
-    lang["{$key}"]="{$item}";
-{/foreach}
-
+var geoMapLang = "{$MAP_LANG|escape:'javascript'}";
+var geoAvailable = ("{$GEOIP_AVAILABLE}" === "yes");
+var geoMapTitle = "{$MAP_TITLE|escape:'javascript'}";
+var geoText = {
+    block: "{$LEGEND_BLOCKED|escape:'javascript'}",
+    pass: "{$LEGEND_PASS|escape:'javascript'}",
+    none: "{$LEGEND_NONE|escape:'javascript'}",
+    blocked: "{$BLOCKED_TITLE|escape:'javascript'}",
+    whitelisted: "{$PASS_TITLE|escape:'javascript'}",
+    noData: "{$NO_DATA|escape:'javascript'}",
+    chart: "{$CHART_TITLE|escape:'javascript'}"
+};
 {literal}
+(function () {
+    'use strict';
 
-am4core.ready(function() {
-
-    resize();
-    // Themes begin
-    am4core.useTheme(am4themes_animated);
-    // Themes end
-
-    // Create map instance
-    chart = am4core.create("chartdiv", am4maps.MapChart);
-    //var interfaceColors = new am4core.InterfaceColorSet();
+    var SVGNS = 'http://www.w3.org/2000/svg';
+    var state = {};          // iso -> 'blocked' | 'pass'
+    var chart = null;
+    var displayNames = null;
 
     try {
-        chart.geodata = am4geodata_worldLow;
+        displayNames = new Intl.DisplayNames([geoMapLang], { type: 'region' });
+    } catch (e) {
+        displayNames = null;
     }
-    catch (e) {
-        chart.raiseCriticalError(new Error("Map geodata could not be loaded. Please download the latest <a href=\"https://www.amcharts.com/download/download-v4/\">amcharts geodata</a> and extract its contents into the same directory as your amCharts files."));
+
+    function countryName(iso, fallback) {
+        if (displayNames) {
+            try {
+                var name = displayNames.of(iso);
+                if (name && name !== iso) return name;
+            } catch (e) {}
+        }
+        return fallback || iso;
     }
 
-    // Set projection
-    chart.projection = new am4maps.projections.Orthographic();
-    chart.panBehavior = "rotateLongLat";
-    chart.padding(20,20,20,20);
+    function showMessage(type, text) {
+        var box = document.getElementById('map_message');
+        var content = document.getElementById('map_message_text');
+        content.textContent = text;
+        box.className = 'iss-alert iss-alert--' + type;
+        box.style.display = '';
+    }
 
-    // Add zoom control
-    chart.zoomControl = new am4maps.ZoomControl();
+    // Los endpoints devuelven texto plano: lista de ISO separados por coma.
+    function fetchList(param, cb) {
+        $.get('index.php?menu=sec_geoip_map&rawmode=yes&' + param + '=1', function (data) {
+            var list = String(data || '').split(',').filter(function (x) { return /^[A-Z]{2}$/.test(x); });
+            cb(list);
+        }).fail(function () { cb([]); });
+    }
 
-{/literal}
-    chart.geodataNames = am4geodata_lang_{$lang};
-{literal}
-    var homeButton = new am4core.Button();
-    homeButton.events.on("hit", function(){
-      mapPolygon=polygonSeries.getPolygonById(home);
-      //rotateTo(mapPolygon,mapPolygon.visualLongitude*-1,mapPolygon.visualLatitude*-1);
-      rotateTo(mapPolygon,homeLongitude*-1,homeLatitude*-1);
+    function fetchAttacks(cb) {
+        $.get('index.php?menu=sec_geoip_map&rawmode=yes&attacks=1', function (data) {
+            try { cb(typeof data === 'string' ? JSON.parse(data) : data); } catch (e) { cb({}); }
+        }).fail(function () { cb({}); });
+    }
+
+    function fetchHome(cb) {
+        $.get('index.php?menu=sec_geoip_map&rawmode=yes&homecountry=1', function (data) {
+            var iso = String(data || '').split(',')[0];
+            cb(/^[A-Z]{2}$/.test(iso) ? iso : '');
+        }).fail(function () { cb(''); });
+    }
+
+    function pathFor(iso) {
+        return document.querySelector('.geo-country[data-iso="' + iso + '"]');
+    }
+
+    function setPathState(iso, value) {
+        var el = pathFor(iso);
+        if (!el) return;
+        el.classList.remove('is-blocked', 'is-pass');
+        if (value === 'blocked') el.classList.add('is-blocked');
+        if (value === 'pass') el.classList.add('is-pass');
+    }
+
+    function localizeMap() {
+        var paths = document.querySelectorAll('.geo-country');
+        for (var i = 0; i < paths.length; i++) {
+            var iso = paths[i].getAttribute('data-iso');
+            var name = countryName(iso, paths[i].getAttribute('data-name'));
+            paths[i].setAttribute('aria-label', name);
+            paths[i].setAttribute('data-name', name);
+            var title = paths[i].querySelector('title');
+            if (!title) {
+                title = document.createElementNS(SVGNS, 'title');
+                paths[i].appendChild(title);
+            }
+            title.textContent = name;
+        }
+    }
+
+    function renderList(id, isos, action) {
+        var ul = document.getElementById(id);
+        ul.innerHTML = '';
+        if (!isos.length) {
+            var empty = document.createElement('li');
+            empty.className = 'iss-field__help';
+            empty.textContent = geoText.noData;
+            ul.appendChild(empty);
+            return;
+        }
+        isos.sort().forEach(function (iso) {
+            var li = document.createElement('li');
+            li.className = 'd-flex justify-content-between align-items-center py-1';
+            var name = document.createElement('span');
+            name.textContent = countryName(iso, iso);
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'button';
+            btn.textContent = action === 'noneblock' ? geoText.none : geoText.block;
+            btn.addEventListener('click', function () {
+                mutate(action, iso);
+            });
+            li.appendChild(name);
+            li.appendChild(btn);
+            ul.appendChild(li);
+        });
+    }
+
+    function refresh() {
+        fetchList('blocked', function (blocked) {
+            fetchList('pass', function (pass) {
+                state = {};
+                blocked.forEach(function (iso) { state[iso] = 'blocked'; });
+                pass.forEach(function (iso) { state[iso] = 'pass'; });
+
+                document.querySelectorAll('.geo-country').forEach(function (el) {
+                    el.classList.remove('is-blocked', 'is-pass');
+                });
+                Object.keys(state).forEach(function (iso) { setPathState(iso, state[iso]); });
+
+                renderList('blocked_list', blocked, 'noneblock');
+                renderList('pass_list', pass, 'unblock');
+            });
+        });
+
+        fetchAttacks(function (data) {
+            var entries = Object.keys(data || {}).map(function (iso) {
+                return [iso, parseInt(data[iso], 10) || 0];
+            }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 10);
+
+            var ctx = document.getElementById('f2bchart');
+            if (!ctx || typeof Chart === 'undefined') return;
+            if (chart) chart.destroy();
+
+            var labels = entries.map(function (e) { return countryName(e[0], e[0]); });
+            var values = entries.map(function (e) { return e[1]; });
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.length ? labels : [geoText.noData],
+                    datasets: [{
+                        label: geoText.chart,
+                        data: values.length ? values : [0],
+                        backgroundColor: (typeof IssabelCharts !== 'undefined')
+                            ? IssabelCharts.palette(Math.max(1, values.length)) : undefined
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { precision: 0 } }
+                    }
+                }
+            });
+        });
+
+        fetchHome(function (iso) {
+            if (iso) {
+                var el = pathFor(iso);
+                if (el) el.classList.add('is-home');
+            }
+        });
+    }
+
+    function mutate(action, iso) {
+        if (!geoAvailable) return;
+        var payload = {};
+        payload[action] = iso;
+        $.ajax({
+            type: 'POST',
+            url: 'index.php?menu=sec_geoip_map&rawmode=yes',
+            data: payload,
+            dataType: 'json'
+        }).done(function (res) {
+            if (res && res.status === 'success') {
+                showMessage('success', res.message);
+            } else {
+                showMessage('error', res && res.message ? res.message : geoText.noData);
+            }
+        }).fail(function () {
+            showMessage('error', geoText.noData);
+        }).always(function () {
+            refresh();
+        });
+    }
+
+    document.addEventListener('click', function (e) {
+        if (!geoAvailable) return;
+        var el = e.target.closest ? e.target.closest('.geo-country') : null;
+        if (!el) return;
+        var iso = el.getAttribute('data-iso');
+        var current = state[iso] || 'none';
+        if (current === 'blocked') mutate('noneblock', iso);
+        else if (current === 'pass') mutate('unblock', iso);
+        else mutate('block', iso);
     });
 
-    homeButton.icon = new am4core.Sprite();
-    homeButton.padding(7, 5, 7, 5);
-    homeButton.width = 30;
-    homeButton.icon.path = "M16,8 L14,8 L14,16 L10,16 L10,10 L6,10 L6,16 L2,16 L2,8 L0,8 L8,0 L16,8 Z M16,8";
-    homeButton.marginBottom = 10;
-    homeButton.parent = chart.zoomControl;
-    homeButton.insertBefore(chart.zoomControl.plusButton);
-
-    chart.backgroundSeries.mapPolygons.template.polygon.fill = am4core.color("#006994");
-    chart.backgroundSeries.mapPolygons.template.polygon.fillOpacity = 1;
-    chart.deltaLongitude = 20;
-    chart.deltaLatitude = -20;
-
-    // limits vertical rotation
-    chart.adapter.add("deltaLatitude", function(delatLatitude){
-        return am4core.math.fitToRange(delatLatitude, -90, 90);
-    })
-
-    
-    // Create map polygon series SHADOW
-    var shadowPolygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
-    shadowPolygonSeries.geodata = am4geodata_continentsLow;
-
-    try {
-        shadowPolygonSeries.geodata = am4geodata_continentsLow;
-    }
-    catch (e) {
-        shadowPolygonSeries.raiseCriticalError(new Error("Map geodata could not be loaded. Please download the latest <a href=\"https://www.amcharts.com/download/download-v4/\">amcharts geodata</a> and extract its contents into the same directory as your amCharts files."));
-    }
-
-    shadowPolygonSeries.useGeodata = true;
-    shadowPolygonSeries.dx = 2;
-    shadowPolygonSeries.dy = 2;
-    shadowPolygonSeries.mapPolygons.template.fill = am4core.color("#000");
-    shadowPolygonSeries.mapPolygons.template.fillOpacity = 0.2;
-    shadowPolygonSeries.mapPolygons.template.strokeOpacity = 0;
-    shadowPolygonSeries.fillOpacity = 0.1;
-    shadowPolygonSeries.fill = am4core.color("#000");
-
-    // Create map polygon series
-    polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
-    polygonSeries.useGeodata = true;
-
-    polygonSeries.calculateVisualCenter = true;
-    polygonSeries.tooltip.background.fillOpacity = 0.2;
-    polygonSeries.tooltip.background.cornerRadius = 5;
-
-    var template = polygonSeries.mapPolygons.template;
-    template.nonScalingStroke = true;
-    template.fill = am4core.color(none_color);
-    template.stroke = am4core.color("#e2c9b0");
-
-    polygonSeries.calculateVisualCenter = true;
-    template.propertyFields.id = "id";
-    template.tooltipPosition = "fixed";
-    template.fillOpacity = 1;
-
-    var graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
-    graticuleSeries.mapLines.template.stroke = am4core.color("#fff");
-    graticuleSeries.fitExtent = false;
-    graticuleSeries.mapLines.template.strokeOpacity = 0.2;
-    graticuleSeries.mapLines.template.stroke = am4core.color("#fff");
-
-    var measelsSeries = chart.series.push(new am4maps.MapPolygonSeries())
-    measelsSeries.tooltip.background.fillOpacity = 1;
-    measelsSeries.tooltip.background.cornerRadius = 5;
-    measelsSeries.tooltip.autoTextColor = false;
-    measelsSeries.tooltip.label.fill = am4core.color("#000");
-    measelsSeries.tooltip.dy = -5;
-
-    var measelTemplate = measelsSeries.mapPolygons.template;
-    measelTemplate.fill = am4core.color(f2b_color);
-    measelTemplate.strokeOpacity = 0;
-    measelTemplate.fillOpacity = 0.75;
-    measelTemplate.tooltipPosition = "fixed";
-
-    imageSeriesHome = chart.series.push(new am4maps.MapImageSeries());
-    var imageSeriesHomeTemplate = imageSeriesHome.mapImages.template;
-    var marker = imageSeriesHomeTemplate.createChild(am4core.Image);
-    marker.href = "modules/sec_geoip_map/images/gota-issabel.png";
-    marker.width = 40;
-    marker.height = 40;
-    marker.nonScaling = true;
-    marker.tooltipText = "{title}";
-    marker.horizontalCenter = "middle";
-    marker.verticalCenter = "bottom";
-
-    // Set property fields
-    imageSeriesHomeTemplate.propertyFields.latitude = "latitude";
-    imageSeriesHomeTemplate.propertyFields.longitude = "longitude";
-
-    // Click
-    template.events.on("hit", function(ev) {
-        iso2 = ev.target.dataItem.dataContext.id
-        if(blockState[iso2]==1) {
-            polygonSeries.getPolygonById(iso2).fill = am4core.color(none_color);
-            blockState[iso2]=-1;
-            $.get( "index.php?menu=sec_geoip_map&rawmode=yes&noneblock="+iso2, function( data  ) {
-                console.log(data);
-            });
-        } else  
-        if(blockState[iso2]==-1) {
-            polygonSeries.getPolygonById(iso2).fill = am4core.color(unblocked_color);
-            blockState[iso2]=0;
-            $.get( "index.php?menu=sec_geoip_map&rawmode=yes&unblock="+iso2, function( data  ) {
-                console.log(data);
-            });
-        } else {
-            blockState[iso2]=1;
-            polygonSeries.getPolygonById(iso2).fill = am4core.color(blocked_color);
-            $.get( "index.php?menu=sec_geoip_map&rawmode=yes&block="+iso2, function( data  ) {
-                console.log(data);
-            });
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        var el = document.activeElement;
+        if (el && el.classList && el.classList.contains('geo-country')) {
+            e.preventDefault();
+            el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         }
     });
 
-    polygonSeries.events.on("inited", function () {
+    var refreshBtn = document.getElementById('map_refresh');
+    if (refreshBtn) refreshBtn.addEventListener('click', refresh);
 
-        lineSeries = chart.series.push(new am4maps.MapLineSeries());
-        lineSeries.mapLines.template.strokeWidth = 0.2;
-        lineSeries.mapLines.template.stroke = am4core.color("#000");
+    // Accesibilidad: los paths reciben foco con Tab.
+    document.querySelectorAll('.geo-country').forEach(function (el) {
+        el.setAttribute('tabindex', '0');
+        el.setAttribute('role', 'button');
+    });
 
-        $.get( "index.php?menu=sec_geoip_map&rawmode=yes&f2b=1", function( data ) {
-            f2b = JSON.parse(data);
-            polygonSeries.mapPolygons.each(function (mapPolygon) {
-                iso = mapPolygon.dataItem.dataContext.id;
-                blockState[iso]=-1;
-                if(f2b.hasOwnProperty(iso)) {
-                    value = f2b[iso];
-                    var polygon = measelsSeries.mapPolygons.create();
-                    polygon.multiPolygon = am4maps.getCircle(mapPolygon.visualLongitude, mapPolygon.visualLatitude, Math.max(1, Math.log(value) * Math.LN10 / 2 ));
-                    polygon.tooltipText = mapPolygon.dataItem.dataContext.name + ": " + value;
-                    mapPolygon.dummyData = polygon;
-                    polygon.events.on("over", function () {
-                        mapPolygon.isHover = true;
-                    })
-                    polygon.events.on("out", function () {
-                        mapPolygon.isHover = false;
-                    })
-                } else {
-                    // Country tooltip with no fail2ban blocks
-                    mapPolygon.tooltipText = mapPolygon.dataItem.dataContext.name;
-                    mapPolygon.tooltip.background.fillOpacity = 1;
-                    mapPolygon.tooltip.background.cornerRadius = 5;
-                }
-            })
-        })
+    var rootSvg = document.querySelector('.geo-map');
+    if (rootSvg) rootSvg.setAttribute('aria-label', geoMapTitle);
 
-        $.get( "index.php?menu=sec_geoip_map&rawmode=yes&blocked=1", function( data ) {
-            countries = data.split(",");
-            for(var i=0; i < countries.length; i++) {
-                if(typeof(am4geodata_data_countries2[countries[i]])=="object") {
-                    pais = polygonSeries.getPolygonById(countries[i]);
-                    if(typeof(pais)!='undefined') {
-                       pais.fill = am4core.color(blocked_color);
-                    }
-                    blockState[countries[i]]=1;
-                }
-            }
-        });
-
-        $.get( "index.php?menu=sec_geoip_map&rawmode=yes&pass=1", function( data ) {
-            countries = data.split(",");
-            for(var i=0; i < countries.length; i++) {
-                if(typeof(am4geodata_data_countries2[countries[i]])=="object") {
-                    pais = polygonSeries.getPolygonById(countries[i]);
-                    if(typeof(pais)!='undefined') {
-                        pais.fill = am4core.color(unblocked_color);
-                    }
-                    blockState[countries[i]]=0;
-                }
-            }
-        });
-
-        $.when(
-            $.ajax( "index.php?menu=sec_geoip_map&rawmode=yes&homecountry=1" ),
-        ).done(function(data) {
-            ret = data.split(",");
-            home     = ret[0];
-            publicip = ret[1];
-            $.ajax("//ipwhois.app/json/" + publicip).done(function(data) {
-                if(data.success) {
-                    homeLatitude  = parseFloat(data.latitude);
-                    homeLongitude = parseFloat(data.longitude);
-                } else {
-                    homePolygon   = polygonSeries.getPolygonById(home);
-                    homeLatitude  = homePolygon.visualLatitude;
-                    homeLongitude = homePolygon.visualLongitude;
-                }
-                imageSeriesHome.addData({
-                    "latitude":  parseFloat(homeLatitude),
-                    "longitude": parseFloat(homeLongitude),
-                    "title": lang["My Issabel"]
-                })
-  
-            })
-            .fail(function() {
-                homePolygon   = polygonSeries.getPolygonById(home);
-                homeLatitude  = homePolygon.visualLatitude;
-                homeLongitude = homePolygon.visualLongitude;
-                imageSeriesHome.addData({
-                    "latitude":  homeLatitude,
-                    "longitude": homeLongitude,
-                    "title": "My Issabel"
-                })
-            })
-        });
-    }); // end inited
-    // check for attacks
-    const interval = setInterval(function() {
-        // method to be executed;
-        if (enableAnimations == 1) {
-            $.get("index.php?menu=sec_geoip_map&rawmode=yes&getattacks=1",function(data) {
-                if(data.length>0) {
-                    for(i=0;i<data.length;i++) {
-                       attack = data[i];
-                       var countryname = chart.geodataNames[attack.source];
-                       atacar(attack.source,home,attack.hour,countryname);
-                    } 
-                }
-            });
-        }
-    }, 5000);
-
-    var label = chart.createChild(am4core.Label)
-    label.text = "🟡  "+lang.blockedLegend;
-    label.fontSize = 12;
-    label.align = "left";
-    label.valign = "bottom"
-    label.fill = am4core.color("#000");
-    label.background = new am4core.RoundedRectangle()
-    label.background.cornerRadius(5,5,5,5);
-    label.padding(10,10,10,10);
-    label.marginLeft = 20;
-    label.marginBottom = 30;
-    label.background.strokeOpacity = 0.3;
-    label.background.stroke =am4core.color("#927459");
-    label.background.fill = am4core.color("#f9e3fe");
-    label.background.fillOpacity = 0.6;
-
-
-}); // end am4core.ready()
-
+    localizeMap();
+    refresh();
+})();
 {/literal}
 </script>
-<div class='stars'></div>
-<div class='twinkling'></div>
-<div id="chartdiv" class='chart' style='z-index:1;'></div>
-

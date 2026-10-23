@@ -1,0 +1,47 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Attacks by country (last 24 hours)' => '国別の攻撃 (過去 24 時間)',
+    'Blocked' => 'ブロック済み',
+    'Blocked countries' => 'ブロックされている国',
+    'Click a country to cycle between blocked, whitelisted and not listed.' => '国をクリックして、ブロック、ホワイトリスト、リスト外を切り替えます。',
+    'Country blocked' => 'ブロックされている国',
+    'Country removed from the list' => 'リストから削除された国',
+    'Country whitelisted' => 'ホワイトリストに登録されている国',
+    'GeoIP Map' => '地域IPマップ',
+    'GeoIP is not available' => 'GeoIPは利用できません',
+    'Invalid country code' => '無効な国コード',
+    'Method not allowed' => '許可されていないメソッド',
+    'My Issabel' => '私のイサベル',
+    'No data' => 'データなし',
+    'Not listed' => '記載されていない',
+    'Recent attacks' => '最近の攻撃',
+    'Refresh' => 'リフレッシュ',
+    'The change could not be applied' => '変更を適用できませんでした',
+    'The map could not be loaded' => '地図を読み込めませんでした',
+    'This server' => 'このサーバー',
+    'Whitelisted' => 'ホワイトリストに登録されています',
+    'Whitelisted countries' => 'ホワイトリストに登録されている国',
+    'attackLegend' => '攻撃伝説',
+    'blockedLegend' => 'ブロックされた凡例',
+    '{0}: Stopped attack from {1}' => '{0}: Stopped attack from {1}',
+);

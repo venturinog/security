@@ -1,0 +1,47 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Attacks by country (last 24 hours)' => 'Támadások országonként (elmúlt 24 óra)',
+    'Blocked' => 'Blokkolva',
+    'Blocked countries' => 'Letiltott országok',
+    'Click a country to cycle between blocked, whitelisted and not listed.' => 'Kattintson egy országra a blokkolt, az engedélyezőlistán szereplő és a listán nem szereplő országok közötti váltáshoz.',
+    'Country blocked' => 'Ország blokkolva',
+    'Country removed from the list' => 'Ország eltávolítva a listáról',
+    'Country whitelisted' => 'Az ország engedélyezőlistára került',
+    'GeoIP Map' => 'GeoIP térkép',
+    'GeoIP is not available' => 'A GeoIP nem elérhető',
+    'Invalid country code' => 'Érvénytelen országkód',
+    'Method not allowed' => 'A módszer nem engedélyezett',
+    'My Issabel' => 'Az én Issabelem',
+    'No data' => 'Nincs adat',
+    'Not listed' => 'Nincs felsorolva',
+    'Recent attacks' => 'Legutóbbi támadások',
+    'Refresh' => 'Frissítés',
+    'The change could not be applied' => 'A módosítást nem lehetett alkalmazni',
+    'The map could not be loaded' => 'A térképet nem sikerült betölteni',
+    'This server' => 'Ez a szerver',
+    'Whitelisted' => 'Felkerült az engedélyezőlistára',
+    'Whitelisted countries' => 'Az engedélyezőlistán szereplő országok',
+    'attackLegend' => 'támadásLegend',
+    'blockedLegend' => 'blokkolvaLegend',
+    '{0}: Stopped attack from {1}' => '{0}: Stopped attack from {1}',
+);

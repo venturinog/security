@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2021 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -19,12 +19,31 @@
   +----------------------------------------------------------------------+
   | The Initial Developer of the Original Code is Issabel Foundation     |
   +----------------------------------------------------------------------+
-  $Id: en.lang,v 1.1 2021-03-24 11:02:09 Nicolas Gudino nicolas@issabel.com Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"attackLegend"=>"Real Time Attack Avoided",
-"blockedLegend"=>"Attackers blocked by Fail2ban",
-"{0}: Stopped attack from {1}" => "{0}: Stoped attack from {1}",
-"My Issabel"=>"My Issabel"
+$arrLangModule = array(
+    'Attacks by country (last 24 hours)' => 'Attacks by country (last 24 hours)',
+    'Blocked' => 'Blocked',
+    'Blocked countries' => 'Blocked countries',
+    'Click a country to cycle between blocked, whitelisted and not listed.' => 'Click a country to cycle between blocked, whitelisted and not listed.',
+    'Country blocked' => 'Country blocked',
+    'Country removed from the list' => 'Country removed from the list',
+    'Country whitelisted' => 'Country whitelisted',
+    'GeoIP Map' => 'GeoIP Map',
+    'GeoIP is not available' => 'GeoIP is not available',
+    'Invalid country code' => 'Invalid country code',
+    'Method not allowed' => 'Method not allowed',
+    'My Issabel' => 'My Issabel',
+    'No data' => 'No data',
+    'Not listed' => 'Not listed',
+    'Recent attacks' => 'Recent attacks',
+    'Refresh' => 'Refresh',
+    'The change could not be applied' => 'The change could not be applied',
+    'The map could not be loaded' => 'The map could not be loaded',
+    'This server' => 'This server',
+    'Whitelisted' => 'Whitelisted',
+    'Whitelisted countries' => 'Whitelisted countries',
+    'attackLegend' => 'Real Time Attack Avoided',
+    'blockedLegend' => 'Attackers blocked by Fail2ban',
+    '{0}: Stopped attack from {1}' => '{0}: Stoped attack from {1}',
 );
-?>

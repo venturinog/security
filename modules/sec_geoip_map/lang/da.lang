@@ -1,0 +1,47 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Attacks by country (last 24 hours)' => 'Angreb efter land (sidste 24 timer)',
+    'Blocked' => 'Blokeret',
+    'Blocked countries' => 'Blokerede lande',
+    'Click a country to cycle between blocked, whitelisted and not listed.' => 'Klik på et land for at skifte mellem blokeret, hvidlistet og ikke-listet.',
+    'Country blocked' => 'Land blokeret',
+    'Country removed from the list' => 'Land fjernet fra listen',
+    'Country whitelisted' => 'Land hvidlistet',
+    'GeoIP Map' => 'GeoIP kort',
+    'GeoIP is not available' => 'GeoIP er ikke tilgængelig',
+    'Invalid country code' => 'Ugyldig landekode',
+    'Method not allowed' => 'Metoden er ikke tilladt',
+    'My Issabel' => 'Min Isabel',
+    'No data' => 'Ingen data',
+    'Not listed' => 'Ikke opført',
+    'Recent attacks' => 'Seneste angreb',
+    'Refresh' => 'Opdater',
+    'The change could not be applied' => 'Ændringen kunne ikke anvendes',
+    'The map could not be loaded' => 'Kortet kunne ikke indlæses',
+    'This server' => 'Denne server',
+    'Whitelisted' => 'Hvidlistet',
+    'Whitelisted countries' => 'Hvidlistede lande',
+    'attackLegend' => 'angreb Legend',
+    'blockedLegend' => 'blokeret Legend',
+    '{0}: Stopped attack from {1}' => '{0}: Stopped attack from {1}',
+);

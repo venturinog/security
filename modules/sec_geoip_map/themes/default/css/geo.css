@@ -1,55 +1,72 @@
-#chartdiv {
-  max-width: 100%;
+.geo-map-wrap {
+    width: 100%;
+    overflow-x: auto;
 }
 
-* {
-    margin: 0;
-    padding: 0;
+.geo-map {
+    width: 100%;
+    height: auto;
+    max-height: 62vh;
+    display: block;
 }
 
-.stars, .twinkling, .chart {
-    position:absolute;
-    top:135px;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100%;
-    height:100%;
-    display:block;
+.geo-country {
+    fill: var(--iss-surface-2);
+    stroke: var(--iss-border);
+    stroke-width: .4;
+    cursor: pointer;
+    transition: fill-opacity .15s ease;
 }
 
-.stars {
-   background:#000 url(../../../images/stars.png) repeat top center;
-   z-index:0;
+.geo-country:hover,
+.geo-country:focus {
+    stroke: var(--iss-text);
+    stroke-width: 1;
+    outline: none;
 }
 
-.twinkling{
-  background:transparent url(../../../images/twinkling.png) repeat top center;
-  z-index:1;
-
-  -moz-animation:move-twink-back 200s linear infinite;
-  -ms-animation:move-twink-back 200s linear infinite;
-  -o-animation:move-twink-back 200s linear infinite;
-  -webkit-animation:move-twink-back 200s linear infinite;
-  animation:move-twink-back 200s linear infinite;
+.geo-country.is-blocked {
+    fill: var(--iss-sev-critical);
+    fill-opacity: .55;
 }
 
-
-@keyframes move-twink-back {
-    from {background-position:0 0;}
-    to {background-position:-10000px 5000px;}
-}
-@-webkit-keyframes move-twink-back {
-    from {background-position:0 0;}
-    to {background-position:-10000px 5000px;}
-}
-@-moz-keyframes move-twink-back {
-    from {background-position:0 0;}
-    to {background-position:-10000px 5000px;}
-}
-@-ms-keyframes move-twink-back {
-    from {background-position:0 0;}
-    to {background-position:-10000px 5000px;}
+.geo-country.is-pass {
+    fill: var(--iss-sev-ok);
+    fill-opacity: .5;
 }
 
+.geo-country.is-home {
+    stroke: var(--iss-primary);
+    stroke-width: 1.4;
+}
 
+.geo-chart-wrap {
+    position: relative;
+    height: 320px;
+}
+
+.iss-legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 10px;
+    font-size: .75rem;
+    color: var(--iss-text-muted);
+}
+
+.iss-legend::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    display: inline-block;
+}
+
+.iss-legend--blocked::before { background: var(--iss-sev-critical); }
+.iss-legend--pass::before    { background: var(--iss-sev-ok); }
+.iss-legend--none::before    { background: var(--iss-surface-2); border: 1px solid var(--iss-border); }
+.iss-legend--home::before    { background: transparent; border: 2px solid var(--iss-primary); }
+
+@media (prefers-reduced-motion: reduce) {
+    .geo-country { transition: none; }
+}

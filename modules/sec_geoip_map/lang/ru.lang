@@ -1,0 +1,47 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Attacks by country (last 24 hours)' => 'Атаки по странам (за последние 24 часа)',
+    'Blocked' => 'Заблокировано',
+    'Blocked countries' => 'Заблокированные страны',
+    'Click a country to cycle between blocked, whitelisted and not listed.' => 'Нажмите страну, чтобы переключаться между заблокированными, внесенными в белый список и не включенными в список.',
+    'Country blocked' => 'Страна заблокирована',
+    'Country removed from the list' => 'Страна удалена из списка',
+    'Country whitelisted' => 'Страна в белом списке',
+    'GeoIP Map' => 'ГеоIP-карта',
+    'GeoIP is not available' => 'GeoIP недоступен',
+    'Invalid country code' => 'Неверный код страны',
+    'Method not allowed' => 'Метод не разрешен',
+    'My Issabel' => 'Моя Исабель',
+    'No data' => 'Нет данных',
+    'Not listed' => 'Нет в списке',
+    'Recent attacks' => 'Недавние атаки',
+    'Refresh' => 'Обновить',
+    'The change could not be applied' => 'Не удалось применить изменение',
+    'The map could not be loaded' => 'Не удалось загрузить карту',
+    'This server' => 'Этот сервер',
+    'Whitelisted' => 'В белом списке',
+    'Whitelisted countries' => 'Страны из белого списка',
+    'attackLegend' => 'атакаЛегенда',
+    'blockedLegend' => 'заблокированная легенда',
+    '{0}: Stopped attack from {1}' => '{0}: Stopped attack from {1}',
+);

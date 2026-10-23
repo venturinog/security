@@ -1,0 +1,47 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Attacks by country (last 24 hours)' => '국가별 공격(지난 24시간)',
+    'Blocked' => '차단됨',
+    'Blocked countries' => '차단된 국가',
+    'Click a country to cycle between blocked, whitelisted and not listed.' => '국가를 클릭하면 차단, 허용, 미등록 사이를 순환할 수 있습니다.',
+    'Country blocked' => '차단된 국가',
+    'Country removed from the list' => '목록에서 국가가 삭제되었습니다.',
+    'Country whitelisted' => '허용된 국가',
+    'GeoIP Map' => 'GeoIP 지도',
+    'GeoIP is not available' => 'GeoIP를 사용할 수 없습니다',
+    'Invalid country code' => '잘못된 국가 코드',
+    'Method not allowed' => '허용되지 않는 방법',
+    'My Issabel' => '나의 이사벨',
+    'No data' => '데이터 없음',
+    'Not listed' => '목록에 없음',
+    'Recent attacks' => '최근 공격',
+    'Refresh' => '새로고침',
+    'The change could not be applied' => '변경 사항을 적용할 수 없습니다',
+    'The map could not be loaded' => '지도를 로드할 수 없습니다.',
+    'This server' => '이 서버',
+    'Whitelisted' => '화이트리스트에 등록됨',
+    'Whitelisted countries' => '화이트리스트 국가',
+    'attackLegend' => '공격전설',
+    'blockedLegend' => '차단된 범례',
+    '{0}: Stopped attack from {1}' => '{0}: Stopped attack from {1}',
+);

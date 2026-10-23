@@ -1,0 +1,47 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Attacks by country (last 24 hours)' => 'Επιθέσεις ανά χώρα (τελευταίες 24 ώρες)',
+    'Blocked' => 'Αποκλεισμένο',
+    'Blocked countries' => 'Αποκλεισμένες χώρες',
+    'Click a country to cycle between blocked, whitelisted and not listed.' => 'Κάντε κλικ σε μια χώρα για εναλλαγή μεταξύ αποκλεισμένων, επιτρεπόμενων και μη καταχωρισμένων.',
+    'Country blocked' => 'Η χώρα έχει αποκλειστεί',
+    'Country removed from the list' => 'Η χώρα αφαιρέθηκε από τη λίστα',
+    'Country whitelisted' => 'Χώρα στη λίστα επιτρεπόμενων',
+    'GeoIP Map' => 'Χάρτης GeoIP',
+    'GeoIP is not available' => 'Το GeoIP δεν είναι διαθέσιμο',
+    'Invalid country code' => 'Μη έγκυρος κωδικός χώρας',
+    'Method not allowed' => 'Η μέθοδος δεν επιτρέπεται',
+    'My Issabel' => 'Ιζαμπέλ μου',
+    'No data' => 'Δεν υπάρχουν δεδομένα',
+    'Not listed' => 'Δεν αναφέρεται',
+    'Recent attacks' => 'Πρόσφατες επιθέσεις',
+    'Refresh' => 'Ανανέωση',
+    'The change could not be applied' => 'Δεν ήταν δυνατή η εφαρμογή της αλλαγής',
+    'The map could not be loaded' => 'Δεν ήταν δυνατή η φόρτωση του χάρτη',
+    'This server' => 'Αυτός ο διακομιστής',
+    'Whitelisted' => 'Επιτρεπόμενη λίστα',
+    'Whitelisted countries' => 'Χώρες στη λίστα επιτρεπόμενων',
+    'attackLegend' => 'επίθεσηΘρύλος',
+    'blockedLegend' => 'blockedLegend',
+    '{0}: Stopped attack from {1}' => '{0}: Stopped attack from {1}',
+);

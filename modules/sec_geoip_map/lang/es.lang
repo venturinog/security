@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2021 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,15 +17,31 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is Issabel Foundation     |
-  +----------------------------------------------------------------------+
-  $Id: en.lang,v 1.1 2021-03-24 11:02:09 Nicolas Gudino nicolas@issabel.com Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"attackLegend"=>"Ataque evitado en tiempo real",
-"blockedLegend"=>"Atacantes bloqueados por Fail2ban",
-"GeoIP Map" => "Mapa GeoIP",
-"{0}: Stopped attack from {1}" => "{0}: Ataque rechazado de {1}",
-"My Issabel" => "Mi Issabel"
+$arrLangModule = array(
+    'Attacks by country (last 24 hours)' => 'Ataques por país (últimas 24 horas)',
+    'Blocked' => 'Bloqueado',
+    'Blocked countries' => 'Países bloqueados',
+    'Click a country to cycle between blocked, whitelisted and not listed.' => 'Haga clic en un país para alternar entre bloqueado, incluido en la lista blanca y no incluido en la lista.',
+    'Country blocked' => 'País bloqueado',
+    'Country removed from the list' => 'País eliminado de la lista',
+    'Country whitelisted' => 'País incluido en la lista blanca',
+    'GeoIP Map' => 'Mapa GeoIP',
+    'GeoIP is not available' => 'GeoIP no está disponible',
+    'Invalid country code' => 'Código de país no válido',
+    'Method not allowed' => 'Método no permitido',
+    'My Issabel' => 'Mi Issabel',
+    'No data' => 'Sin datos',
+    'Not listed' => 'No listado',
+    'Recent attacks' => 'Ataques recientes',
+    'Refresh' => 'Actualizar',
+    'The change could not be applied' => 'No se ha podido aplicar el cambio',
+    'The map could not be loaded' => 'No se pudo cargar el mapa',
+    'This server' => 'este servidor',
+    'Whitelisted' => 'Lista blanca',
+    'Whitelisted countries' => 'Países en la lista blanca',
+    'attackLegend' => 'Ataque evitado en tiempo real',
+    'blockedLegend' => 'Atacantes bloqueados por Fail2ban',
+    '{0}: Stopped attack from {1}' => '{0}: Ataque rechazado de {1}',
 );
-?>

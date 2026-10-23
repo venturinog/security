@@ -15,6 +15,13 @@ Security
 
 Security modules for Issabel. Firewall configuration and setup. Port knocking. Audit Logs.
 
+Notas de diseño
+----
+
+- `docs/geoip-map.md` — por qué **GeoIP Map** dejó de usar amCharts y cómo se
+  sustituyó por un SVG del tema + Chart.js (licencia, i18n, modo oscuro,
+  privacidad, peso y accesibilidad).
+
 
 License
 ----

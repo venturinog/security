@@ -1,0 +1,47 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Attacks by country (last 24 hours)' => 'Napadi po državah (zadnjih 24 ur)',
+    'Blocked' => 'Blokirano',
+    'Blocked countries' => 'Blokirane države',
+    'Click a country to cycle between blocked, whitelisted and not listed.' => 'Kliknite državo, če želite preklapljati med blokirano, dovoljeno in ni na seznamu.',
+    'Country blocked' => 'Država blokirana',
+    'Country removed from the list' => 'Država odstranjena s seznama',
+    'Country whitelisted' => 'Država na seznamu dovoljenih',
+    'GeoIP Map' => 'Zemljevid GeoIP',
+    'GeoIP is not available' => 'GeoIP ni na voljo',
+    'Invalid country code' => 'Neveljavna koda države',
+    'Method not allowed' => 'Metoda ni dovoljena',
+    'My Issabel' => 'Moja Issabel',
+    'No data' => 'Ni podatkov',
+    'Not listed' => 'Ni navedeno',
+    'Recent attacks' => 'Nedavni napadi',
+    'Refresh' => 'Osveži',
+    'The change could not be applied' => 'Spremembe ni bilo mogoče uporabiti',
+    'The map could not be loaded' => 'Zemljevida ni bilo mogoče naložiti',
+    'This server' => 'Ta strežnik',
+    'Whitelisted' => 'Na seznamu dovoljenih',
+    'Whitelisted countries' => 'Države na beli listi',
+    'attackLegend' => 'attackLegend',
+    'blockedLegend' => 'blockedLegend',
+    '{0}: Stopped attack from {1}' => '{0}: Stopped attack from {1}',
+);

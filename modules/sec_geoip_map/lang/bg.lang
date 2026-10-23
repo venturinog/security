@@ -1,0 +1,47 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Attacks by country (last 24 hours)' => 'Атаки по държави (последните 24 часа)',
+    'Blocked' => 'Блокиран',
+    'Blocked countries' => 'Блокирани държави',
+    'Click a country to cycle between blocked, whitelisted and not listed.' => 'Щракнете върху държава, за да превключвате между блокирани, бели и невключени.',
+    'Country blocked' => 'Държавата е блокирана',
+    'Country removed from the list' => 'Държавата е премахната от списъка',
+    'Country whitelisted' => 'Държава в белия списък',
+    'GeoIP Map' => 'GeoIP карта',
+    'GeoIP is not available' => 'GeoIP не е наличен',
+    'Invalid country code' => 'Невалиден код на държавата',
+    'Method not allowed' => 'Методът не е разрешен',
+    'My Issabel' => 'Моята Изабел',
+    'No data' => 'Няма данни',
+    'Not listed' => 'Не е посочено',
+    'Recent attacks' => 'Скорошни атаки',
+    'Refresh' => 'Опресняване',
+    'The change could not be applied' => 'Промяната не може да бъде приложена',
+    'The map could not be loaded' => 'Картата не можа да се зареди',
+    'This server' => 'Този сървър',
+    'Whitelisted' => 'В белия списък',
+    'Whitelisted countries' => 'Държави в белия списък',
+    'attackLegend' => 'атакаЛегенда',
+    'blockedLegend' => 'blockedLegend',
+    '{0}: Stopped attack from {1}' => '{0}: Stopped attack from {1}',
+);

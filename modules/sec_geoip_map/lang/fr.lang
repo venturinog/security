@@ -1,0 +1,47 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Attacks by country (last 24 hours)' => 'Attaques par pays (dernières 24 heures)',
+    'Blocked' => 'Bloqué',
+    'Blocked countries' => 'Pays bloqués',
+    'Click a country to cycle between blocked, whitelisted and not listed.' => 'Cliquez sur un pays pour basculer entre bloqué, sur liste blanche et non répertorié.',
+    'Country blocked' => 'Pays bloqué',
+    'Country removed from the list' => 'Pays supprimé de la liste',
+    'Country whitelisted' => 'Pays sur liste blanche',
+    'GeoIP Map' => 'Carte GéoIP',
+    'GeoIP is not available' => 'GeoIP n\'est pas disponible',
+    'Invalid country code' => 'Code de pays invalide',
+    'Method not allowed' => 'Méthode non autorisée',
+    'My Issabel' => 'Mon Isabelle',
+    'No data' => 'Aucune donnée',
+    'Not listed' => 'Non répertorié',
+    'Recent attacks' => 'Attaques récentes',
+    'Refresh' => 'Actualiser',
+    'The change could not be applied' => 'La modification n\'a pas pu être appliquée',
+    'The map could not be loaded' => 'La carte n\'a pas pu être chargée',
+    'This server' => 'Ce serveur',
+    'Whitelisted' => 'Sur liste blanche',
+    'Whitelisted countries' => 'Pays sur liste blanche',
+    'attackLegend' => 'attaqueLégende',
+    'blockedLegend' => 'bloquéLégende',
+    '{0}: Stopped attack from {1}' => '{0}: Stopped attack from {1}',
+);

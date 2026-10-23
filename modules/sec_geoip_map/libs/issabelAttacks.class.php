@@ -54,6 +54,33 @@ class issabelAttacks {
 
     }
 
+    /**
+     * Cuenta los ataques por país en la ventana indicada, sin marcarlos como
+     * consumidos: el mapa los usa como serie histórica, no como cola.
+     *
+     * @param int $minutes ventana en minutos (por defecto 24 h)
+     * @return array  ISO => total
+     */
+    public function getAttackCounts($minutes = 1440)
+    {
+        $minutes = (int)$minutes;
+        if ($minutes < 1) $minutes = 1440;
+        $query = 'SELECT source, COUNT(*) AS total FROM attacks '
+               . 'WHERE datetime>=datetime("now","localtime","-' . $minutes . ' minutes") '
+               . 'AND source<>"IP Address not found" GROUP BY source ORDER BY total DESC LIMIT 50';
+        $result = $this->_DB->fetchTable($query, true);
+        if ($result === false) {
+            $this->errMsg = $this->_DB->errMsg;
+            return array();
+        }
+        $out = array();
+        foreach ($result as $row) {
+            $iso = strtoupper(trim($row['source']));
+            if (preg_match('/^[A-Z]{2}$/', $iso)) $out[$iso] = (int)$row['total'];
+        }
+        return $out;
+    }
+
     public function getAttacks() {
         $query = 'SELECT rowid,source,time(datetime) as hour FROM attacks WHERE datetime>=datetime("now","localtime","-10 minutes") and done=0 and source<>"IP Address not found" LIMIT 2';
         $result = $this->_DB->fetchTable($query, true, array());
