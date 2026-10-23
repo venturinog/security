@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s が無効です',
+    '%s is required' => '%s は必須です',
+    'Add IP Address' => 'IPアドレスの追加',
+    'Are you sure you wish to delete the IP address?' => 'IP アドレスを削除してもよろしいですか?',
+    'Back' => '戻る',
+    'Cancel' => 'キャンセル',
+    'Define IP Address' => 'IPアドレスの定義',
+    'Delete' => '削除',
+    'Delete correctly' => '正しく削除してください',
+    'ERROR' => 'Error',
+    'Edit' => '編集',
+    'Edit IP Address' => 'IPアドレスの編集',
+    'IP Address' => 'IPアドレス',
+    'Invalid Format' => '無効な形式',
+    'Message' => 'メッセージ',
+    'No records were selected' => 'レコードが選択されていませんでした',
+    'Note' => '注記',
+    'Options' => 'オプション',
+    'Required field' => '必須フィールド',
+    'Save' => '保存',
+    'Save correctly' => '正しく保存する',
+    'The IP address or network format is not valid' => 'IPアドレスまたはネットワーク形式が無効です',
+    'This IP address had already been defined' => 'このIPアドレスはすでに定義されています',
+    'Update correctly' => '正しくアップデートする',
+    'View' => '表示',
+    'View IP Address' => 'IPアドレスの表示',
+    'White List' => 'ホワイトリスト',
+);

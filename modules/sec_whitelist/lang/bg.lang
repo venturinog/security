@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s е невалидно',
+    '%s is required' => '%s е задължително',
+    'Add IP Address' => 'Добавете IP адрес',
+    'Are you sure you wish to delete the IP address?' => 'Сигурни ли сте, че искате да изтриете IP адреса?',
+    'Back' => 'Назад',
+    'Cancel' => 'Отказ',
+    'Define IP Address' => 'Определете IP адрес',
+    'Delete' => 'Изтрий',
+    'Delete correctly' => 'Изтрийте правилно',
+    'ERROR' => 'Error',
+    'Edit' => 'Редактирай',
+    'Edit IP Address' => 'Редактиране на IP адрес',
+    'IP Address' => 'IP адрес',
+    'Invalid Format' => 'Невалиден формат',
+    'Message' => 'Съобщение',
+    'No records were selected' => 'Няма избрани записи',
+    'Note' => 'Забележка',
+    'Options' => 'Опции',
+    'Required field' => 'Задължителни полета',
+    'Save' => 'Запази',
+    'Save correctly' => 'Запазете правилно',
+    'The IP address or network format is not valid' => 'IP адресът или мрежовият формат не са валидни',
+    'This IP address had already been defined' => 'Този IP адрес вече е дефиниран',
+    'Update correctly' => 'Актуализирайте правилно',
+    'View' => 'Преглед',
+    'View IP Address' => 'Преглед на IP адрес',
+    'White List' => 'Бял списък',
+);

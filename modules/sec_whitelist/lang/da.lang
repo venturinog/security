@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s er ugyldig',
+    '%s is required' => '%s er påkrævet',
+    'Add IP Address' => 'Tilføj IP-adresse',
+    'Are you sure you wish to delete the IP address?' => 'Er du sikker på, at du vil slette IP-adressen?',
+    'Back' => 'Tilbage',
+    'Cancel' => 'Annuller',
+    'Define IP Address' => 'Definer IP-adresse',
+    'Delete' => 'Slet',
+    'Delete correctly' => 'Slet korrekt',
+    'ERROR' => 'Error',
+    'Edit' => 'Rediger',
+    'Edit IP Address' => 'Rediger IP-adresse',
+    'IP Address' => 'IP-adresse',
+    'Invalid Format' => 'Ugyldigt format',
+    'Message' => 'Besked',
+    'No records were selected' => 'Ingen poster blev valgt',
+    'Note' => 'Bemærk',
+    'Options' => 'Valgmuligheder',
+    'Required field' => 'Feltet skal udfyldes',
+    'Save' => 'Gem',
+    'Save correctly' => 'Gem korrekt',
+    'The IP address or network format is not valid' => 'IP-adressen eller netværksformatet er ikke gyldigt',
+    'This IP address had already been defined' => 'Denne IP-adresse var allerede blevet defineret',
+    'Update correctly' => 'Opdater korrekt',
+    'View' => 'Vis',
+    'View IP Address' => 'Se IP-adresse',
+    'White List' => 'Hvid liste',
+);

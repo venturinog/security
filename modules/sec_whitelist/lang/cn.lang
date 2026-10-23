@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s 无效',
+    '%s is required' => '%s 为必填项',
+    'Add IP Address' => '添加IP地址',
+    'Are you sure you wish to delete the IP address?' => '您确定要删除 IP 地址吗？',
+    'Back' => '返回',
+    'Cancel' => '取消',
+    'Define IP Address' => '定义IP地址',
+    'Delete' => '删除',
+    'Delete correctly' => '正确删除',
+    'ERROR' => 'Error',
+    'Edit' => '编辑',
+    'Edit IP Address' => '编辑 IP 地址',
+    'IP Address' => 'IP地址',
+    'Invalid Format' => '格式无效',
+    'Message' => '留言',
+    'No records were selected' => '没有选择任何记录',
+    'Note' => '注意事项',
+    'Options' => '选项',
+    'Required field' => '必填项',
+    'Save' => '保存',
+    'Save correctly' => '正确保存',
+    'The IP address or network format is not valid' => 'IP 地址或网络格式无效',
+    'This IP address had already been defined' => '该IP地址已被定义',
+    'Update correctly' => '正确更新',
+    'View' => '查看',
+    'View IP Address' => '查看IP地址',
+    'White List' => '白名单',
+);

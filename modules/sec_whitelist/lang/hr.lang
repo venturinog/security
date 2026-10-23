@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s nije ispravno',
+    '%s is required' => '%s je obavezno',
+    'Add IP Address' => 'Dodajte IP adresu',
+    'Are you sure you wish to delete the IP address?' => 'Jeste li sigurni da želite izbrisati IP adresu?',
+    'Back' => 'Natrag',
+    'Cancel' => 'Odustani',
+    'Define IP Address' => 'Definirajte IP adresu',
+    'Delete' => 'Izbriši',
+    'Delete correctly' => 'Brisanje ispravno',
+    'ERROR' => 'Error',
+    'Edit' => 'Uredi',
+    'Edit IP Address' => 'Uredi IP adresu',
+    'IP Address' => 'IP adresa',
+    'Invalid Format' => 'Nevažeći format',
+    'Message' => 'Poruka',
+    'No records were selected' => 'Nije odabran nijedan zapis',
+    'Note' => 'Napomena',
+    'Options' => 'Opcije',
+    'Required field' => 'Obvezatno polje',
+    'Save' => 'Spremi',
+    'Save correctly' => 'Spremite ispravno',
+    'The IP address or network format is not valid' => 'IP adresa ili mrežni format nisu valjani',
+    'This IP address had already been defined' => 'Ova IP adresa je već definirana',
+    'Update correctly' => 'Ažurirajte ispravno',
+    'View' => 'Prikaži',
+    'View IP Address' => 'Pogledajte IP adresu',
+    'White List' => 'Bijela lista',
+);

@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s이(가) 유효하지 않습니다',
+    '%s is required' => '%s은(는) 필수입니다',
+    'Add IP Address' => 'IP 주소 추가',
+    'Are you sure you wish to delete the IP address?' => 'IP 주소를 삭제하시겠습니까?',
+    'Back' => '뒤로',
+    'Cancel' => '취소',
+    'Define IP Address' => 'IP 주소 정의',
+    'Delete' => '삭제',
+    'Delete correctly' => '올바르게 삭제',
+    'ERROR' => 'Error',
+    'Edit' => '편집',
+    'Edit IP Address' => 'IP 주소 편집',
+    'IP Address' => 'IP 주소',
+    'Invalid Format' => '잘못된 형식',
+    'Message' => '메시지',
+    'No records were selected' => '선택한 레코드가 없습니다.',
+    'Note' => '참고',
+    'Options' => '옵션',
+    'Required field' => '요구된 필드',
+    'Save' => '저장',
+    'Save correctly' => '올바르게 저장하세요',
+    'The IP address or network format is not valid' => 'IP 주소 또는 네트워크 형식이 유효하지 않습니다.',
+    'This IP address had already been defined' => '이 IP 주소는 이미 정의되었습니다.',
+    'Update correctly' => '올바르게 업데이트하세요',
+    'View' => '보기',
+    'View IP Address' => 'IP 주소 보기',
+    'White List' => '화이트리스트',
+);

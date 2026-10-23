@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s نامعتبر است',
+    '%s is required' => '%s الزامی است',
+    'Add IP Address' => 'آدرس IP را اضافه کنید',
+    'Are you sure you wish to delete the IP address?' => 'آیا مطمئن هستید که می خواهید آدرس IP را حذف کنید؟',
+    'Back' => 'برگشت',
+    'Cancel' => 'انصراف',
+    'Define IP Address' => 'آدرس IP را تعریف کنید',
+    'Delete' => 'حذف',
+    'Delete correctly' => 'درست حذف کنید',
+    'ERROR' => 'خطا',
+    'Edit' => 'ويرايش',
+    'Edit IP Address' => 'آدرس IP را ویرایش کنید',
+    'IP Address' => 'آدرس IP',
+    'Invalid Format' => 'قالب نامعتبر است',
+    'Message' => 'پیام',
+    'No records were selected' => 'هیچ رکوردی انتخاب نشد',
+    'Note' => 'توجه داشته باشید',
+    'Options' => 'گزینه ها',
+    'Required field' => 'فيلد مورد نياز',
+    'Save' => 'ذخيره',
+    'Save correctly' => 'به درستی ذخیره کنید',
+    'The IP address or network format is not valid' => 'آدرس IP یا قالب شبکه معتبر نیست',
+    'This IP address had already been defined' => 'این آدرس IP قبلاً تعریف شده بود',
+    'Update correctly' => 'درست آپدیت کنید',
+    'View' => 'مشاهده',
+    'View IP Address' => 'مشاهده آدرس IP',
+    'White List' => 'لیست سفید',
+);

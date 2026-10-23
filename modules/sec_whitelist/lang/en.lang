@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2020 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,18 +17,36 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  $Id: en.lang.php, Sun 17 May 2020 01:05:37 PM EDT, nicolas@issabel.com
+  | The Initial Developer of the Original Code is Issabel Foundation     |
+  +----------------------------------------------------------------------+
 */
 global $arrLangModule;
-$arrLangModule=array(
-"Save correctly"   => "Changes saved",
-"Delete correctly" => "Delete successful",
-"IP Address"       => "IP Address",
-"Note"             => "Note",
-"White List"       => "White List",
-"Add IP Address"   => "Add IP Address",
-"The IP address or network format is not valid" => "The IP address or network format is not valid",
-"This IP address had already been defined" => "This IP address had already been defined",
-"Are you sure you wish to delete the IP address?" => "Are you sure you wish to delete the IP address?"
+$arrLangModule = array(
+    '%s is invalid' => '%s is invalid',
+    '%s is required' => '%s is required',
+    'Add IP Address' => 'Add IP Address',
+    'Are you sure you wish to delete the IP address?' => 'Are you sure you wish to delete the IP address?',
+    'Back' => 'Back',
+    'Cancel' => 'Cancel',
+    'Define IP Address' => 'Define IP Address',
+    'Delete' => 'Delete',
+    'Delete correctly' => 'Delete successful',
+    'ERROR' => 'ERROR',
+    'Edit' => 'Edit',
+    'Edit IP Address' => 'Edit IP Address',
+    'IP Address' => 'IP Address',
+    'Invalid Format' => 'Invalid Format',
+    'Message' => 'Message',
+    'No records were selected' => 'No records were selected',
+    'Note' => 'Note',
+    'Options' => 'Options',
+    'Required field' => 'Required field',
+    'Save' => 'Save',
+    'Save correctly' => 'Changes saved',
+    'The IP address or network format is not valid' => 'The IP address or network format is not valid',
+    'This IP address had already been defined' => 'This IP address had already been defined',
+    'Update correctly' => 'Update correctly',
+    'View' => 'View',
+    'View IP Address' => 'View IP Address',
+    'White List' => 'White List',
 );
-?>

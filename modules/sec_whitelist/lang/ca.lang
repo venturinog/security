@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s no és vàlid',
+    '%s is required' => '%s és obligatori',
+    'Add IP Address' => 'Afegeix una adreça IP',
+    'Are you sure you wish to delete the IP address?' => 'Esteu segur que voleu suprimir l\'adreça IP?',
+    'Back' => 'Torna',
+    'Cancel' => 'Cancel·la',
+    'Define IP Address' => 'Definiu l\'adreça IP',
+    'Delete' => 'Elimina',
+    'Delete correctly' => 'Eliminar correctament',
+    'ERROR' => 'Error',
+    'Edit' => 'Edita',
+    'Edit IP Address' => 'Edita l\'adreça IP',
+    'IP Address' => 'Adreça IP',
+    'Invalid Format' => 'Format no vàlid',
+    'Message' => 'Missatge',
+    'No records were selected' => 'No s\'ha seleccionat cap registre',
+    'Note' => 'Nota',
+    'Options' => 'Opcions',
+    'Required field' => 'Camp requerit',
+    'Save' => 'Desa',
+    'Save correctly' => 'Desa correctament',
+    'The IP address or network format is not valid' => 'L\'adreça IP o el format de xarxa no són vàlids',
+    'This IP address had already been defined' => 'Aquesta adreça IP ja s\'havia definit',
+    'Update correctly' => 'Actualitzar correctament',
+    'View' => 'Mostra',
+    'View IP Address' => 'Veure l\'adreça IP',
+    'White List' => 'Llista Blanca',
+);

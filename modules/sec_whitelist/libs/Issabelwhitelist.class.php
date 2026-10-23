@@ -132,6 +132,33 @@ class Issabelwhitelist{
 
     }
 
+    /**
+     * Actualiza una entrada de la whitelist. Si cambia la IP hay que reflejarlo
+     * también en el firewall (quitar la vieja y añadir la nueva).
+     */
+    function updatewhitelist($old_ip, $ip_address, $note)
+    {
+        if ($old_ip === $ip_address) {
+            $query = "UPDATE whitelist SET note=? WHERE ip_address=?";
+            $result = $this->_DB->genQuery($query, array($note, $old_ip));
+            if ($result == FALSE) {
+                $this->errMsg = $this->_DB->errMsg;
+                return FALSE;
+            }
+            return TRUE;
+        }
+
+        // Primero se añade la nueva IP: si falla, la entrada anterior sigue
+        // intacta y el firewall no queda a medias.
+        if ($this->savewhitelist($ip_address, $note) === FALSE) {
+            return FALSE;
+        }
+        if ($this->deletewhitelist($old_ip) === FALSE) {
+            return FALSE;
+        }
+        return TRUE;
+    }
+
     function validateIpOrMask($variable) {
 
         $error = "";

@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s este invalid',
+    '%s is required' => '%s este obligatoriu',
+    'Add IP Address' => 'Adăugați adresa IP',
+    'Are you sure you wish to delete the IP address?' => 'Sigur doriți să ștergeți adresa IP?',
+    'Back' => 'Înapoi',
+    'Cancel' => 'Anulează',
+    'Define IP Address' => 'Definiți adresa IP',
+    'Delete' => 'Șterge',
+    'Delete correctly' => 'Ștergeți corect',
+    'ERROR' => 'Error',
+    'Edit' => 'Editează',
+    'Edit IP Address' => 'Editați adresa IP',
+    'IP Address' => 'Adresa IP',
+    'Invalid Format' => 'Format nevalid',
+    'Message' => 'Mesaj',
+    'No records were selected' => 'Nu au fost selectate înregistrări',
+    'Note' => 'Notă',
+    'Options' => 'Opțiuni',
+    'Required field' => 'Camp Obligatoriu',
+    'Save' => 'Salvează',
+    'Save correctly' => 'Salvați corect',
+    'The IP address or network format is not valid' => 'Adresa IP sau formatul de rețea nu este valid',
+    'This IP address had already been defined' => 'Această adresă IP a fost deja definită',
+    'Update correctly' => 'Actualizați corect',
+    'View' => 'Vizualizează',
+    'View IP Address' => 'Vizualizați adresa IP',
+    'White List' => 'Lista albă',
+);

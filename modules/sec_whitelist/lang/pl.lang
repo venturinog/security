@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s jest nieprawidłowe',
+    '%s is required' => '%s jest wymagane',
+    'Add IP Address' => 'Dodaj adres IP',
+    'Are you sure you wish to delete the IP address?' => 'Czy na pewno chcesz usunąć adres IP?',
+    'Back' => 'Wstecz',
+    'Cancel' => 'Anuluj',
+    'Define IP Address' => 'Zdefiniuj adres IP',
+    'Delete' => 'Usuń',
+    'Delete correctly' => 'Usuń poprawnie',
+    'ERROR' => 'Error',
+    'Edit' => 'Edytuj',
+    'Edit IP Address' => 'Edytuj adres IP',
+    'IP Address' => 'Adres IP',
+    'Invalid Format' => 'Nieprawidłowy format',
+    'Message' => 'Wiadomość',
+    'No records were selected' => 'Nie wybrano żadnych rekordów',
+    'Note' => 'Uwaga',
+    'Options' => 'Opcje',
+    'Required field' => 'Wymagane pole',
+    'Save' => 'Zapisz',
+    'Save correctly' => 'Zapisz poprawnie',
+    'The IP address or network format is not valid' => 'Adres IP lub format sieci jest nieprawidłowy',
+    'This IP address had already been defined' => 'Ten adres IP został już zdefiniowany',
+    'Update correctly' => 'Aktualizuj poprawnie',
+    'View' => 'Zobacz',
+    'View IP Address' => 'Wyświetl adres IP',
+    'White List' => 'Biała lista',
+);

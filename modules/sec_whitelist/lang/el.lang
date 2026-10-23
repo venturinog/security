@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s δεν είναι έγκυρο',
+    '%s is required' => '%s είναι υποχρεωτικό',
+    'Add IP Address' => 'Προσθήκη διεύθυνσης IP',
+    'Are you sure you wish to delete the IP address?' => 'Είστε βέβαιοι ότι θέλετε να διαγράψετε τη διεύθυνση IP;',
+    'Back' => 'Πίσω',
+    'Cancel' => 'Ακύρωση',
+    'Define IP Address' => 'Ορίστε τη διεύθυνση IP',
+    'Delete' => 'Διαγραφή',
+    'Delete correctly' => 'Διαγραφή σωστά',
+    'ERROR' => 'Error',
+    'Edit' => 'Επεξεργασία',
+    'Edit IP Address' => 'Επεξεργασία διεύθυνσης IP',
+    'IP Address' => 'Διεύθυνση IP',
+    'Invalid Format' => 'Μη έγκυρη μορφή',
+    'Message' => 'Μήνυμα',
+    'No records were selected' => 'Δεν επιλέχθηκαν εγγραφές',
+    'Note' => 'Σημείωση',
+    'Options' => 'Επιλογές',
+    'Required field' => 'Απαιτούμενα Πεδία',
+    'Save' => 'Αποθήκευση',
+    'Save correctly' => 'Αποθηκεύστε σωστά',
+    'The IP address or network format is not valid' => 'Η διεύθυνση IP ή η μορφή δικτύου δεν είναι έγκυρη',
+    'This IP address had already been defined' => 'Αυτή η διεύθυνση IP είχε ήδη οριστεί',
+    'Update correctly' => 'Ενημερώστε σωστά',
+    'View' => 'Προβολή',
+    'View IP Address' => 'Προβολή διεύθυνσης IP',
+    'White List' => 'Λευκή λίστα',
+);

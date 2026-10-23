@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2020 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,19 +17,34 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  $Id: en.lang.php, Sun 17 May 2020 01:05:37 PM EDT, nicolas@issabel.com
-  $Id: br.lang,v 1.2 2021-25-10 12:55:00 Leandro Saltori - Prisma Telecom leandro@prismatelecom.com Exp $
 */
 global $arrLangModule;
-$arrLangModule=array(
-"Save correctly"   => "Alterações salvas",
-"Delete correctly" => "Exclusão bem-sucedida ",
-"IP Address"       => "Endereço de IP",
-"Note"             => "Nota",
-"White List"       => "Lista Branca",
-"Add IP Address"   => "Adicionar Endereço de IP",
-"The IP address or network format is not valid" => "O endereço IP ou formato de rede não é válido",
-"This IP address had already been defined" => "Este endereço IP já havia sido definido",
-"Are you sure you wish to delete the IP address?" => "Tem certeza de que deseja excluir o endereço IP?"
+$arrLangModule = array(
+    '%s is invalid' => '%s é inválido',
+    '%s is required' => '%s é obrigatório',
+    'Add IP Address' => 'Adicionar Endereço de IP',
+    'Are you sure you wish to delete the IP address?' => 'Tem certeza de que deseja excluir o endereço IP?',
+    'Back' => 'Voltar',
+    'Cancel' => 'Cancelar',
+    'Define IP Address' => 'Definir endereço IP',
+    'Delete' => 'Apagar',
+    'Delete correctly' => 'Exclusão bem-sucedida ',
+    'ERROR' => 'Erro',
+    'Edit' => 'Editar',
+    'Edit IP Address' => 'Editar endereço IP',
+    'IP Address' => 'Endereço de IP',
+    'Invalid Format' => 'Formato inválido',
+    'Message' => 'Mensagem',
+    'No records were selected' => 'Nenhum registro foi selecionado',
+    'Note' => 'Nota',
+    'Options' => 'Opções',
+    'Required field' => 'Campo obrigatório',
+    'Save' => 'Salvar',
+    'Save correctly' => 'Alterações salvas',
+    'The IP address or network format is not valid' => 'O endereço IP ou formato de rede não é válido',
+    'This IP address had already been defined' => 'Este endereço IP já havia sido definido',
+    'Update correctly' => 'Atualizar corretamente',
+    'View' => 'Ver',
+    'View IP Address' => 'Ver endereço IP',
+    'White List' => 'Lista Branca',
 );
-?>

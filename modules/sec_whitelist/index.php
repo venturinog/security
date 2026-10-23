@@ -29,28 +29,22 @@ function _moduleContent(&$smarty, $module_name)
     include_once "modules/$module_name/configs/default.conf.php";
     include_once "modules/$module_name/libs/Issabelwhitelist.class.php";
 
-    //include file language agree to issabel configuration
-    //if file language not exists, then include language by default (en)
-    $lang=get_language();
-    $base_dir=dirname($_SERVER['SCRIPT_FILENAME']);
-    $lang_file="modules/$module_name/lang/$lang.lang";
-    if (file_exists("$base_dir/$lang_file")) include_once "$lang_file";
-    else include_once "modules/$module_name/lang/en.lang";
+    load_language_module($module_name);
 
     //global variables
     global $arrConf;
     global $arrConfModule;
-    global $arrLang;
-    global $arrLangModule;
     $arrConf = array_merge($arrConf,$arrConfModule);
-    $arrLang = array_merge($arrLang,$arrLangModule);
 
     //folder path for custom templates
     $templates_dir=(isset($arrConf['templates_dir']))?$arrConf['templates_dir']:'themes';
+    $base_dir=dirname($_SERVER['SCRIPT_FILENAME']);
     $local_templates_dir="$base_dir/modules/$module_name/".$templates_dir.'/'.$arrConf['theme'];
 
     //conexion resource
     $pDB = new paloDB($arrConf['dsn_conn_database']);
+
+    $smarty->assign('SECURITY_ALERT', '');
 
     //actions
     $action = getAction();
@@ -59,6 +53,9 @@ function _moduleContent(&$smarty, $module_name)
     switch($action){
         case 'save':
             $content = savewhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+            break;
+        case 'save_edit':
+            $content = savewhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, true);
             break;
         case 'new': case 'view': case 'edit':
             $content = newwhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $action);
@@ -74,9 +71,6 @@ function _moduleContent(&$smarty, $module_name)
             break;
     }
     return $content;
-
-
-
 }
 
 function reportwhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
@@ -88,19 +82,16 @@ function reportwhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $ar
     //begin grid parameters
     $oGrid  = new paloSantoGrid($smarty);
     $oGrid->addNew("new",_tr("Add IP Address"));
-    $oGrid->deleteList("Are you sure you wish to delete the IP address?","delete",_tr("Delete"));
+    $oGrid->deleteList(_tr("Are you sure you wish to delete the IP address?"),"delete",_tr("Delete"));
     $oGrid->setTitle(_tr("White List"));
     $oGrid->pagingShow(true); // show paging section.
-
-    //$oGrid->enableExport();   // enable export.
-    //$oGrid->setNameFile_Export(_tr("whitelist"));
 
     $url = array(
         "menu"         =>  $module_name,
     );
     $oGrid->setURL($url);
 
-    $arrColumns = array("",_tr("IP Address"),_tr("Note"),);
+    $arrColumns = array("",_tr("IP Address"),_tr("Note"),_tr("Options"));
     $oGrid->setColumns($arrColumns);
 
     $total   = $pwhitelist->getNumwhitelist();
@@ -119,10 +110,12 @@ function reportwhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $ar
     $arrResult =$pwhitelist->getwhitelist($limit, $offset);
 
     if(is_array($arrResult) && $total>0){
-        foreach($arrResult as $key => $value){ 
-            $arrTmp[0] = "<input type='checkbox' name='ips[]' value='".$value['ip_address']."'>";
-            $arrTmp[1] = htmlspecialchars($value['ip_address']);
-            $arrTmp[2] = htmlspecialchars($value['note']);
+        foreach($arrResult as $key => $value){
+            $ip = htmlspecialchars($value['ip_address'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[0] = "<input type='checkbox' name='del_x[]' value='".$ip."'>";
+            $arrTmp[1] = $ip;
+            $arrTmp[2] = htmlspecialchars($value['note'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[3] = "&nbsp;<a href='?menu=$module_name&action=view&id=".urlencode($value['ip_address'])."'>"._tr('View')."</a>";
             $arrData[] = $arrTmp;
         }
     }
@@ -131,108 +124,136 @@ function reportwhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $ar
     $content = $oGrid->fetchGrid();
     //end grid parameters
 
-    return $content;
+    return $smarty->getTemplateVars('SECURITY_ALERT').$content;
 }
 
-function newwhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, $action)
+function newwhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, $action, $errors = array(), $data = array())
 {
+    $pwhitelist = new Issabelwhitelist($pDB);
+    $pwhitelist->checkTable();
+
+    // En vista/edición se parte de la fila guardada; `id` es la IP original.
+    if (($action === 'view' || $action === 'edit') && count($data) === 0) {
+        $id = getParameter('id');
+        $row = $pwhitelist->getwhitelistByIp($id);
+        if (is_array($row)) {
+            $data = array('ip_address' => $row['ip_address'], 'note' => $row['note'], 'id' => $row['ip_address']);
+        }
+    }
+
     $arrFormNew = createFieldForm();
+    // Recuadro rojo por campo (conservando form-control).
+    foreach (array('ip_address','note') as $f) {
+        if (!isset($errors[$f])) continue;
+        if (!isset($arrFormNew[$f]['INPUT_EXTRA_PARAM']) || !is_array($arrFormNew[$f]['INPUT_EXTRA_PARAM']))
+            $arrFormNew[$f]['INPUT_EXTRA_PARAM'] = array();
+        $cls = isset($arrFormNew[$f]['INPUT_EXTRA_PARAM']['class'])
+            ? $arrFormNew[$f]['INPUT_EXTRA_PARAM']['class'].' ' : 'form-control ';
+        $arrFormNew[$f]['INPUT_EXTRA_PARAM']['class'] = $cls.'is-invalid';
+    }
     $oForm = new paloForm($smarty, $arrFormNew);
-    $titulo = "";
-    $smarty->assign("CANCEL", _tr("Cancel"));
-    $smarty->assign("REQUIRED_FIELD", _tr("Required field"));
-    $smarty->assign("icon", "images/list.png");
 
-    $smarty->assign("SAVE", _tr("Save"));
     $titulo = _tr('Define IP Address');
+    if ($action === 'view') $titulo = _tr('View IP Address');
+    if ($action === 'edit') $titulo = _tr('Edit IP Address');
 
+    $smarty->assign("CANCEL", _tr("Cancel"));
+    $smarty->assign("BACK", _tr("Back"));
+    $smarty->assign("EDIT", _tr("Edit"));
+    $smarty->assign("REQUIRED_FIELD", _tr("Required field"));
+    $smarty->assign("SAVE", _tr("Save"));
     $smarty->assign("MODE", $action);
+    $smarty->assign("icon", "images/list.png");
+    $smarty->assign("ERRORS", array_merge(array('ip_address' => '', 'note' => ''), $errors));
+    $smarty->assign("VALUES", array_merge(array('ip_address' => '', 'note' => '', 'id' => ''), $data));
 
-    $htmlForm = $oForm->fetchForm("$local_templates_dir/form.tpl", $titulo, $_POST);
-    $contenidoModulo = "<form  method='POST' style='margin-bottom:0;' action='?menu=$module_name'>".$htmlForm."</form>";
+    $htmlForm = $oForm->fetchForm("$local_templates_dir/form.tpl", $titulo, $data);
+    $contenidoModulo = "<form method='POST' style='margin-bottom:0;' action='?menu=$module_name'>".$htmlForm."</form>";
 
-    return $contenidoModulo;
-
+    return $smarty->getTemplateVars('SECURITY_ALERT').$contenidoModulo;
 }
 
 function deletewhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
     $oIssa = new Issabelwhitelist($pDB);
     $str_msj_error = "";
+    $ips = isset($_POST['del_x']) && is_array($_POST['del_x']) ? $_POST['del_x'] : array();
 
-    foreach( $_POST['ips'] as $key => $value ){
+    if (count($ips) === 0) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('warning', _tr('Message'), _tr('No records were selected')));
+        return reportwhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+    }
+
+    foreach( $ips as $value ){
         if( $oIssa->deletewhitelist($value) == false ) {
-            $str_msj_error .= $oIssa->errMsg."<br />";
+            $str_msj_error .= htmlspecialchars((string)$oIssa->errMsg, ENT_COMPAT, 'UTF-8')."<br />";
         }
     }
 
     if( strlen($str_msj_error) == 0 ){
-        $smarty->assign("mb_title", _tr("Message"));
-        $smarty->assign("mb_message", _tr("Delete correctly"));
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr('Message'), _tr('Delete correctly')));
     }
     else{
-        $smarty->assign("mb_title", _tr("ERROR"));
-        $smarty->assign("mb_message", $str_msj_error);
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr('ERROR'), $str_msj_error, array('html' => true)));
     }
 
     return reportwhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
 }
 
-function savewhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
+function savewhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, $isEdit = false)
 {
-
-    $arrFormNew = createFieldForm();
-    $oForm      = new paloForm($smarty, $arrFormNew);
-
     $oIssa = new Issabelwhitelist($pDB);
-    $isError = false;
+    $oIssa->checkTable();
 
-    $ip_address = $_POST['ip_address'];
-    $note       = $_POST['note'];
+    $ip_address = isset($_POST['ip_address']) ? trim((string)$_POST['ip_address']) : '';
+    $note       = isset($_POST['note']) ? trim((string)$_POST['note']) : '';
+    $old_ip     = isset($_POST['id']) ? trim((string)$_POST['id']) : '';
+    $action     = $isEdit ? 'edit' : 'new';
 
-    if($oIssa->getwhitelistByIp($ip_address) == true ){
-        $strErrorMsg = _tr("This IP address had already been defined").": $portName";
-        $isError = true;
-    }
-    else if($oIssa->validateIpOrMask($_POST['ip_address'])!="") {
-        $err = $oIssa->validateIpOrMask($_POST['ip_address']);
-        $strErrorMsg = "<b>"._tr('The IP address or network format is not valid');
-        $isError = true;
-    }
-
-    if($isError){ // validation errors
-        $smarty->assign("mb_title", _tr("Validation Error"));
-        $smarty->assign("mb_message", $strErrorMsg);
-        return newwhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $mode);
+    $errors = array();
+    if ($ip_address === '') {
+        $errors['ip_address'] = sprintf(_tr('%s is required'), _tr('IP Address'));
+    } else if ($oIssa->validateIpOrMask($ip_address) !== '') {
+        $errors['ip_address'] = sprintf(_tr('%s is invalid'), _tr('IP Address'));
     } else {
- 
-        if($oIssa->savewhitelist($ip_address, $note)) {
-            $smarty->assign("mb_title", _tr("Message"));
-            $smarty->assign("mb_message", _tr("Save correctly"));
+        $existing = $oIssa->getwhitelistByIp($ip_address);
+        if (is_array($existing) && ($isEdit === false || $existing['ip_address'] !== $old_ip)) {
+            $errors['ip_address'] = _tr("This IP address had already been defined");
         }
-        else{
-            $smarty->assign("mb_title", "Error");
-            $smarty->assign("mb_message", $oIssa->errMsg);
-            return newwhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $mode);
-        }
+    }
+
+    if (count($errors) > 0) {
+        // Re-render de la misma página, sin redirigir y sin perder lo escrito.
+        return newwhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $action, $errors,
+            array('ip_address' => $ip_address, 'note' => $note, 'id' => $old_ip));
+    }
+
+    $ok = $isEdit
+        ? $oIssa->updatewhitelist($old_ip, $ip_address, $note)
+        : $oIssa->savewhitelist($ip_address, $note);
+
+    if ($ok) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr('Message'),
+            $isEdit ? _tr('Update correctly') : _tr('Save correctly')));
+    } else {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr('ERROR'), $oIssa->errMsg));
     }
 
     return reportwhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
 }
 
 function createFieldForm(){
-
     $arrFormElements = array(
         "ip_address" => array("LABEL"                  => _tr("IP Address"),
-                              "REQUIRED"               => "no",
+                              "REQUIRED"               => "yes",
                               "INPUT_TYPE"             => "TEXT",
-                              "INPUT_EXTRA_PARAM"      => "",
-                              "VALIDATION_TYPE"        => "ip/mask",
+                              "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "placeholder" => "192.168.1.0/24"),
+                              "VALIDATION_TYPE"        => "text",
                               "VALIDATION_EXTRA_PARAM" => ""),
             "note" => array(  "LABEL"                  => _tr("Note"),
                               "REQUIRED"               => "no",
                               "INPUT_TYPE"             => "TEXT",
-                              "INPUT_EXTRA_PARAM"      => "",
+                              "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
                               "VALIDATION_TYPE"        => "text",
                               "VALIDATION_EXTRA_PARAM" => ""),
     );
@@ -241,20 +262,23 @@ function createFieldForm(){
 
 function getAction()
 {
-    if(getParameter("save")) //Get parameter by POST (submit)
+    $isPost = ($_SERVER['REQUEST_METHOD'] === 'POST');
+    if($isPost && getParameter("save_edit"))
+        return "save_edit";
+    else if($isPost && getParameter("save"))
         return "save";
+    else if(getParameter("edit"))
+        return "edit";
     else if(getParameter("new"))
         return "new";
-    else if(getParameter("save_edit"))
-        return "save_edit";
-    else if(getParameter("delete")) 
+    else if($isPost && getParameter("delete"))
         return "delete";
-    else if(getParameter("new_open")) 
-        return "view_form";
-    else if(getParameter("action")=="view")      //Get parameter by GET (command pattern, links)
-        return "view_form";
-    else if(getParameter("action")=="view_edit")
-        return "view_form";
+    else if(getParameter("action")=="view")
+        return "view";
+    else if(getParameter("action")=="edit")
+        return "edit";
+    else if(getParameter("cancel"))
+        return "cancel";
     else
         return "report"; //cancel
 }

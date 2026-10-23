@@ -1,39 +1,50 @@
 <?php
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
-   Codificación: UTF-8
+  Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
   | compliance with the License. You may obtain a copy of the License at |
   | http://www.opensource.org/licenses/gpl-license.php                   |
   |                                                                      |
-  | Software distributed under the License is distributed on "AS IS"     |
+  | Software distributed under the License is distributed on an "AS IS"  |
   | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  |                                                                      |
-  | Translated by: LLC LeNET                                             |
-  | Email: support@lenet.com.ua                                          |
-  +----------------------------------------------------------------------+
-  $Id: uk.lang,v 1.7 2023-10-30 02:09:35 LLC LENET support@lenet.ua Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-	"Save correctly" => "Зміни Збережено",
-	"Delete correctly" => "Видалення виконано успішно",
-	"IP Address" => "IP Адреса",
-	"Note" => "Примітка",
-	"White List" => "Білий Список",
-	"Add IP Address" => "Додати IP Адресу",
-	"The IP address or network format is not valid" => "IP Адреса або формат мережі не є дійсними",
-	"This IP address had already been defined" => "Ця IP Адреса вже була визначена",
-	"Are you sure you wish to delete the IP address?" => "Ви впевнені що хочете видалити IP Адресу?",
+$arrLangModule = array(
+    '%s is invalid' => '%s невірно',
+    '%s is required' => '%s обовʼязково',
+    'Add IP Address' => 'Додати IP Адресу',
+    'Are you sure you wish to delete the IP address?' => 'Ви впевнені що хочете видалити IP Адресу?',
+    'Back' => 'Назад',
+    'Cancel' => 'Скасувати',
+    'Define IP Address' => 'Визначте IP-адресу',
+    'Delete' => 'Видалити',
+    'Delete correctly' => 'Видалення виконано успішно',
+    'ERROR' => 'Помилка',
+    'Edit' => 'Редагувати',
+    'Edit IP Address' => 'Редагувати IP-адресу',
+    'IP Address' => 'IP Адреса',
+    'Invalid Format' => 'Недійсний формат',
+    'Message' => 'повідомлення',
+    'No records were selected' => 'Записи не вибрано',
+    'Note' => 'Примітка',
+    'Options' => 'Опції',
+    'Required field' => 'Обов\'язкове поле',
+    'Save' => 'Зберегти',
+    'Save correctly' => 'Зміни Збережено',
+    'The IP address or network format is not valid' => 'IP Адреса або формат мережі не є дійсними',
+    'This IP address had already been defined' => 'Ця IP Адреса вже була визначена',
+    'Update correctly' => 'Правильно оновлювати',
+    'View' => 'Переглянути',
+    'View IP Address' => 'Переглянути IP-адресу',
+    'White List' => 'Білий Список',
 );
-?>

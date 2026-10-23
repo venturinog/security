@@ -1,0 +1,50 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is invalid' => '%s är ogiltigt',
+    '%s is required' => '%s krävs',
+    'Add IP Address' => 'Lägg till IP-adress',
+    'Are you sure you wish to delete the IP address?' => 'Är du säker på att du vill ta bort IP-adressen?',
+    'Back' => 'Tillbaka',
+    'Cancel' => 'Avbryt',
+    'Define IP Address' => 'Definiera IP-adress',
+    'Delete' => 'Ta bort',
+    'Delete correctly' => 'Radera korrekt',
+    'ERROR' => 'Error',
+    'Edit' => 'Redigera',
+    'Edit IP Address' => 'Redigera IP-adress',
+    'IP Address' => 'IP-adress',
+    'Invalid Format' => 'Ogiltigt format',
+    'Message' => 'Meddelande',
+    'No records were selected' => 'Inga poster valdes ut',
+    'Note' => 'Obs',
+    'Options' => 'Inställningar',
+    'Required field' => 'Obligatoriskt fält',
+    'Save' => 'Spara',
+    'Save correctly' => 'Spara korrekt',
+    'The IP address or network format is not valid' => 'IP-adressen eller nätverksformatet är inte giltigt',
+    'This IP address had already been defined' => 'Denna IP-adress hade redan definierats',
+    'Update correctly' => 'Uppdatera korrekt',
+    'View' => 'Visa',
+    'View IP Address' => 'Visa IP-adress',
+    'White List' => 'Vita listan',
+);

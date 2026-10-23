@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2020 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,18 +17,34 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  $Id: es.lang.php, Sun 17 May 2020 01:05:58 PM EDT, nicolas@issabel.com
 */
 global $arrLangModule;
-$arrLangModule=array(
-"Save correctly"   => "Guardado Correctamente",
-"IP Address"       => "Dirección IP",
-"Note"             => "Nota",
-"White List"       => "Lista Blanca",
-"Delete correctly" => "Borrado correctamente",
-"Add IP Address"   => "Agregar Dirección IP",
-"The IP address or network format is not valid" => "Formato de dirección IP o Red incorrecto",
-"This IP address had already been defined" => "Esta dirección IP ya está definida",
-"Are you sure you wish to delete the IP address?" => "Está seguro de querer borrar esta dirección IP?"
+$arrLangModule = array(
+    '%s is invalid' => '%s no es válido',
+    '%s is required' => '%s es obligatorio',
+    'Add IP Address' => 'Agregar Dirección IP',
+    'Are you sure you wish to delete the IP address?' => 'Está seguro de querer borrar esta dirección IP?',
+    'Back' => 'Atrás',
+    'Cancel' => 'Cancelar',
+    'Define IP Address' => 'Definir dirección IP',
+    'Delete' => 'Eliminar',
+    'Delete correctly' => 'Borrado correctamente',
+    'ERROR' => 'Error',
+    'Edit' => 'Editar',
+    'Edit IP Address' => 'Editar dirección IP',
+    'IP Address' => 'Dirección IP',
+    'Invalid Format' => 'Formato no válido',
+    'Message' => 'Mensaje',
+    'No records were selected' => 'No se seleccionaron registros',
+    'Note' => 'Nota',
+    'Options' => 'Opciones',
+    'Required field' => 'Campo requerido',
+    'Save' => 'Guardar',
+    'Save correctly' => 'Guardado Correctamente',
+    'The IP address or network format is not valid' => 'Formato de dirección IP o Red incorrecto',
+    'This IP address had already been defined' => 'Esta dirección IP ya está definida',
+    'Update correctly' => 'Actualizar correctamente',
+    'View' => 'Ver',
+    'View IP Address' => 'Ver dirección IP',
+    'White List' => 'Lista Blanca',
 );
-?>
