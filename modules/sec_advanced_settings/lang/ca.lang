@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'Però s\'han modificat els fitxers següents:',
+    '%s is required' => '%s és obligatori',
+    'Access direct to IssabelPBX has been disabled.' => 'S\'ha desactivat l\'accés directe a IssabelPBX.',
+    'Access direct to IssabelPBX has been enabled.' => 'S\'ha habilitat l\'accés directe a IssabelPBX.',
+    'Access direct to IssabelPBX has not been disabled.' => 'L\'accés directe a IssabelPBX no s\'ha desactivat.',
+    'Access direct to IssabelPBX has not been enabled.' => 'L\'accés directe a IssabelPBX no s\'ha habilitat.',
+    'Advanced Security Settings' => 'Configuració de seguretat avançada',
+    'Advice' => 'Consell',
+    'Anonymous SIP calls are now disabled.' => 'Les trucades SIP anònimes ara estan desactivades.',
+    'Anonymous SIP calls are now enabled.' => 'Les trucades SIP anònimes ara estan habilitades.',
+    'Anonymous SIP calls cannot be disabled.' => 'Les trucades SIP anònimes no es poden desactivar.',
+    'Anonymous SIP calls cannot be enabled.' => 'Les trucades SIP anònimes no es poden activar.',
+    'But the following files have been modified:' => 'Però s\'han modificat els fitxers següents:',
+    'Cancel' => 'Cancel·la',
+    'Change Password' => 'Canvia la contrasenya',
+    'Database and Web Administration IssabelPBX Password' => 'Administració de bases de dades i web IssabelPBX Contrasenya',
+    'Disabled' => 'Desactivat',
+    'Dismiss' => 'Descartar',
+    'ERROR' => 'Error',
+    'Edit' => 'Edita',
+    'Enable access' => 'Activa l\'accés',
+    'Enable anonymous SIP calls' => 'Activa les trucades SIP anònimes',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'Activa l\'accés directe (no incrustat) a IssabelPBX',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'Habiliteu l\'accés directe (no incrustat) a IssabelPBX al menú "Seguretat >> Configuració de seguretat avançada".',
+    'Enabled' => 'Activat',
+    'Information' => 'Informació',
+    'Password Confirmation' => 'Confirmació de contrasenya',
+    'Password and confirmation do not match!' => 'La contrasenya i la confirmació no coincideixen!',
+    'Password has been updated.' => 'La contrasenya s\'ha actualitzat.',
+    'Password has not been updated.' => 'La contrasenya no s\'ha actualitzat.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'La contrasenya només pot contenir caràcters alfanumèrics, espais o el següent: .&-@=_!<>.',
+    'Required field' => 'Camp requerit',
+    'Save' => 'Desa',
+    'The following field contain errors' => 'El camp següent conté errors',
+    'The following fields are required' => 'Els camps següents són obligatoris',
+    'The settings could not be saved' => 'La configuració no s\'ha pogut desar',
+    'Unauthorized' => 'No autoritzat',
+    'Update correctly' => 'Actualitzar correctament',
+    'You are not authorized to access this page.' => 'No teniu autorització per accedir a aquesta pàgina.',
+    'is licensed under' => 'està autoritzat sota',
+);

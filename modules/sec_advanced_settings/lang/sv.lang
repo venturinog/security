@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'Men följande filer har ändrats:',
+    '%s is required' => '%s krävs',
+    'Access direct to IssabelPBX has been disabled.' => 'Direkt åtkomst till IssabelPBX har inaktiverats.',
+    'Access direct to IssabelPBX has been enabled.' => 'Direkt åtkomst till IssabelPBX har aktiverats.',
+    'Access direct to IssabelPBX has not been disabled.' => 'Direkt åtkomst till IssabelPBX har inte inaktiverats.',
+    'Access direct to IssabelPBX has not been enabled.' => 'Direkt åtkomst till IssabelPBX har inte aktiverats.',
+    'Advanced Security Settings' => 'Avancerade säkerhetsinställningar',
+    'Advice' => 'Råd',
+    'Anonymous SIP calls are now disabled.' => 'Anonyma SIP-samtal är nu inaktiverade.',
+    'Anonymous SIP calls are now enabled.' => 'Anonyma SIP-samtal är nu aktiverade.',
+    'Anonymous SIP calls cannot be disabled.' => 'Anonyma SIP-samtal kan inte inaktiveras.',
+    'Anonymous SIP calls cannot be enabled.' => 'Anonyma SIP-samtal kan inte aktiveras.',
+    'But the following files have been modified:' => 'Men följande filer har ändrats:',
+    'Cancel' => 'Avbryt',
+    'Change Password' => 'Ändra lösenord',
+    'Database and Web Administration IssabelPBX Password' => 'Databas och webbadministration IssabelPBX Lösenord',
+    'Disabled' => 'Inaktiverad',
+    'Dismiss' => 'Avvisa',
+    'ERROR' => 'Error',
+    'Edit' => 'Redigera',
+    'Enable access' => 'Aktivera åtkomst',
+    'Enable anonymous SIP calls' => 'Aktivera anonyma SIP-samtal',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'Aktivera direktåtkomst (icke-inbäddad) till IssabelPBX',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'Aktivera direktåtkomst (icke-inbäddad) till IssabelPBX i menyn "Säkerhet >> Avancerade säkerhetsinställningar".',
+    'Enabled' => 'Aktiverad',
+    'Information' => 'Information',
+    'Password Confirmation' => 'Lösenordsbekräftelse',
+    'Password and confirmation do not match!' => 'Lösenord och bekräftelse stämmer inte överens!',
+    'Password has been updated.' => 'Lösenordet har uppdaterats.',
+    'Password has not been updated.' => 'Lösenordet har inte uppdaterats.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'Lösenordet får endast innehålla alfanumeriska tecken, mellanslag eller följande: .&-@=_!<>.',
+    'Required field' => 'Obligatoriskt fält',
+    'Save' => 'Spara',
+    'The following field contain errors' => 'Följande fält innehåller fel',
+    'The following fields are required' => 'Följande fält är obligatoriska',
+    'The settings could not be saved' => 'Inställningarna kunde inte sparas',
+    'Unauthorized' => 'Obehörig',
+    'Update correctly' => 'Uppdatera korrekt',
+    'You are not authorized to access this page.' => 'Du har inte behörighet att komma åt den här sidan.',
+    'is licensed under' => 'är licensierad enligt',
+);

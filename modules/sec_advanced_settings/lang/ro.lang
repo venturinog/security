@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'Dar următoarele fișiere au fost modificate:',
+    '%s is required' => '%s este obligatoriu',
+    'Access direct to IssabelPBX has been disabled.' => 'Accesul direct la IssabelPBX a fost dezactivat.',
+    'Access direct to IssabelPBX has been enabled.' => 'Accesul direct la IssabelPBX a fost activat.',
+    'Access direct to IssabelPBX has not been disabled.' => 'Accesul direct la IssabelPBX nu a fost dezactivat.',
+    'Access direct to IssabelPBX has not been enabled.' => 'Accesul direct la IssabelPBX nu a fost activat.',
+    'Advanced Security Settings' => 'Setări avansate de securitate',
+    'Advice' => 'Sfat',
+    'Anonymous SIP calls are now disabled.' => 'Apelurile SIP anonime sunt acum dezactivate.',
+    'Anonymous SIP calls are now enabled.' => 'Apelurile SIP anonime sunt acum activate.',
+    'Anonymous SIP calls cannot be disabled.' => 'Apelurile SIP anonime nu pot fi dezactivate.',
+    'Anonymous SIP calls cannot be enabled.' => 'Apelurile SIP anonime nu pot fi activate.',
+    'But the following files have been modified:' => 'Dar următoarele fișiere au fost modificate:',
+    'Cancel' => 'Anulează',
+    'Change Password' => 'Schimbați parola',
+    'Database and Web Administration IssabelPBX Password' => 'Administrare baze de date și web IssabelPBX Parola',
+    'Disabled' => 'Dezactivat',
+    'Dismiss' => 'Respingeți',
+    'ERROR' => 'Error',
+    'Edit' => 'Editează',
+    'Enable access' => 'Activați accesul',
+    'Enable anonymous SIP calls' => 'Activați apelurile SIP anonime',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'Activați accesul direct (neîncorporat) la IssabelPBX',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'Activați accesul direct (neîncorporat) la IssabelPBX în meniul „Securitate >> Setări avansate de securitate”.',
+    'Enabled' => 'Activat',
+    'Information' => 'Informații',
+    'Password Confirmation' => 'Confirmarea parolei',
+    'Password and confirmation do not match!' => 'Parola și confirmarea nu se potrivesc!',
+    'Password has been updated.' => 'Parola a fost actualizată.',
+    'Password has not been updated.' => 'Parola nu a fost actualizată.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'Parola poate conține numai caractere alfanumerice, spații sau următoarele: .&-@=_!<>.',
+    'Required field' => 'Camp Obligatoriu',
+    'Save' => 'Salvează',
+    'The following field contain errors' => 'Următorul câmp conține erori',
+    'The following fields are required' => 'Următoarele câmpuri sunt obligatorii',
+    'The settings could not be saved' => 'Setările nu au putut fi salvate',
+    'Unauthorized' => 'Neautorizat',
+    'Update correctly' => 'Actualizați corect',
+    'You are not authorized to access this page.' => 'Nu sunteți autorizat să accesați această pagină.',
+    'is licensed under' => 'este licențiat sub',
+);

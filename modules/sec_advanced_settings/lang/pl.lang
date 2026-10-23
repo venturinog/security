@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'Ale następujące pliki zostały zmodyfikowane:',
+    '%s is required' => '%s jest wymagane',
+    'Access direct to IssabelPBX has been disabled.' => 'Dostęp bezpośredni do IssabelPBX został wyłączony.',
+    'Access direct to IssabelPBX has been enabled.' => 'Dostęp bezpośredni do IssabelPBX został włączony.',
+    'Access direct to IssabelPBX has not been disabled.' => 'Dostęp bezpośredni do IssabelPBX nie został wyłączony.',
+    'Access direct to IssabelPBX has not been enabled.' => 'Dostęp bezpośredni do IssabelPBX nie został włączony.',
+    'Advanced Security Settings' => 'Zaawansowane ustawienia zabezpieczeń',
+    'Advice' => 'Porada',
+    'Anonymous SIP calls are now disabled.' => 'Anonimowe połączenia SIP są teraz wyłączone.',
+    'Anonymous SIP calls are now enabled.' => 'Anonimowe połączenia SIP są teraz włączone.',
+    'Anonymous SIP calls cannot be disabled.' => 'Nie można wyłączyć anonimowych połączeń SIP.',
+    'Anonymous SIP calls cannot be enabled.' => 'Nie można włączyć anonimowych połączeń SIP.',
+    'But the following files have been modified:' => 'Ale następujące pliki zostały zmodyfikowane:',
+    'Cancel' => 'Anuluj',
+    'Change Password' => 'Zmień hasło',
+    'Database and Web Administration IssabelPBX Password' => 'Administracja bazami danych i siecią IssabelPBX Hasło',
+    'Disabled' => 'Wyłączone',
+    'Dismiss' => 'Odrzuć',
+    'ERROR' => 'Error',
+    'Edit' => 'Edytuj',
+    'Enable access' => 'Włącz dostęp',
+    'Enable anonymous SIP calls' => 'Włącz anonimowe połączenia SIP',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'Włącz bezpośredni dostęp (nie wbudowany) do IssabelPBX',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'Włącz bezpośredni dostęp (nie wbudowany) do IssabelPBX w menu „Bezpieczeństwo >> Zaawansowane ustawienia zabezpieczeń”.',
+    'Enabled' => 'Włączone',
+    'Information' => 'Informacje',
+    'Password Confirmation' => 'Potwierdzenie hasła',
+    'Password and confirmation do not match!' => 'Hasło i potwierdzenie nie pasują!',
+    'Password has been updated.' => 'Hasło zostało zaktualizowane.',
+    'Password has not been updated.' => 'Hasło nie zostało zaktualizowane.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'Hasło może zawierać wyłącznie znaki alfanumeryczne, spacje lub następujące elementy: .&-@=_!<>.',
+    'Required field' => 'Wymagane pole',
+    'Save' => 'Zapisz',
+    'The following field contain errors' => 'Poniższe pole zawiera błędy',
+    'The following fields are required' => 'Wymagane są następujące pola',
+    'The settings could not be saved' => 'Nie można zapisać ustawień',
+    'Unauthorized' => 'Nieautoryzowany',
+    'Update correctly' => 'Aktualizuj poprawnie',
+    'You are not authorized to access this page.' => 'Nie masz uprawnień dostępu do tej strony.',
+    'is licensed under' => 'jest licencjonowany pod',
+);

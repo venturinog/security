@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'Mais les fichiers suivants ont été modifiés :',
+    '%s is required' => '%s est obligatoire',
+    'Access direct to IssabelPBX has been disabled.' => 'L\'accès direct à IssabelPBX a été désactivé.',
+    'Access direct to IssabelPBX has been enabled.' => 'L\'accès direct à IssabelPBX a été activé.',
+    'Access direct to IssabelPBX has not been disabled.' => 'L\'accès direct à IssabelPBX n\'a ​​pas été désactivé.',
+    'Access direct to IssabelPBX has not been enabled.' => 'L\'accès direct à IssabelPBX n\'a ​​pas été activé.',
+    'Advanced Security Settings' => 'Paramètres de sécurité avancés',
+    'Advice' => 'Conseil',
+    'Anonymous SIP calls are now disabled.' => 'Les appels SIP anonymes sont désormais désactivés.',
+    'Anonymous SIP calls are now enabled.' => 'Les appels SIP anonymes sont désormais activés.',
+    'Anonymous SIP calls cannot be disabled.' => 'Les appels SIP anonymes ne peuvent pas être désactivés.',
+    'Anonymous SIP calls cannot be enabled.' => 'Les appels SIP anonymes ne peuvent pas être activés.',
+    'But the following files have been modified:' => 'Mais les fichiers suivants ont été modifiés :',
+    'Cancel' => 'Annuler',
+    'Change Password' => 'Changer le mot de passe',
+    'Database and Web Administration IssabelPBX Password' => 'Base de données et administration Web Mot de passe IsabelPBX',
+    'Disabled' => 'Désactivé',
+    'Dismiss' => 'Rejeter',
+    'ERROR' => 'Erreur',
+    'Edit' => 'Editer',
+    'Enable access' => 'Activer l\'accès',
+    'Enable anonymous SIP calls' => 'Activer les appels SIP anonymes',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'Activer l\'accès direct (non intégré) à IssabelPBX',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'Activez l\'accès direct (non intégré) à IssabelPBX dans le menu "Sécurité >> Paramètres de sécurité avancés".',
+    'Enabled' => 'Activé',
+    'Information' => 'Informations',
+    'Password Confirmation' => 'Confirmation du mot de passe',
+    'Password and confirmation do not match!' => 'Le mot de passe et la confirmation ne correspondent pas !',
+    'Password has been updated.' => 'Le mot de passe a été mis à jour.',
+    'Password has not been updated.' => 'Le mot de passe n\'a pas été mis à jour.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'Le mot de passe ne peut contenir que des caractères alphanumériques, des espaces ou les éléments suivants : .&-@=_!<>.',
+    'Required field' => 'Champ requis',
+    'Save' => 'Sauver',
+    'The following field contain errors' => 'Le champ suivant contient des erreurs',
+    'The following fields are required' => 'Les champs suivants sont obligatoires',
+    'The settings could not be saved' => 'Les paramètres n\'ont pas pu être enregistrés',
+    'Unauthorized' => 'Non autorisé',
+    'Update correctly' => 'Mettre à jour correctement',
+    'You are not authorized to access this page.' => 'Vous n\'êtes pas autorisé à accéder à cette page.',
+    'is licensed under' => 'est licencié sous',
+);

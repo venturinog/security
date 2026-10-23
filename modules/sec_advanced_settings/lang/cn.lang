@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => '但以下文件已被修改：',
+    '%s is required' => '%s 为必填项',
+    'Access direct to IssabelPBX has been disabled.' => '直接访问 IssabelPBX 已被禁用。',
+    'Access direct to IssabelPBX has been enabled.' => '已启用直接访问 IssabelPBX。',
+    'Access direct to IssabelPBX has not been disabled.' => '尚未禁用直接访问 IssabelPBX。',
+    'Access direct to IssabelPBX has not been enabled.' => '尚未启用直接访问 IssabelPBX。',
+    'Advanced Security Settings' => '高级安全设置',
+    'Advice' => '忠告',
+    'Anonymous SIP calls are now disabled.' => '匿名 SIP 呼叫现已禁用。',
+    'Anonymous SIP calls are now enabled.' => '现已启用匿名 SIP 呼叫。',
+    'Anonymous SIP calls cannot be disabled.' => '无法禁用匿名 SIP 呼叫。',
+    'Anonymous SIP calls cannot be enabled.' => '无法启用匿名 SIP 呼叫。',
+    'But the following files have been modified:' => '但以下文件已被修改：',
+    'Cancel' => '取消',
+    'Change Password' => '更改密码',
+    'Database and Web Administration IssabelPBX Password' => '数据库和 Web 管理 IssabelPBX 密码',
+    'Disabled' => '已禁用',
+    'Dismiss' => '解雇',
+    'ERROR' => 'Error',
+    'Edit' => '编辑',
+    'Enable access' => '启用访问',
+    'Enable anonymous SIP calls' => '启用匿名 SIP 呼叫',
+    'Enable direct access (Non-embedded) to IssabelPBX' => '启用对 IssabelPBX 的直接访问（非嵌入式）',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => '在“安全>>高级安全设置”菜单中启用对 IssabelPBX 的直接访问（非嵌入式）。',
+    'Enabled' => '已启用',
+    'Information' => '信息',
+    'Password Confirmation' => '密码确认',
+    'Password and confirmation do not match!' => '密码和确认不匹配！',
+    'Password has been updated.' => '密码已更新。',
+    'Password has not been updated.' => '密码尚未更新。',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => '密码只能包含字母数字字符、空格或以下内容：.&-@=_!<>。',
+    'Required field' => '必填项',
+    'Save' => '保存',
+    'The following field contain errors' => '以下字段包含错误',
+    'The following fields are required' => '以下字段为必填项',
+    'The settings could not be saved' => '无法保存设置',
+    'Unauthorized' => '未经授权',
+    'Update correctly' => '正确更新',
+    'You are not authorized to access this page.' => '您无权访问此页面。',
+    'is licensed under' => '已获得许可',
+);

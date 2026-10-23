@@ -2,11 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2019 Issabel Foundation                                |
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -18,37 +17,54 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  | Translate by: Haamed Kouhfallah                                      |
-  | Email: k.haamed@gmail.com                                            |
-  +----------------------------------------------------------------------+
-  $Id: fa.lang,v 1.1 2019-11-30 04:08:50 Haamed Kouhfallah k.haamed@gmail.com Exp $
 */
 global $arrLangModule;
-$arrLangModule=array(
-"Advanced Security Settings"                       => "تنظيمات پيشرفته امنيتي",
-"Enable direct access (Non-embedded) to FreePBX®"   => "Freepbx فعال كردن دسترسي مستقيم به برنامه",
-"Change Password"                                  => "تغيير رمز",
-"Enable access"                                    => "فعال كردن دسترسي",
-"Database and Web Administration FreePBX® Password" => "Freepbx رمز ديتا بيس و محيط مديريت برنامه",
-"Password Confirmation"                            => "تاييد رمز",
-"Password and confirmation do not match!"          => "رمز و تاييديه آن يكسان نيستند",
-"The following fields are required"                => "پر كردن فيلد‌هاي زير الزامي است",
-"The following field contain errors"               => "فيلد‌هاي زير داراي خطا هستند",
-"Information"                                      => "اطلاعات",
-"Password has been updated."                       => "رمز عبور به روز رساني شد",
-"Password has not been updated."                   => "رمز عبور با موفقيت به روز رساني نشد",
-"Access direct to FreePBX® has been enabled."       => "فعال شد Freepbx دسترسي مستقيم به",
-"Access direct to FreePBX® has not been enabled."   => "فعال نشد Freepbx دسترسي مستقيم به",
-"Access direct to FreePBX® has been disabled."      => "غير فعال شد Freepbx دسترسي مستقيم به",
-"Access direct to FreePBX® has not been disabled."  => "غير فعال نشد Freepbx دسترسي مستقيم به",
-" But the following files have been modified: "    => "ولي فال‌هاي زير تغيير داده شد",
-"Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>." => 
-"Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.",
-"Advice"                                           => "نكته",
-"Unauthorized"                                     => "نا شناخته",
-"You are not authorized to access this page."      => "شما مجاز به دسترسي به اين صفحه نيستيد",
-"Enable direct access (Non-embedded) to FreePBX in \"Security >> Advanced Security Settings\" menu." 
-						   => "Enable direct access (Non-embedded) to FreePBX in \"Security >> Advanced Security Settings\" menu."
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'ولي فال‌هاي زير تغيير داده شد',
+    '%s is required' => '%s الزامی است',
+    'Access direct to FreePBX® has been disabled.' => 'غير فعال شد Freepbx دسترسي مستقيم به',
+    'Access direct to FreePBX® has been enabled.' => 'فعال شد Freepbx دسترسي مستقيم به',
+    'Access direct to FreePBX® has not been disabled.' => 'غير فعال نشد Freepbx دسترسي مستقيم به',
+    'Access direct to FreePBX® has not been enabled.' => 'فعال نشد Freepbx دسترسي مستقيم به',
+    'Access direct to IssabelPBX has been disabled.' => 'دسترسی مستقیم به IssabelPBX غیرفعال شده است.',
+    'Access direct to IssabelPBX has been enabled.' => 'دسترسی مستقیم به IssabelPBX فعال شده است.',
+    'Access direct to IssabelPBX has not been disabled.' => 'دسترسی مستقیم به IssabelPBX غیرفعال نشده است.',
+    'Access direct to IssabelPBX has not been enabled.' => 'دسترسی مستقیم به IssabelPBX فعال نشده است.',
+    'Advanced Security Settings' => 'تنظيمات پيشرفته امنيتي',
+    'Advice' => 'نكته',
+    'Anonymous SIP calls are now disabled.' => 'تماس‌های SIP ناشناس اکنون غیرفعال شده‌اند.',
+    'Anonymous SIP calls are now enabled.' => 'تماس‌های SIP ناشناس اکنون فعال هستند.',
+    'Anonymous SIP calls cannot be disabled.' => 'تماس های SIP ناشناس را نمی توان غیرفعال کرد.',
+    'Anonymous SIP calls cannot be enabled.' => 'تماس های SIP ناشناس را نمی توان فعال کرد.',
+    'But the following files have been modified:' => 'اما فایل های زیر اصلاح شده اند:',
+    'Cancel' => 'انصراف',
+    'Change Password' => 'تغيير رمز',
+    'Database and Web Administration FreePBX® Password' => 'Freepbx رمز ديتا بيس و محيط مديريت برنامه',
+    'Database and Web Administration IssabelPBX Password' => 'پایگاه داده و مدیریت وب رمز عبور IssabelPBX',
+    'Disabled' => 'از کار افتاده است',
+    'Dismiss' => 'رد کردن',
+    'ERROR' => 'خطا',
+    'Edit' => 'ويرايش',
+    'Enable access' => 'فعال كردن دسترسي',
+    'Enable anonymous SIP calls' => 'تماس های SIP ناشناس را فعال کنید',
+    'Enable direct access (Non-embedded) to FreePBX in "Security >> Advanced Security Settings" menu.' => 'Enable direct access (Non-embedded) to FreePBX in "Security >> Advanced Security Settings" menu.',
+    'Enable direct access (Non-embedded) to FreePBX®' => 'Freepbx فعال كردن دسترسي مستقيم به برنامه',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'دسترسی مستقیم (غیر تعبیه شده) به IssabelPBX را فعال کنید',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'در منوی "Security >> Advanced Security Settings" دسترسی مستقیم (غیر تعبیه شده) به IssabelPBX را فعال کنید.',
+    'Enabled' => 'فعال شد',
+    'Information' => 'اطلاعات',
+    'Password Confirmation' => 'تاييد رمز',
+    'Password and confirmation do not match!' => 'رمز و تاييديه آن يكسان نيستند',
+    'Password has been updated.' => 'رمز عبور به روز رساني شد',
+    'Password has not been updated.' => 'رمز عبور با موفقيت به روز رساني نشد',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'رمز عبور ممکن است فقط شامل نویسه های الفبایی، فاصله یا موارد زیر باشد: .&-@=_!<>.',
+    'Required field' => 'فيلد مورد نياز',
+    'Save' => 'ذخيره',
+    'The following field contain errors' => 'فيلد‌هاي زير داراي خطا هستند',
+    'The following fields are required' => 'پر كردن فيلد‌هاي زير الزامي است',
+    'The settings could not be saved' => 'تنظیمات ذخیره نشد',
+    'Unauthorized' => 'نا شناخته',
+    'Update correctly' => 'درست آپدیت کنید',
+    'You are not authorized to access this page.' => 'شما مجاز به دسترسي به اين صفحه نيستيد',
+    'is licensed under' => 'تحت مجوز است',
 );
-?>

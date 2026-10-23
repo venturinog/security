@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'Ancak aşağıdaki dosyalar değiştirildi:',
+    '%s is required' => '%s zorunludur',
+    'Access direct to IssabelPBX has been disabled.' => 'IssabelPBX\'e doğrudan erişim devre dışı bırakıldı.',
+    'Access direct to IssabelPBX has been enabled.' => 'IssabelPBX\'e doğrudan erişim etkinleştirildi.',
+    'Access direct to IssabelPBX has not been disabled.' => 'IssabelPBX\'e doğrudan erişim devre dışı bırakılmadı.',
+    'Access direct to IssabelPBX has not been enabled.' => 'IssabelPBX\'e doğrudan erişim etkinleştirilmedi.',
+    'Advanced Security Settings' => 'Gelişmiş Güvenlik Ayarları',
+    'Advice' => 'Tavsiye',
+    'Anonymous SIP calls are now disabled.' => 'Anonim SIP aramaları artık devre dışı.',
+    'Anonymous SIP calls are now enabled.' => 'Anonim SIP çağrıları artık etkindir.',
+    'Anonymous SIP calls cannot be disabled.' => 'Anonim SIP çağrıları devre dışı bırakılamaz.',
+    'Anonymous SIP calls cannot be enabled.' => 'Anonim SIP çağrıları etkinleştirilemez.',
+    'But the following files have been modified:' => 'Ancak aşağıdaki dosyalar değiştirildi:',
+    'Cancel' => 'İptal',
+    'Change Password' => 'Şifreyi Değiştir',
+    'Database and Web Administration IssabelPBX Password' => 'Veritabanı ve Web Yönetimi IssabelPBX Şifresi',
+    'Disabled' => 'Devre dışı',
+    'Dismiss' => 'Reddet',
+    'ERROR' => 'Hata',
+    'Edit' => 'Düzenle',
+    'Enable access' => 'Erişimi etkinleştir',
+    'Enable anonymous SIP calls' => 'Anonim SIP çağrılarını etkinleştir',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'IssabelPBX\'e doğrudan erişimi (gömülü olmayan) etkinleştirin',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => '"Güvenlik >> Gelişmiş Güvenlik Ayarları" menüsünde IssabelPBX\'e doğrudan erişimi (gömülü olmayan) etkinleştirin.',
+    'Enabled' => 'Etkin',
+    'Information' => 'Bilgi',
+    'Password Confirmation' => 'Şifre Doğrulaması',
+    'Password and confirmation do not match!' => 'Şifre ve onay eşleşmiyor!',
+    'Password has been updated.' => 'Şifre güncellendi.',
+    'Password has not been updated.' => 'Şifre güncellenmedi.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'Şifre yalnızca alfasayısal karakterler, boşluklar veya aşağıdakileri içerebilir: .&-@=_!<>.',
+    'Required field' => 'Gerekli alan',
+    'Save' => 'Kaydet',
+    'The following field contain errors' => 'Aşağıdaki alan hatalar içeriyor',
+    'The following fields are required' => 'Aşağıdaki alanlar gereklidir',
+    'The settings could not be saved' => 'Ayarlar kaydedilemedi',
+    'Unauthorized' => 'Yetkisiz',
+    'Update correctly' => 'Doğru şekilde güncelleyin',
+    'You are not authorized to access this page.' => 'Bu ekrana girme yetkiniz yok.',
+    'is licensed under' => 'kapsamında lisanslıdır',
+);

@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'ただし、次のファイルは変更されています。',
+    '%s is required' => '%s は必須です',
+    'Access direct to IssabelPBX has been disabled.' => 'IssabelPBX への直接アクセスは無効になっています。',
+    'Access direct to IssabelPBX has been enabled.' => 'IssabelPBX への直接アクセスが有効になりました。',
+    'Access direct to IssabelPBX has not been disabled.' => 'IssabelPBX への直接アクセスは無効になっていません。',
+    'Access direct to IssabelPBX has not been enabled.' => 'IssabelPBX への直接アクセスは有効になっていません。',
+    'Advanced Security Settings' => '高度なセキュリティ設定',
+    'Advice' => 'アドバイス',
+    'Anonymous SIP calls are now disabled.' => '匿名 SIP 通話が無効になりました。',
+    'Anonymous SIP calls are now enabled.' => '匿名 SIP 通話が有効になりました。',
+    'Anonymous SIP calls cannot be disabled.' => '匿名 SIP 通話を無効にすることはできません。',
+    'Anonymous SIP calls cannot be enabled.' => '匿名 SIP 通話を有効にすることはできません。',
+    'But the following files have been modified:' => 'ただし、次のファイルは変更されています。',
+    'Cancel' => 'キャンセル',
+    'Change Password' => 'パスワードの変更',
+    'Database and Web Administration IssabelPBX Password' => 'データベースと Web 管理 IssabelPBX パスワード',
+    'Disabled' => '無効',
+    'Dismiss' => '却下',
+    'ERROR' => 'Error',
+    'Edit' => '編集',
+    'Enable access' => 'アクセスを有効にする',
+    'Enable anonymous SIP calls' => '匿名 SIP 通話を有効にする',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'IssabelPBX への直接アクセス (非埋め込み) を有効にする',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => '「セキュリティ >> 高度なセキュリティ設定」メニューで IssabelPBX への直接アクセス (非埋め込み) を有効にします。',
+    'Enabled' => '有効',
+    'Information' => '情報',
+    'Password Confirmation' => 'パスワードの確認',
+    'Password and confirmation do not match!' => 'パスワードと確認が一致しません!',
+    'Password has been updated.' => 'パスワードが更新されました。',
+    'Password has not been updated.' => 'パスワードが更新されていません。',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'パスワードには、英数字、スペース、または .&-@=_!<> のみを使用できます。',
+    'Required field' => '必須フィールド',
+    'Save' => '保存',
+    'The following field contain errors' => '次のフィールドにエラーが含まれています',
+    'The following fields are required' => '次のフィールドは必須です',
+    'The settings could not be saved' => '設定を保存できませんでした',
+    'Unauthorized' => '許可されていません',
+    'Update correctly' => '正しくアップデートする',
+    'You are not authorized to access this page.' => 'このページにアクセスする権限がありません。',
+    'is licensed under' => '以下にライセンスされています',
+);

@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'Али следеће датотеке су измењене:',
+    '%s is required' => '%s је обавезно',
+    'Access direct to IssabelPBX has been disabled.' => 'Директан приступ ИссабелПБКС-у је онемогућен.',
+    'Access direct to IssabelPBX has been enabled.' => 'Директан приступ ИссабелПБКС-у је омогућен.',
+    'Access direct to IssabelPBX has not been disabled.' => 'Директан приступ ИссабелПБКС-у није онемогућен.',
+    'Access direct to IssabelPBX has not been enabled.' => 'Директан приступ ИссабелПБКС-у није омогућен.',
+    'Advanced Security Settings' => 'Напредне безбедносне поставке',
+    'Advice' => 'Savet',
+    'Anonymous SIP calls are now disabled.' => 'Анонимни СИП позиви су сада онемогућени.',
+    'Anonymous SIP calls are now enabled.' => 'Анонимни СИП позиви су сада омогућени.',
+    'Anonymous SIP calls cannot be disabled.' => 'Анонимни СИП позиви се не могу онемогућити.',
+    'Anonymous SIP calls cannot be enabled.' => 'Анонимни СИП позиви се не могу омогућити.',
+    'But the following files have been modified:' => 'Али следеће датотеке су измењене:',
+    'Cancel' => 'Откажи',
+    'Change Password' => 'Промени лозинку',
+    'Database and Web Administration IssabelPBX Password' => 'База података и веб администрација ИссабелПБКС Лозинка',
+    'Disabled' => 'Онемогућено',
+    'Dismiss' => 'Одбаци',
+    'ERROR' => 'Error',
+    'Edit' => 'Уреди',
+    'Enable access' => 'Омогући приступ',
+    'Enable anonymous SIP calls' => 'Омогућите анонимне СИП позиве',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'Омогућите директан приступ (неуграђен) ИссабелПБКС-у',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'Омогућите директан приступ (неуграђен) ИссабелПБКС-у у менију „Безбедност >> Напредне безбедносне поставке“.',
+    'Enabled' => 'Омогућено',
+    'Information' => 'Информације',
+    'Password Confirmation' => 'Потврда лозинке',
+    'Password and confirmation do not match!' => 'Лозинка и потврда се не поклапају!',
+    'Password has been updated.' => 'Лозинка је ажурирана.',
+    'Password has not been updated.' => 'Лозинка није ажурирана.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'Лозинка може да садржи само алфанумеричке знакове, размаке или следеће: .&-@=_!<>.',
+    'Required field' => 'Obavezno polje',
+    'Save' => 'Сачувај',
+    'The following field contain errors' => 'Следеће поље садржи грешке',
+    'The following fields are required' => 'Следећа поља су обавезна',
+    'The settings could not be saved' => 'Подешавања нису могла да се сачувају',
+    'Unauthorized' => 'Neovlašćeno',
+    'Update correctly' => 'Ажурирајте исправно',
+    'You are not authorized to access this page.' => 'Nemate ovlašćenje za pristup ovoj stranici.',
+    'is licensed under' => 'је лиценциран под',
+);

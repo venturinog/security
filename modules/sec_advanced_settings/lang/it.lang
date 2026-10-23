@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'Ma i seguenti file sono stati modificati:',
+    '%s is required' => '%s è obbligatorio',
+    'Access direct to IssabelPBX has been disabled.' => 'L\'accesso diretto a IssabelPBX è stato disabilitato.',
+    'Access direct to IssabelPBX has been enabled.' => 'L\'accesso diretto a IssabelPBX è stato abilitato.',
+    'Access direct to IssabelPBX has not been disabled.' => 'L\'accesso diretto a IssabelPBX non è stato disabilitato.',
+    'Access direct to IssabelPBX has not been enabled.' => 'L\'accesso diretto a IssabelPBX non è stato abilitato.',
+    'Advanced Security Settings' => 'Impostazioni di sicurezza avanzate',
+    'Advice' => 'Consiglio',
+    'Anonymous SIP calls are now disabled.' => 'Le chiamate SIP anonime sono ora disabilitate.',
+    'Anonymous SIP calls are now enabled.' => 'Le chiamate SIP anonime sono ora abilitate.',
+    'Anonymous SIP calls cannot be disabled.' => 'Le chiamate SIP anonime non possono essere disabilitate.',
+    'Anonymous SIP calls cannot be enabled.' => 'Non è possibile abilitare le chiamate SIP anonime.',
+    'But the following files have been modified:' => 'Ma i seguenti file sono stati modificati:',
+    'Cancel' => 'Annulla',
+    'Change Password' => 'Cambia password',
+    'Database and Web Administration IssabelPBX Password' => 'Password IssabelPBX per amministrazione database e web',
+    'Disabled' => 'Disabilitato',
+    'Dismiss' => 'Ignora',
+    'ERROR' => 'Error',
+    'Edit' => 'Modifica',
+    'Enable access' => 'Abilita l\'accesso',
+    'Enable anonymous SIP calls' => 'Abilita chiamate SIP anonime',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'Abilita l\'accesso diretto (non incorporato) a IssabelPBX',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'Abilita l\'accesso diretto (non incorporato) a IssabelPBX nel menu "Sicurezza >> Impostazioni di sicurezza avanzate".',
+    'Enabled' => 'Abilitato',
+    'Information' => 'Informazioni',
+    'Password Confirmation' => 'Conferma della password',
+    'Password and confirmation do not match!' => 'Password e conferma non corrispondono!',
+    'Password has been updated.' => 'La password è stata aggiornata.',
+    'Password has not been updated.' => 'La password non è stata aggiornata.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'La password può contenere solo caratteri alfanumerici, spazi o quanto segue: .&-@=_!<>.',
+    'Required field' => 'Campi Obbligatori',
+    'Save' => 'Salva',
+    'The following field contain errors' => 'Il campo seguente contiene errori',
+    'The following fields are required' => 'I seguenti campi sono obbligatori',
+    'The settings could not be saved' => 'Non è stato possibile salvare le impostazioni',
+    'Unauthorized' => 'Non autorizzato',
+    'Update correctly' => 'Aggiorna correttamente',
+    'You are not authorized to access this page.' => 'Non sei autorizzato ad accedere a questa pagina.',
+    'is licensed under' => 'è concesso in licenza con',
+);

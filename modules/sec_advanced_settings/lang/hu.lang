@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'De a következő fájlok módosultak:',
+    '%s is required' => '%s kötelező',
+    'Access direct to IssabelPBX has been disabled.' => 'Az Issabel PBX közvetlen elérése le van tiltva.',
+    'Access direct to IssabelPBX has been enabled.' => 'Az Issabel PBX közvetlen elérése engedélyezve van.',
+    'Access direct to IssabelPBX has not been disabled.' => 'Az Issabel PBX közvetlen elérése nincs letiltva.',
+    'Access direct to IssabelPBX has not been enabled.' => 'Az Issabel PBX közvetlen elérése nincs engedélyezve.',
+    'Advanced Security Settings' => 'Speciális biztonsági beállítások',
+    'Advice' => 'Javaslat',
+    'Anonymous SIP calls are now disabled.' => 'A névtelen SIP-hívások most le vannak tiltva.',
+    'Anonymous SIP calls are now enabled.' => 'A névtelen SIP-hívások mostantól engedélyezve vannak.',
+    'Anonymous SIP calls cannot be disabled.' => 'A névtelen SIP-hívások nem tilthatók le.',
+    'Anonymous SIP calls cannot be enabled.' => 'A névtelen SIP-hívások nem engedélyezhetők.',
+    'But the following files have been modified:' => 'De a következő fájlok módosultak:',
+    'Cancel' => 'Mégse',
+    'Change Password' => 'Jelszó módosítása',
+    'Database and Web Administration IssabelPBX Password' => 'Adatbázis- és webadminisztráció IssabelPBX jelszó',
+    'Disabled' => 'Letiltva',
+    'Dismiss' => 'Elvetés',
+    'ERROR' => 'Error',
+    'Edit' => 'Szerkesztés',
+    'Enable access' => 'Hozzáférés engedélyezése',
+    'Enable anonymous SIP calls' => 'Engedélyezze a névtelen SIP-hívásokat',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'Közvetlen (nem beágyazott) hozzáférés engedélyezése az Issabel PBX-hez',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'Engedélyezze a közvetlen (nem beágyazott) hozzáférést az Issabel PBX-hez a „Biztonság >> Speciális biztonsági beállítások” menüben.',
+    'Enabled' => 'Engedélyezve',
+    'Information' => 'Információ',
+    'Password Confirmation' => 'Jelszó megerősítése',
+    'Password and confirmation do not match!' => 'A jelszó és a megerősítés nem egyezik!',
+    'Password has been updated.' => 'A jelszó frissítve lett.',
+    'Password has not been updated.' => 'A jelszó nem frissült.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'A jelszó csak alfanumerikus karaktereket, szóközöket vagy a következőket tartalmazhatja: .&-@=_!<>.',
+    'Required field' => 'Szükséges mező',
+    'Save' => 'Mentés',
+    'The following field contain errors' => 'A következő mező hibákat tartalmaz',
+    'The following fields are required' => 'A következő mezők kitöltése kötelező',
+    'The settings could not be saved' => 'A beállításokat nem sikerült elmenteni',
+    'Unauthorized' => 'Jogosulatlan',
+    'Update correctly' => 'Frissítse helyesen',
+    'You are not authorized to access this page.' => 'Nincs jogosultsága az oldal eléréséhez.',
+    'is licensed under' => 'alatt van engedélyezve',
+);

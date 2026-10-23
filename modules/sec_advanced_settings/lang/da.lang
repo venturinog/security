@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'Men følgende filer er blevet ændret:',
+    '%s is required' => '%s er påkrævet',
+    'Access direct to IssabelPBX has been disabled.' => 'Adgang direkte til IssabelPBX er blevet deaktiveret.',
+    'Access direct to IssabelPBX has been enabled.' => 'Adgang direkte til IssabelPBX er blevet aktiveret.',
+    'Access direct to IssabelPBX has not been disabled.' => 'Adgang direkte til IssabelPBX er ikke blevet deaktiveret.',
+    'Access direct to IssabelPBX has not been enabled.' => 'Adgang direkte til IssabelPBX er ikke blevet aktiveret.',
+    'Advanced Security Settings' => 'Avancerede sikkerhedsindstillinger',
+    'Advice' => 'Rådgivning',
+    'Anonymous SIP calls are now disabled.' => 'Anonyme SIP-opkald er nu deaktiveret.',
+    'Anonymous SIP calls are now enabled.' => 'Anonyme SIP-opkald er nu aktiveret.',
+    'Anonymous SIP calls cannot be disabled.' => 'Anonyme SIP-opkald kan ikke deaktiveres.',
+    'Anonymous SIP calls cannot be enabled.' => 'Anonyme SIP-opkald kan ikke aktiveres.',
+    'But the following files have been modified:' => 'Men følgende filer er blevet ændret:',
+    'Cancel' => 'Annuller',
+    'Change Password' => 'Skift adgangskode',
+    'Database and Web Administration IssabelPBX Password' => 'Database og webadministration IssabelPBX Password',
+    'Disabled' => 'Deaktiveret',
+    'Dismiss' => 'Afvis',
+    'ERROR' => 'Error',
+    'Edit' => 'Rediger',
+    'Enable access' => 'Aktiver adgang',
+    'Enable anonymous SIP calls' => 'Aktiver anonyme SIP-opkald',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'Aktiver direkte adgang (ikke-indlejret) til IssabelPBX',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'Aktiver direkte adgang (ikke-indlejret) til IssabelPBX i menuen "Sikkerhed >> Avancerede sikkerhedsindstillinger".',
+    'Enabled' => 'Aktiveret',
+    'Information' => 'Oplysninger',
+    'Password Confirmation' => 'Bekræftelse af adgangskode',
+    'Password and confirmation do not match!' => 'Adgangskode og bekræftelse stemmer ikke overens!',
+    'Password has been updated.' => 'Adgangskoden er blevet opdateret.',
+    'Password has not been updated.' => 'Adgangskoden er ikke blevet opdateret.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'Adgangskoden må kun indeholde alfanumeriske tegn, mellemrum eller følgende: .&-@=_!<>.',
+    'Required field' => 'Feltet skal udfyldes',
+    'Save' => 'Gem',
+    'The following field contain errors' => 'Følgende felt indeholder fejl',
+    'The following fields are required' => 'Følgende felter er obligatoriske',
+    'The settings could not be saved' => 'Indstillingerne kunne ikke gemmes',
+    'Unauthorized' => 'Uautoriseret',
+    'Update correctly' => 'Opdater korrekt',
+    'You are not authorized to access this page.' => 'Du er ikke autoriseret til at få adgang til denne side.',
+    'is licensed under' => 'er licenseret under',
+);

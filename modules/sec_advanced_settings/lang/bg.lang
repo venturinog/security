@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => 'Но следните файлове са променени:',
+    '%s is required' => '%s е задължително',
+    'Access direct to IssabelPBX has been disabled.' => 'Директният достъп до IssabelPBX е деактивиран.',
+    'Access direct to IssabelPBX has been enabled.' => 'Директният достъп до IssabelPBX е разрешен.',
+    'Access direct to IssabelPBX has not been disabled.' => 'Директният достъп до IssabelPBX не е деактивиран.',
+    'Access direct to IssabelPBX has not been enabled.' => 'Директният достъп до IssabelPBX не е активиран.',
+    'Advanced Security Settings' => 'Разширени настройки за сигурност',
+    'Advice' => 'съвет',
+    'Anonymous SIP calls are now disabled.' => 'Анонимните SIP обаждания вече са деактивирани.',
+    'Anonymous SIP calls are now enabled.' => 'Анонимните SIP разговори вече са активирани.',
+    'Anonymous SIP calls cannot be disabled.' => 'Анонимните SIP повиквания не могат да бъдат деактивирани.',
+    'Anonymous SIP calls cannot be enabled.' => 'Анонимните SIP повиквания не могат да бъдат активирани.',
+    'But the following files have been modified:' => 'Но следните файлове са променени:',
+    'Cancel' => 'Отказ',
+    'Change Password' => 'Промяна на паролата',
+    'Database and Web Administration IssabelPBX Password' => 'База данни и уеб администрация IssabelPBX парола',
+    'Disabled' => 'Забранено',
+    'Dismiss' => 'Отхвърляне',
+    'ERROR' => 'Error',
+    'Edit' => 'Редактирай',
+    'Enable access' => 'Разрешете достъпа',
+    'Enable anonymous SIP calls' => 'Активиране на анонимни SIP повиквания',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'Активирайте директен достъп (невграден) до IssabelPBX',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'Активирайте директен достъп (невграден) до IssabelPBX в менюто "Сигурност >> Разширени настройки за сигурност".',
+    'Enabled' => 'Разрешено',
+    'Information' => 'Информация',
+    'Password Confirmation' => 'Потвърждение на парола',
+    'Password and confirmation do not match!' => 'Паролата и потвърждението не съвпадат!',
+    'Password has been updated.' => 'Паролата е актуализирана.',
+    'Password has not been updated.' => 'Паролата не е актуализирана.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'Паролата може да съдържа само буквено-цифрови знаци, интервали или следното: .&-@=_!<>.',
+    'Required field' => 'Задължителни полета',
+    'Save' => 'Запази',
+    'The following field contain errors' => 'Следното поле съдържа грешки',
+    'The following fields are required' => 'Следните полета са задължителни',
+    'The settings could not be saved' => 'Настройките не можаха да бъдат запазени',
+    'Unauthorized' => 'Неразрешено',
+    'Update correctly' => 'Актуализирайте правилно',
+    'You are not authorized to access this page.' => 'Нямате разрешение за достъп до тази страница.',
+    'is licensed under' => 'е лицензиран под',
+);

@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    ' But the following files have been modified: ' => '그러나 다음 파일이 수정되었습니다.',
+    '%s is required' => '%s은(는) 필수입니다',
+    'Access direct to IssabelPBX has been disabled.' => 'IssabelPBX에 대한 직접 액세스가 비활성화되었습니다.',
+    'Access direct to IssabelPBX has been enabled.' => 'IssabelPBX에 대한 직접 액세스가 활성화되었습니다.',
+    'Access direct to IssabelPBX has not been disabled.' => 'IssabelPBX에 대한 직접 액세스는 비활성화되지 않았습니다.',
+    'Access direct to IssabelPBX has not been enabled.' => 'IssabelPBX에 대한 직접 액세스가 활성화되지 않았습니다.',
+    'Advanced Security Settings' => '고급 보안 설정',
+    'Advice' => '도움말',
+    'Anonymous SIP calls are now disabled.' => '이제 익명 SIP 통화가 비활성화되었습니다.',
+    'Anonymous SIP calls are now enabled.' => '이제 익명 SIP 통화가 활성화되었습니다.',
+    'Anonymous SIP calls cannot be disabled.' => '익명 SIP 통화는 비활성화할 수 없습니다.',
+    'Anonymous SIP calls cannot be enabled.' => '익명 SIP 통화는 활성화할 수 없습니다.',
+    'But the following files have been modified:' => '그러나 다음 파일이 수정되었습니다.',
+    'Cancel' => '취소',
+    'Change Password' => '비밀번호 변경',
+    'Database and Web Administration IssabelPBX Password' => '데이터베이스 및 웹 관리 IssabelPBX 비밀번호',
+    'Disabled' => '사용 안 함',
+    'Dismiss' => '닫기',
+    'ERROR' => 'Error',
+    'Edit' => '편집',
+    'Enable access' => '액세스 활성화',
+    'Enable anonymous SIP calls' => '익명 SIP 통화 활성화',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'IssabelPBX에 대한 직접 액세스(비포함) 활성화',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => '"보안 >> 고급 보안 설정" 메뉴에서 IssabelPBX에 대한 직접 액세스(비포함)를 활성화합니다.',
+    'Enabled' => '사용',
+    'Information' => '정보',
+    'Password Confirmation' => '비밀번호 확인',
+    'Password and confirmation do not match!' => '비밀번호와 확인이 일치하지 않습니다!',
+    'Password has been updated.' => '비밀번호가 업데이트되었습니다.',
+    'Password has not been updated.' => '비밀번호가 업데이트되지 않았습니다.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => '비밀번호에는 영숫자, 공백 또는 .&-@=_!<>만 포함할 수 있습니다.',
+    'Required field' => '요구된 필드',
+    'Save' => '저장',
+    'The following field contain errors' => '다음 필드에 오류가 있습니다.',
+    'The following fields are required' => '다음 필드는 필수입니다',
+    'The settings could not be saved' => '설정을 저장할 수 없습니다.',
+    'Unauthorized' => '승인되지 않음',
+    'Update correctly' => '올바르게 업데이트하세요',
+    'You are not authorized to access this page.' => '이 페이지에 액세스할 권한이 없습니다.',
+    'is licensed under' => '아래에 따라 라이선스가 부여됩니다.',
+);

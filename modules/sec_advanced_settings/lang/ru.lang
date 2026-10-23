@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,39 +17,53 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  +----------------------------------------------------------------------+
-  $Id: ru.lang,v 2.5 2016-02-12 16:09:31 Andrey Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"Advanced Security Settings"                       => "Расширенные Настройки Безопасности",
-"Enable direct access (Non-embedded) to IssabelPBX®"   => "Рзрешить прямой доступ (Невстроенный) к IssabelPBX®",
-"Change Password"                                  => "Изменить Пароль",
-"Enable access"                                    => "Разрешить доступ",
-"Database and Web Administration IssabelPBX® Password" => "Пароль для Web администрирования и базы данных IssabelPBX®",
-"Password Confirmation"                            => "Подтверждение Пароля",
-"Password and confirmation do not match!"          => "Пароль и подтвердение не совпадают!",
-"The following fields are required"                => "Следующие поля являются обязательными",
-"The following field contain errors"               => "Следующие поля содержат ошибки",
-"Information"                                      => "Информация",
-"Password has been updated."                       => "Пароль был обновлён.",
-"Password has not been updated."                   => "Пароль не был обновлён.",
-"Access direct to IssabelPBX® has been enabled."       => "Прямой доступ к IssabelPBX® был разрешён.",
-"Access direct to IssabelPBX® has not been enabled."   => "Прямой доступ к IssabelPBX® не был разрешён.",
-"Access direct to IssabelPBX® has been disabled."      => "Прямой доступ к IssabelPBX® был запрещён.",
-"Access direct to IssabelPBX® has not been disabled."  => "Прямой доступ к IssabelPBX® не был запрещён.",
-" But the following files have been modified: "    => " Но следующие файлы были изменены: ",
-"Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>." => 
-"Пароль может содержать только цифры и буквы, пробелы или следующие символы: .&-@=_!<>.",
-"Advice"                                           => "Совет",
-"Unauthorized"                                     => "Неавторизованный",
-"You are not authorized to access this page."      => "Вы не авторизованы для доступа к этой странице.",
-"Enable direct access (Non-embedded) to IssabelPBX in \"Security >> Advanced Security Settings\" menu." 
-						   => "Разрешить прямой доступ (Невстроенный) к IssabelPBX® в меню \"Безопасность >> Расширенные Настройки\".",
-'Enable anonymous SIP calls' => 'Разрешить анонимные SIP вызовы',
-'Anonymous SIP calls are now enabled.' => 'Анонимные SIP вызовы сейчас разрешены',
-'Anonymous SIP calls are now disabled.' => 'Анонимные SIP вызовы сейчас запрещены',
-'Anonymous SIP calls cannot be enabled.' => 'Анонимные SIP вызовы не могут быть разрешены.',
-'Anonymous SIP calls cannot be disabled.' => 'Anonymous SIP calls cannot be disabled.',
+$arrLangModule = array(
+    ' But the following files have been modified: ' => ' Но следующие файлы были изменены: ',
+    '%s is required' => '%s обязательно',
+    'Access direct to IssabelPBX has been disabled.' => 'Прямой доступ к IssabelPBX отключен.',
+    'Access direct to IssabelPBX has been enabled.' => 'Прямой доступ к IssabelPBX включен.',
+    'Access direct to IssabelPBX has not been disabled.' => 'Прямой доступ к IssabelPBX не отключен.',
+    'Access direct to IssabelPBX has not been enabled.' => 'Прямой доступ к IssabelPBX не включен.',
+    'Access direct to IssabelPBX® has been disabled.' => 'Прямой доступ к IssabelPBX® был запрещён.',
+    'Access direct to IssabelPBX® has been enabled.' => 'Прямой доступ к IssabelPBX® был разрешён.',
+    'Access direct to IssabelPBX® has not been disabled.' => 'Прямой доступ к IssabelPBX® не был запрещён.',
+    'Access direct to IssabelPBX® has not been enabled.' => 'Прямой доступ к IssabelPBX® не был разрешён.',
+    'Advanced Security Settings' => 'Расширенные Настройки Безопасности',
+    'Advice' => 'Совет',
+    'Anonymous SIP calls are now disabled.' => 'Анонимные SIP вызовы сейчас запрещены',
+    'Anonymous SIP calls are now enabled.' => 'Анонимные SIP вызовы сейчас разрешены',
+    'Anonymous SIP calls cannot be disabled.' => 'Анонимные SIP-вызовы невозможно отключить.',
+    'Anonymous SIP calls cannot be enabled.' => 'Анонимные SIP вызовы не могут быть разрешены.',
+    'But the following files have been modified:' => 'Но были изменены следующие файлы:',
+    'Cancel' => 'Отменить',
+    'Change Password' => 'Изменить Пароль',
+    'Database and Web Administration IssabelPBX Password' => 'База данных и веб-администрирование Пароль IssabelPBX',
+    'Database and Web Administration IssabelPBX® Password' => 'Пароль для Web администрирования и базы данных IssabelPBX®',
+    'Disabled' => 'Отключено',
+    'Dismiss' => 'Уволить',
+    'ERROR' => 'Ошибка',
+    'Edit' => 'Редактировать',
+    'Enable access' => 'Разрешить доступ',
+    'Enable anonymous SIP calls' => 'Разрешить анонимные SIP вызовы',
+    'Enable direct access (Non-embedded) to IssabelPBX' => 'Включить прямой доступ (не встроенный) к IssabelPBX',
+    'Enable direct access (Non-embedded) to IssabelPBX in "Security >> Advanced Security Settings" menu.' => 'Разрешить прямой доступ (Невстроенный) к IssabelPBX® в меню "Безопасность >> Расширенные Настройки".',
+    'Enable direct access (Non-embedded) to IssabelPBX®' => 'Рзрешить прямой доступ (Невстроенный) к IssabelPBX®',
+    'Enabled' => 'Включено',
+    'Information' => 'Информация',
+    'Password Confirmation' => 'Подтверждение Пароля',
+    'Password and confirmation do not match!' => 'Пароль и подтвердение не совпадают!',
+    'Password has been updated.' => 'Пароль был обновлён.',
+    'Password has not been updated.' => 'Пароль не был обновлён.',
+    'Password may only contain alphanumeric characters, spaces, or the following: .&-@=_!<>.' => 'Пароль может содержать только цифры и буквы, пробелы или следующие символы: .&-@=_!<>.',
+    'Required field' => 'Обязательное поле',
+    'Save' => 'Сохранить',
+    'The following field contain errors' => 'Следующие поля содержат ошибки',
+    'The following fields are required' => 'Следующие поля являются обязательными',
+    'The settings could not be saved' => 'Настройки не удалось сохранить',
+    'Unauthorized' => 'Неавторизованный',
+    'Update correctly' => 'Обновляйтесь правильно',
+    'You are not authorized to access this page.' => 'Вы не авторизованы для доступа к этой странице.',
+    'is licensed under' => 'имеет лицензию',
 );
-?>
