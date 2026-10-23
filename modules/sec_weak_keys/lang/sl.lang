@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s je obvezno',
+    'Cancel' => 'Prekliči',
+    'Change Key' => 'Spremeni ključ',
+    'Change Secret' => 'Spremeni skrivnost',
+    'Confirm New Key' => 'Potrdite nov ključ',
+    'Confirm New Secret' => 'Potrdite novo skrivnost',
+    'Current Key' => 'Trenutni ključ',
+    'Current Secret' => 'Trenutna skrivnost',
+    'Description' => 'Opis',
+    'ERROR' => 'Error',
+    'Error' => 'Napaka',
+    'Extension' => 'Razširitev',
+    'Filter applied: ' => 'Uporabljen filter:',
+    'Key' => 'Ključ',
+    'Message' => 'Sporočilo',
+    'New Key' => 'Nov ključ',
+    'New Secret' => 'Nova skrivnost',
+    'Old Key' => 'Stari ključ',
+    'Reason' => 'Razlog',
+    'Required field' => 'Potrebno polje',
+    'Same Key' => 'Isti ključ',
+    'Save' => 'Shrani',
+    'Search' => 'Iskanje',
+    'Short Key' => 'Kratka tipka',
+    'Show' => 'Prikaži',
+    'Status' => 'Stanje',
+    'Successful Key Update' => 'Uspešna posodobitev ključa',
+    'Successful Secret Update' => 'Uspešna tajna posodobitev',
+    'The Current Key is invalid' => 'Trenutni ključ je neveljaven',
+    'The Current Secret is invalid' => 'Trenutna skrivnost je neveljavna',
+    'The New Key does not match with the Confirmation Key' => 'Nov ključ se ne ujema s potrditvenim ključem',
+    'The New Secret does not match with the Confirmation Secret' => 'Nova skrivnost se ne ujema s potrditveno skrivnostjo',
+    'The following fields contain errors' => 'Ta polja vsebujejo napako',
+    'The key does not match with the actual key' => 'Ključ se ne ujema z dejanskim ključem',
+    'The secret must have at least 5 alphanumeric characters' => 'Skrivnost mora vsebovati vsaj 5 alfanumeričnih znakov',
+    'Validation Error' => 'Napaka v potrditvi veljavnosti',
+    'Weak Key' => 'Šibek ključ',
+    'Weak Keys' => 'Šibki ključi',
+    'Weak Secrets' => 'Slabe skrivnosti',
+    'You are not authorized to enter to that extension' => 'Niste pooblaščeni za vstop v to razširitev',
+);

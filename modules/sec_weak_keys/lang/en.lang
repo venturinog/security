@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0.0-31                                               |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,46 +17,49 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
+  | The Initial Developer of the Original Code is Issabel Foundation     |
   +----------------------------------------------------------------------+
-  $Id: en.lang,v 1.1 2010-12-21 09:08:11 Alberto Santos asantos@palosanto.com Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"Weak Keys" => "Weak Keys",
-"Extension" => "Extension",
-"Description" => "Description",
-"Reason" => "Reason",
-"Same Key" => "Secret and extension number are the same",
-"Short Key" => "Secret is too short (less than 5 digits length)",
-"Search" => "Search",
-"Show" => "Show",
-"Change Key" => "Change Key",
-"Old Key" => "Old Key",
-"New Key" => "New Key",
-"Save" => "Save",
-"Confirm New Key" => "Confirm New Key",
-"Required field" => "Required field",
-"Key" => "Key",
-"Validation Error" => "Validation Error",
-"Error" => "Error",
-"The following fields contain errors" => "The following fields contain errors",
-"The key does not match with the actual key" => "The key does not match with the actual key",
-"The New Key does not match with the Confirmation Key" => "The New Key does not match with the Confirmation Key",
-"Message" => "Message",
-"Successful Key Update" => "Successful Key Update",
-"Current Key" => "Current Key",
-"The Current Key is invalid" => "The Current Key is invalid",
-"Cancel" => "Cancel",
-"You are not authorized to enter to that extension" => "You are not authorized to enter to that extension",
-"Weak Secrets" => "Weak Secrets",
-"Current Secret" => "Current Secret",
-"New Secret" => "New Secret",
-"Confirm New Secret" => "Confirm New Secret",
-"The Current Secret is invalid" => "The Current Secret is invalid",
-"The New Secret does not match with the Confirmation Secret" => "The New Secret does not match with the Confirmation Secret",
-"Successful Secret Update" => "Successful Secret Update",
-"Change Secret" => "Change Secret",
-"Weak Key" => "Weak Key",
-"Status" => "Status"
+$arrLangModule = array(
+    '%s is required' => '%s is required',
+    'Cancel' => 'Cancel',
+    'Change Key' => 'Change Key',
+    'Change Secret' => 'Change Secret',
+    'Confirm New Key' => 'Confirm New Key',
+    'Confirm New Secret' => 'Confirm New Secret',
+    'Current Key' => 'Current Key',
+    'Current Secret' => 'Current Secret',
+    'Description' => 'Description',
+    'ERROR' => 'ERROR',
+    'Error' => 'Error',
+    'Extension' => 'Extension',
+    'Filter applied: ' => 'Filter applied: ',
+    'Key' => 'Key',
+    'Message' => 'Message',
+    'New Key' => 'New Key',
+    'New Secret' => 'New Secret',
+    'Old Key' => 'Old Key',
+    'Reason' => 'Reason',
+    'Required field' => 'Required field',
+    'Same Key' => 'Secret and extension number are the same',
+    'Save' => 'Save',
+    'Search' => 'Search',
+    'Short Key' => 'Secret is too short (less than 5 digits length)',
+    'Show' => 'Show',
+    'Status' => 'Status',
+    'Successful Key Update' => 'Successful Key Update',
+    'Successful Secret Update' => 'Successful Secret Update',
+    'The Current Key is invalid' => 'The Current Key is invalid',
+    'The Current Secret is invalid' => 'The Current Secret is invalid',
+    'The New Key does not match with the Confirmation Key' => 'The New Key does not match with the Confirmation Key',
+    'The New Secret does not match with the Confirmation Secret' => 'The New Secret does not match with the Confirmation Secret',
+    'The following fields contain errors' => 'The following fields contain errors',
+    'The key does not match with the actual key' => 'The key does not match with the actual key',
+    'The secret must have at least 5 alphanumeric characters' => 'The secret must have at least 5 alphanumeric characters',
+    'Validation Error' => 'Validation Error',
+    'Weak Key' => 'Weak Key',
+    'Weak Keys' => 'Weak Keys',
+    'Weak Secrets' => 'Weak Secrets',
+    'You are not authorized to enter to that extension' => 'You are not authorized to enter to that extension',
 );
-?>

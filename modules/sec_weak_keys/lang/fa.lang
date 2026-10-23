@@ -2,11 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2019 Issabel Foundation                                |
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -18,47 +17,47 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  | Translate by: Haamed Kouhfallah                                      |
-  | Email: k.haamed@gmail.com                                            |
-  +----------------------------------------------------------------------+
-  $Id: fa.lang,v 1.1 2019-11-30 04:08:50 Haamed Kouhfallah k.haamed@gmail.com Exp $
 */
 global $arrLangModule;
-$arrLangModule=array(
-"Weak Keys" => "رمز‌هاي ضعيف",
-"Extension" => "داخلي",
-"Description" => "توصيف",
-"Reason" => "دليل",
-"Same Key" => "رمز و نام داخلي يكسان مي باشند",
-"Short Key" => "رمز كوتاه است، كمتر از 5 رقم",
-"Search" => "جستجو",
-"Show" => "نمايش",
-"Change Key" => "تغيير رمز",
-"Old Key" => "رمز قديم",
-"New Key" => "رمز جديد",
-"Save" => "ذخيره",
-"Confirm New Key" => "تاييد رمز جديد",
-"Required field" => "فيلد مورد نياز",
-"Key" => "كليد",
-"Validation Error" => "خطا در اعتبار سنجي",
-"Error" => "خطا",
-"The following fields contain errors" => "فيلد هاي ذيل داراي خطا هستند",
-"The key does not match with the actual key" => "رمز با رمز واقعي يكسان نمي‌باشد",
-"The New Key does not match with the Confirmation Key" => "رمز جديد با تاييد آن يكسان نمي‌باشد",
-"Message" => "پيام",
-"Successful Key Update" => "رمز با موفقيت به روز رساني شد",
-"Current Key" => "كليد جاري",
-"The Current Key is invalid" => "رمز جاري معتبر نمي‌باشد",
-"Cancel" => "انصراف",
-"You are not authorized to enter to that extension" => "شما مجاز به استفاده از اين داخلي نيستيد",
-"Weak Secrets" => "رمز‌هاي ضعيف",
-"Current Secret" => "رمز جاري",
-"New Secret" => "رمز جديد",
-"Confirm New Secret" => "تاييد رمز جديد",
-"The Current Secret is invalid" => "رمز جاري معتبر نمي باشد",
-"The New Secret does not match with the Confirmation Secret" => "رمز جديد با رمز تاييد مجدد يكسان نمي باشد",
-"Successful Secret Update" => "رمز با موفقيت به روز رساني شد",
-"Change Secret" => "تغيير رمز",
+$arrLangModule = array(
+    '%s is required' => '%s الزامی است',
+    'Cancel' => 'انصراف',
+    'Change Key' => 'تغيير رمز',
+    'Change Secret' => 'تغيير رمز',
+    'Confirm New Key' => 'تاييد رمز جديد',
+    'Confirm New Secret' => 'تاييد رمز جديد',
+    'Current Key' => 'كليد جاري',
+    'Current Secret' => 'رمز جاري',
+    'Description' => 'توصيف',
+    'ERROR' => 'خطا',
+    'Error' => 'خطا',
+    'Extension' => 'داخلي',
+    'Filter applied: ' => 'فیلتر شده بر اساس:  ',
+    'Key' => 'كليد',
+    'Message' => 'پيام',
+    'New Key' => 'رمز جديد',
+    'New Secret' => 'رمز جديد',
+    'Old Key' => 'رمز قديم',
+    'Reason' => 'دليل',
+    'Required field' => 'فيلد مورد نياز',
+    'Same Key' => 'رمز و نام داخلي يكسان مي باشند',
+    'Save' => 'ذخيره',
+    'Search' => 'جستجو',
+    'Short Key' => 'رمز كوتاه است، كمتر از 5 رقم',
+    'Show' => 'نمايش',
+    'Status' => 'وضعيت',
+    'Successful Key Update' => 'رمز با موفقيت به روز رساني شد',
+    'Successful Secret Update' => 'رمز با موفقيت به روز رساني شد',
+    'The Current Key is invalid' => 'رمز جاري معتبر نمي‌باشد',
+    'The Current Secret is invalid' => 'رمز جاري معتبر نمي باشد',
+    'The New Key does not match with the Confirmation Key' => 'رمز جديد با تاييد آن يكسان نمي‌باشد',
+    'The New Secret does not match with the Confirmation Secret' => 'رمز جديد با رمز تاييد مجدد يكسان نمي باشد',
+    'The following fields contain errors' => 'فيلد هاي ذيل داراي خطا هستند',
+    'The key does not match with the actual key' => 'رمز با رمز واقعي يكسان نمي‌باشد',
+    'The secret must have at least 5 alphanumeric characters' => 'راز باید حداقل 5 کاراکتر الفبایی داشته باشد',
+    'Validation Error' => 'خطا در اعتبار سنجي',
+    'Weak Key' => 'کلید ضعیف',
+    'Weak Keys' => 'رمز‌هاي ضعيف',
+    'Weak Secrets' => 'رمز‌هاي ضعيف',
+    'You are not authorized to enter to that extension' => 'شما مجاز به استفاده از اين داخلي نيستيد',
 );
-?>

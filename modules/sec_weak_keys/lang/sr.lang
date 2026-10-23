@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s је обавезно',
+    'Cancel' => 'Откажи',
+    'Change Key' => 'Цханге Кеи',
+    'Change Secret' => 'Цханге Сецрет',
+    'Confirm New Key' => 'Потврдите нови кључ',
+    'Confirm New Secret' => 'Потврдите нову тајну',
+    'Current Key' => 'Тренутни кључ',
+    'Current Secret' => 'Цуррент Сецрет',
+    'Description' => 'Опис',
+    'ERROR' => 'Error',
+    'Error' => 'Грешка',
+    'Extension' => 'Продужетак',
+    'Filter applied: ' => 'Филтер је примењен:',
+    'Key' => 'Кључ',
+    'Message' => 'Порука',
+    'New Key' => 'Нови кључ',
+    'New Secret' => 'Нова тајна',
+    'Old Key' => 'Стари кључ',
+    'Reason' => 'Разлог',
+    'Required field' => 'Obavezno polje',
+    'Same Key' => 'Исти кључ',
+    'Save' => 'Сачувај',
+    'Search' => 'Претрага',
+    'Short Key' => 'Кратки кључ',
+    'Show' => 'Прикажи',
+    'Status' => 'Статус',
+    'Successful Key Update' => 'Успешно ажурирање кључа',
+    'Successful Secret Update' => 'Успешно тајно ажурирање',
+    'The Current Key is invalid' => 'Тренутни кључ је неважећи',
+    'The Current Secret is invalid' => 'Тренутна тајна је неважећа',
+    'The New Key does not match with the Confirmation Key' => 'Нови кључ се не поклапа са кључем за потврду',
+    'The New Secret does not match with the Confirmation Secret' => 'Нова тајна се не поклапа са тајном потврде',
+    'The following fields contain errors' => 'Sledeca polja sadrze greske',
+    'The key does not match with the actual key' => 'Кључ се не поклапа са стварним кључем',
+    'The secret must have at least 5 alphanumeric characters' => 'Тајна мора имати најмање 5 алфанумеричких знакова',
+    'Validation Error' => 'Validacijona greska',
+    'Weak Key' => 'Слаб кључ',
+    'Weak Keys' => 'Слаби кључеви',
+    'Weak Secrets' => 'Слабе тајне',
+    'You are not authorized to enter to that extension' => 'Нисте овлашћени да уђете у тај локал',
+);

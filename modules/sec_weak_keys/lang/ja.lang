@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s は必須です',
+    'Cancel' => 'キャンセル',
+    'Change Key' => 'キーの変更',
+    'Change Secret' => 'シークレットの変更',
+    'Confirm New Key' => '新しいキーの確認',
+    'Confirm New Secret' => '新しいシークレットの確認',
+    'Current Key' => '現在のキー',
+    'Current Secret' => '現在の秘密',
+    'Description' => '説明',
+    'ERROR' => 'Error',
+    'Error' => 'エラー',
+    'Extension' => '延長',
+    'Filter applied: ' => '適用されたフィルター:',
+    'Key' => 'キー',
+    'Message' => 'メッセージ',
+    'New Key' => '新しいキー',
+    'New Secret' => '新しい秘密',
+    'Old Key' => '古い鍵',
+    'Reason' => '理由',
+    'Required field' => '必須フィールド',
+    'Same Key' => '同じキー',
+    'Save' => '保存',
+    'Search' => '検索',
+    'Short Key' => 'ショートキー',
+    'Show' => '表示',
+    'Status' => 'ステータス',
+    'Successful Key Update' => 'キーの更新が成功しました',
+    'Successful Secret Update' => 'シークレットの更新が成功しました',
+    'The Current Key is invalid' => '現在のキーが無効です',
+    'The Current Secret is invalid' => '現在のシークレットは無効です',
+    'The New Key does not match with the Confirmation Key' => '新しいキーが確認キーと一致しません',
+    'The New Secret does not match with the Confirmation Secret' => '新しいシークレットが確認シークレットと一致しません',
+    'The following fields contain errors' => '以下の内容に間違いがあります',
+    'The key does not match with the actual key' => 'キーが実際のキーと一致しません',
+    'The secret must have at least 5 alphanumeric characters' => 'シークレットには少なくとも 5 文字の英数字が必要です',
+    'Validation Error' => '検証エラー',
+    'Weak Key' => '弱いキー',
+    'Weak Keys' => '弱いキー',
+    'Weak Secrets' => '弱い秘密',
+    'You are not authorized to enter to that extension' => 'その内線番号に入る権限がありません',
+);

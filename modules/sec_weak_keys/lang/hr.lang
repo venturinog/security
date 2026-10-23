@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s je obavezno',
+    'Cancel' => 'Odustani',
+    'Change Key' => 'Promjena ključa',
+    'Change Secret' => 'Promijeni tajnu',
+    'Confirm New Key' => 'Potvrdite novi ključ',
+    'Confirm New Secret' => 'Potvrdite novu tajnu',
+    'Current Key' => 'Trenutni ključ',
+    'Current Secret' => 'Trenutna tajna',
+    'Description' => 'Opis',
+    'ERROR' => 'Error',
+    'Error' => 'Greška',
+    'Extension' => 'Proširenje',
+    'Filter applied: ' => 'Primijenjen filtar:',
+    'Key' => 'Ključ',
+    'Message' => 'Poruka',
+    'New Key' => 'Novi ključ',
+    'New Secret' => 'Nova tajna',
+    'Old Key' => 'Stari ključ',
+    'Reason' => 'razum',
+    'Required field' => 'Obvezatno polje',
+    'Same Key' => 'Isti ključ',
+    'Save' => 'Spremi',
+    'Search' => 'Pretraži',
+    'Short Key' => 'Kratki ključ',
+    'Show' => 'Prikaži',
+    'Status' => 'Status',
+    'Successful Key Update' => 'Uspješno ažuriranje ključa',
+    'Successful Secret Update' => 'Uspješno tajno ažuriranje',
+    'The Current Key is invalid' => 'Trenutačni ključ je nevažeći',
+    'The Current Secret is invalid' => 'Trenutačna tajna nije važeća',
+    'The New Key does not match with the Confirmation Key' => 'Novi ključ ne odgovara ključu potvrde',
+    'The New Secret does not match with the Confirmation Secret' => 'Nova tajna ne odgovara tajni potvrde',
+    'The following fields contain errors' => 'Slijedeće polje sadržava pogreške',
+    'The key does not match with the actual key' => 'Ključ ne odgovara stvarnom ključu',
+    'The secret must have at least 5 alphanumeric characters' => 'Tajna mora imati najmanje 5 alfanumeričkih znakova',
+    'Validation Error' => 'Pogreška provjere',
+    'Weak Key' => 'Slab ključ',
+    'Weak Keys' => 'Slabe tipke',
+    'Weak Secrets' => 'Slabe tajne',
+    'You are not authorized to enter to that extension' => 'Niste ovlašteni za pristup tom proširenju',
+);

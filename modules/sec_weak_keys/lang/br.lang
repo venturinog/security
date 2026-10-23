@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0.0-31                                               |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,49 +17,47 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  +----------------------------------------------------------------------+
-  $Id: en.lang,v 1.1 2010-12-21 09:08:11 Alberto Santos asantos@palosanto.com Exp $ 
-  $Id: br.lang,v 1.2 2021-25-10 12:55:00 Leandro Saltori - Prisma Telecom leandro@prismatelecom.com Exp $
-  */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-  
-"Weak Keys" => "Chaves Fracas",
-"Extension" => "Ramal",
-"Description" => "Descrição",
-"Reason" => "Evento",
-"Same Key" => "O senha e o número do ramal são iguais",
-"Short Key" => "A senha é muito curta (menos de 5 dígitos)",
-"Search" => "Pesquisar",
-"Show" => "Vizualizar",
-"Change Key" => "Chave de mudança",
-"Old Key" => "Senha Atual",
-"New Key" => "Nova Senha",
-"Save" => "Salvar",
-"Confirm New Key" => "Confirmar Nova Senha",
-"Required field" => "Campo obrigatório",
-"Key" => "Chave",
-"Validation Error" => "Erro de Validação",
-"Error" => "Error",
-"The following fields contain errors" => "Os campos a seguir contêm erros",
-"The key does not match with the actual key" => "A chave não corresponde à chave real",
-"The New Key does not match with the Confirmation Key" => "A nova chave não coincide com a chave de confirmação",
-"Message" => "Mensagem",
-"Successful Key Update" => "Atualização de chave bem-sucedida",
-"Current Key" => "Chave Atual",
-"The Current Key is invalid" => "A chave atual é inválida",
-"Cancel" => "Cancelar",
-"You are not authorized to enter to that extension" => "Você não está autorizado a entrar nessa extensão",
-"Weak Secrets" => "Senah fraca",
-"Current Secret" => "Senha Atual",
-"New Secret" => "Nova Senha",
-"Confirm New Secret" => "Confirmar Nova Senha",
-"The Current Secret is invalid" => "O segredo atual é inválido",
-"The New Secret does not match with the Confirmation Secret" => "O novo segredo não corresponde ao segredo de confirmação",
-"Successful Secret Update" => "Atualização secreta bem-sucedida",
-"Change Secret" => "Mudar segredo",
-"Weak Key" => "Chave Fraca",
-"Status" => "Status"
+$arrLangModule = array(
+    '%s is required' => '%s é obrigatório',
+    'Cancel' => 'Cancelar',
+    'Change Key' => 'Chave de mudança',
+    'Change Secret' => 'Mudar segredo',
+    'Confirm New Key' => 'Confirmar Nova Senha',
+    'Confirm New Secret' => 'Confirmar Nova Senha',
+    'Current Key' => 'Chave Atual',
+    'Current Secret' => 'Senha Atual',
+    'Description' => 'Descrição',
+    'ERROR' => 'Erro',
+    'Error' => 'Erro',
+    'Extension' => 'Ramal',
+    'Filter applied: ' => 'Filtro aplicado: ',
+    'Key' => 'Chave',
+    'Message' => 'Mensagem',
+    'New Key' => 'Nova Senha',
+    'New Secret' => 'Nova Senha',
+    'Old Key' => 'Senha Atual',
+    'Reason' => 'Evento',
+    'Required field' => 'Campo obrigatório',
+    'Same Key' => 'O senha e o número do ramal são iguais',
+    'Save' => 'Salvar',
+    'Search' => 'Pesquisar',
+    'Short Key' => 'A senha é muito curta (menos de 5 dígitos)',
+    'Show' => 'Vizualizar',
+    'Status' => 'Estado',
+    'Successful Key Update' => 'Atualização de chave bem-sucedida',
+    'Successful Secret Update' => 'Atualização secreta bem-sucedida',
+    'The Current Key is invalid' => 'A chave atual é inválida',
+    'The Current Secret is invalid' => 'O segredo atual é inválido',
+    'The New Key does not match with the Confirmation Key' => 'A nova chave não coincide com a chave de confirmação',
+    'The New Secret does not match with the Confirmation Secret' => 'O novo segredo não corresponde ao segredo de confirmação',
+    'The following fields contain errors' => 'Os campos a seguir contêm erros',
+    'The key does not match with the actual key' => 'A chave não corresponde à chave real',
+    'The secret must have at least 5 alphanumeric characters' => 'O segredo deve ter pelo menos 5 caracteres alfanuméricos',
+    'Validation Error' => 'Erro de Validação',
+    'Weak Key' => 'Chave Fraca',
+    'Weak Keys' => 'Chaves Fracas',
+    'Weak Secrets' => 'Senah fraca',
+    'You are not authorized to enter to that extension' => 'Você não está autorizado a entrar nessa extensão',
 );
-?>

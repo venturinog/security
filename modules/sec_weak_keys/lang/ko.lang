@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s은(는) 필수입니다',
+    'Cancel' => '취소',
+    'Change Key' => '키 변경',
+    'Change Secret' => '비밀번호 변경',
+    'Confirm New Key' => '새 키 확인',
+    'Confirm New Secret' => '새 비밀 확인',
+    'Current Key' => '현재 키',
+    'Current Secret' => '현재 비밀',
+    'Description' => '설명',
+    'ERROR' => 'Error',
+    'Error' => '오류',
+    'Extension' => '확장',
+    'Filter applied: ' => '적용된 필터:',
+    'Key' => '열쇠',
+    'Message' => '메시지',
+    'New Key' => '새 키',
+    'New Secret' => '새로운 비밀',
+    'Old Key' => '오래된 열쇠',
+    'Reason' => '이유',
+    'Required field' => '요구된 필드',
+    'Same Key' => '동일한 키',
+    'Save' => '저장',
+    'Search' => '검색',
+    'Short Key' => '짧은 키',
+    'Show' => '표시',
+    'Status' => '상태',
+    'Successful Key Update' => '성공적인 키 업데이트',
+    'Successful Secret Update' => '성공적인 비밀 업데이트',
+    'The Current Key is invalid' => '현재 키가 유효하지 않습니다.',
+    'The Current Secret is invalid' => '현재 비밀번호가 잘못되었습니다.',
+    'The New Key does not match with the Confirmation Key' => '새 키가 확인 키와 일치하지 않습니다.',
+    'The New Secret does not match with the Confirmation Secret' => '새 비밀번호가 확인 비밀번호와 일치하지 않습니다.',
+    'The following fields contain errors' => '다음 필드는 에러을 나타냅니다.',
+    'The key does not match with the actual key' => '열쇠가 실제 열쇠와 일치하지 않습니다.',
+    'The secret must have at least 5 alphanumeric characters' => '비밀번호에는 영숫자 5자 이상이 포함되어야 합니다.',
+    'Validation Error' => '유효 에러',
+    'Weak Key' => '약한 키',
+    'Weak Keys' => '약한 키',
+    'Weak Secrets' => '약한 비밀',
+    'You are not authorized to enter to that extension' => '해당 확장 프로그램에 들어갈 권한이 없습니다.',
+);

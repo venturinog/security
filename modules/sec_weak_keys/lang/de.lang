@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s ist erforderlich',
+    'Cancel' => 'Abbrechen',
+    'Change Key' => 'Schlüssel ändern',
+    'Change Secret' => 'Geheimnis ändern',
+    'Confirm New Key' => 'Bestätigen Sie den neuen Schlüssel',
+    'Confirm New Secret' => 'Neues Geheimnis bestätigen',
+    'Current Key' => 'Aktueller Schlüssel',
+    'Current Secret' => 'Aktuelles Geheimnis',
+    'Description' => 'Beschreibung',
+    'ERROR' => 'Error',
+    'Error' => 'Fehler',
+    'Extension' => 'Erweiterung',
+    'Filter applied: ' => 'Angewendeter Filter:',
+    'Key' => 'Schlüssel',
+    'Message' => 'Nachricht',
+    'New Key' => 'Neuer Schlüssel',
+    'New Secret' => 'Neues Geheimnis',
+    'Old Key' => 'Alter Schlüssel',
+    'Reason' => 'Grund',
+    'Required field' => 'erforderliche Felder',
+    'Same Key' => 'Gleicher Schlüssel',
+    'Save' => 'Speichern',
+    'Search' => 'Suchen',
+    'Short Key' => 'Kurzer Schlüssel',
+    'Show' => 'Anzeigen',
+    'Status' => 'Status',
+    'Successful Key Update' => 'Erfolgreiches Schlüsselupdate',
+    'Successful Secret Update' => 'Erfolgreiches geheimes Update',
+    'The Current Key is invalid' => 'Der aktuelle Schlüssel ist ungültig',
+    'The Current Secret is invalid' => 'Das aktuelle Geheimnis ist ungültig',
+    'The New Key does not match with the Confirmation Key' => 'Der neue Schlüssel stimmt nicht mit dem Bestätigungsschlüssel überein',
+    'The New Secret does not match with the Confirmation Secret' => 'Das neue Geheimnis stimmt nicht mit dem Bestätigungsgeheimnis überein',
+    'The following fields contain errors' => 'folgende Felder enthalten Fehler',
+    'The key does not match with the actual key' => 'Der Schlüssel stimmt nicht mit dem tatsächlichen Schlüssel überein',
+    'The secret must have at least 5 alphanumeric characters' => 'Das Geheimnis muss mindestens 5 alphanumerische Zeichen haben',
+    'Validation Error' => 'Gültigkeitssfehler',
+    'Weak Key' => 'Schwacher Schlüssel',
+    'Weak Keys' => 'Schwache Schlüssel',
+    'Weak Secrets' => 'Schwache Geheimnisse',
+    'You are not authorized to enter to that extension' => 'Sie sind nicht berechtigt, diese Nebenstelle zu betreten',
+);

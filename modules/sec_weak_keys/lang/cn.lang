@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s 为必填项',
+    'Cancel' => '取消',
+    'Change Key' => '更改密钥',
+    'Change Secret' => '改变秘密',
+    'Confirm New Key' => '确认新密钥',
+    'Confirm New Secret' => '确认新秘密',
+    'Current Key' => '当前密钥',
+    'Current Secret' => '当前的秘密',
+    'Description' => '描述',
+    'ERROR' => 'Error',
+    'Error' => '错误',
+    'Extension' => '扩展',
+    'Filter applied: ' => '应用过滤器：',
+    'Key' => '钥匙',
+    'Message' => '留言',
+    'New Key' => '新钥匙',
+    'New Secret' => '新秘密',
+    'Old Key' => '旧钥匙',
+    'Reason' => '原因',
+    'Required field' => '必填项',
+    'Same Key' => '相同的钥匙',
+    'Save' => '保存',
+    'Search' => '搜索',
+    'Short Key' => '快捷键',
+    'Show' => '显示',
+    'Status' => '状态',
+    'Successful Key Update' => '密钥更新成功',
+    'Successful Secret Update' => '秘密更新成功',
+    'The Current Key is invalid' => '当前密钥无效',
+    'The Current Secret is invalid' => '当前秘密无效',
+    'The New Key does not match with the Confirmation Key' => '新密钥与确认密钥不匹配',
+    'The New Secret does not match with the Confirmation Secret' => '新秘密与确认秘密不匹配',
+    'The following fields contain errors' => '以下项目有误',
+    'The key does not match with the actual key' => '密钥与实际密钥不匹配',
+    'The secret must have at least 5 alphanumeric characters' => '密码必须至少包含 5 个字母数字字符',
+    'Validation Error' => '确认出错',
+    'Weak Key' => '弱密钥',
+    'Weak Keys' => '弱键',
+    'Weak Secrets' => '弱秘密',
+    'You are not authorized to enter to that extension' => '您无权进入该分机',
+);

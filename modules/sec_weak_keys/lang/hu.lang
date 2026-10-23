@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s kötelező',
+    'Cancel' => 'Mégse',
+    'Change Key' => 'Kulcs módosítása',
+    'Change Secret' => 'Titok módosítása',
+    'Confirm New Key' => 'Erősítse meg az Új kulcsot',
+    'Confirm New Secret' => 'Erősítse meg az új titkot',
+    'Current Key' => 'Aktuális kulcs',
+    'Current Secret' => 'Aktuális titok',
+    'Description' => 'Leírás',
+    'ERROR' => 'Error',
+    'Error' => 'Hiba',
+    'Extension' => 'Kiterjesztés',
+    'Filter applied: ' => 'Alkalmazott szűrő:',
+    'Key' => 'Kulcs',
+    'Message' => 'Üzenet',
+    'New Key' => 'Új kulcs',
+    'New Secret' => 'Új titok',
+    'Old Key' => 'Régi kulcs',
+    'Reason' => 'Ok',
+    'Required field' => 'Szükséges mező',
+    'Same Key' => 'Ugyanaz a kulcs',
+    'Save' => 'Mentés',
+    'Search' => 'Keresés',
+    'Short Key' => 'Rövid kulcs',
+    'Show' => 'Mutat',
+    'Status' => 'Állapot',
+    'Successful Key Update' => 'Sikeres kulcsfrissítés',
+    'Successful Secret Update' => 'Sikeres titkos frissítés',
+    'The Current Key is invalid' => 'Az aktuális kulcs érvénytelen',
+    'The Current Secret is invalid' => 'Az aktuális titok érvénytelen',
+    'The New Key does not match with the Confirmation Key' => 'Az új kulcs nem egyezik a megerősítő kulccsal',
+    'The New Secret does not match with the Confirmation Secret' => 'Az új titok nem egyezik a megerősítési titokkal',
+    'The following fields contain errors' => 'A következő mezők hibásak',
+    'The key does not match with the actual key' => 'A kulcs nem egyezik a tényleges kulccsal',
+    'The secret must have at least 5 alphanumeric characters' => 'A titoknak legalább 5 alfanumerikus karakterből kell állnia',
+    'Validation Error' => 'Érvényesítési hiba',
+    'Weak Key' => 'Gyenge kulcs',
+    'Weak Keys' => 'Gyenge kulcsok',
+    'Weak Secrets' => 'Gyenge titkok',
+    'You are not authorized to enter to that extension' => 'Nem jogosult belépni a bővítménybe',
+);

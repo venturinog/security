@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s krävs',
+    'Cancel' => 'Avbryt',
+    'Change Key' => 'Ändra nyckel',
+    'Change Secret' => 'Ändra hemlighet',
+    'Confirm New Key' => 'Bekräfta ny nyckel',
+    'Confirm New Secret' => 'Bekräfta ny hemlighet',
+    'Current Key' => 'Aktuell nyckel',
+    'Current Secret' => 'Aktuell hemlighet',
+    'Description' => 'Beskrivning',
+    'ERROR' => 'Error',
+    'Error' => 'Fel',
+    'Extension' => 'Förlängning',
+    'Filter applied: ' => 'Filter tillämpat:',
+    'Key' => 'Nyckel',
+    'Message' => 'Meddelande',
+    'New Key' => 'Ny nyckel',
+    'New Secret' => 'Ny hemlighet',
+    'Old Key' => 'Gammal nyckel',
+    'Reason' => 'Anledning',
+    'Required field' => 'Obligatoriskt fält',
+    'Same Key' => 'Samma nyckel',
+    'Save' => 'Spara',
+    'Search' => 'Sök',
+    'Short Key' => 'Kort nyckel',
+    'Show' => 'Visa',
+    'Status' => 'Status',
+    'Successful Key Update' => 'Lyckad nyckeluppdatering',
+    'Successful Secret Update' => 'Lyckad hemlig uppdatering',
+    'The Current Key is invalid' => 'Den aktuella nyckeln är ogiltig',
+    'The Current Secret is invalid' => 'Den aktuella hemligheten är ogiltig',
+    'The New Key does not match with the Confirmation Key' => 'Den nya nyckeln matchar inte bekräftelsenyckeln',
+    'The New Secret does not match with the Confirmation Secret' => 'Den nya hemligheten stämmer inte överens med bekräftelsehemligheten',
+    'The following fields contain errors' => 'Följande fält innehåller fel',
+    'The key does not match with the actual key' => 'Nyckeln stämmer inte överens med den faktiska nyckeln',
+    'The secret must have at least 5 alphanumeric characters' => 'Hemligheten måste ha minst 5 alfanumeriska tecken',
+    'Validation Error' => 'Fel Uppstod Vid Validering',
+    'Weak Key' => 'Svag nyckel',
+    'Weak Keys' => 'Svaga nycklar',
+    'Weak Secrets' => 'Svaga hemligheter',
+    'You are not authorized to enter to that extension' => 'Du har inte behörighet att gå in i den anknytningen',
+);

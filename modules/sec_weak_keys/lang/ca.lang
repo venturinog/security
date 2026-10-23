@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s és obligatori',
+    'Cancel' => 'Cancel·la',
+    'Change Key' => 'Canvia clau',
+    'Change Secret' => 'Canvia el secret',
+    'Confirm New Key' => 'Confirmeu la clau nova',
+    'Confirm New Secret' => 'Confirmeu el nou secret',
+    'Current Key' => 'Clau actual',
+    'Current Secret' => 'Secret actual',
+    'Description' => 'Descripció',
+    'ERROR' => 'Error',
+    'Error' => 'Error',
+    'Extension' => 'Extensió',
+    'Filter applied: ' => 'Filtre aplicat:',
+    'Key' => 'clau',
+    'Message' => 'Missatge',
+    'New Key' => 'Nova clau',
+    'New Secret' => 'Nou Secret',
+    'Old Key' => 'Clau Vella',
+    'Reason' => 'Raó',
+    'Required field' => 'Camp requerit',
+    'Same Key' => 'La mateixa clau',
+    'Save' => 'Desa',
+    'Search' => 'Cerca',
+    'Short Key' => 'Clau curta',
+    'Show' => 'Mostra',
+    'Status' => 'Estat',
+    'Successful Key Update' => 'Actualització de claus satisfactòria',
+    'Successful Secret Update' => 'Actualització secreta reeixida',
+    'The Current Key is invalid' => 'La clau actual no és vàlida',
+    'The Current Secret is invalid' => 'El secret actual no és vàlid',
+    'The New Key does not match with the Confirmation Key' => 'La clau nova no coincideix amb la clau de confirmació',
+    'The New Secret does not match with the Confirmation Secret' => 'El nou secret no coincideix amb el secret de confirmació',
+    'The following fields contain errors' => 'Els següents camps contenen errors',
+    'The key does not match with the actual key' => 'La clau no coincideix amb la clau real',
+    'The secret must have at least 5 alphanumeric characters' => 'El secret ha de tenir almenys 5 caràcters alfanumèrics',
+    'Validation Error' => 'Error de validació',
+    'Weak Key' => 'Clau feble',
+    'Weak Keys' => 'Claus febles',
+    'Weak Secrets' => 'Secrets febles',
+    'You are not authorized to enter to that extension' => 'No teniu autorització per entrar a aquesta extensió',
+);

@@ -99,7 +99,7 @@ function reportWeakKeys($smarty, $module_name, $local_templates_dir, &$pDB)
     $oGrid -> setURL($url);
     $arrResult =$pWeakKeys->getWeakKeys($limit,$offset,$filter_field,$filter_value);
     if (!is_array($arrResult) && $pWeakKeys->errMsg != "") {
-        $smarty->assign("mb_message", $pWeakKeys->errMsg);
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pWeakKeys->errMsg));
     }
     $arrData = null;
     //$arrResult =$pWeakKeys->getWeakKeysChecker();
@@ -132,31 +132,36 @@ function reportWeakKeys($smarty, $module_name, $local_templates_dir, &$pDB)
     $htmlFilter = $oFilterForm->fetchForm("$local_templates_dir/filter.tpl","",$_POST);
     //end section filter
     $oGrid->showFilter(trim($htmlFilter));
-    $content = $oGrid->fetchGrid();
-
     //end grid parameters
 
-    return $content;
+    return $smarty->getTemplateVars('SECURITY_ALERT').$oGrid->fetchGrid();
 }
 
-function editWeakKeys($smarty, $module_name, $local_templates_dir, $pDB, $Extension = "")
+function editWeakKeys($smarty, $module_name, $local_templates_dir, $pDB, $Extension = "", $errors = array())
 {
     $id = getParameter("id");
     if($id == "")
         $id = $Extension;
-    $pWeakKeys = new paloSantoWeakKeys($pDB);
 
     $arrFormRules = createFieldForm();
+    foreach (array('New_Secret','Confirm_New_Secret') as $f) {
+        if (!isset($errors[$f]) || $errors[$f] === '') continue;
+        if (!isset($arrFormRules[$f]['INPUT_EXTRA_PARAM']) || !is_array($arrFormRules[$f]['INPUT_EXTRA_PARAM']))
+            $arrFormRules[$f]['INPUT_EXTRA_PARAM'] = array();
+        $cls = isset($arrFormRules[$f]['INPUT_EXTRA_PARAM']['class'])
+            ? $arrFormRules[$f]['INPUT_EXTRA_PARAM']['class'].' ' : 'form-control ';
+        $arrFormRules[$f]['INPUT_EXTRA_PARAM']['class'] = $cls.'is-invalid';
+    }
     $oForm = new paloForm($smarty,$arrFormRules);
     $smarty->assign("SAVE", _tr("Save"));
     $smarty->assign("CANCEL", _tr("Cancel"));
     $smarty->assign("REQUIRED_FIELD", _tr("Required field"));
-    $smarty->assign("DISPLAY", "display:none;");
     $smarty->assign("icon", "images/list.png");
-    $arrValues['Extension'] = $id;
-    $htmlForm = $oForm->fetchForm("$local_templates_dir/change.tpl",_tr("Change Key"), $arrValues);
+    $smarty->assign("ERRORS", array_merge(array('New_Secret' => '', 'Confirm_New_Secret' => ''), $errors));
+    $smarty->assign("EXTENSION", $id);
+    $htmlForm = $oForm->fetchForm("$local_templates_dir/change.tpl",_tr("Change Key"), array('Extension' => $id));
     $contenidoModulo = "<form  method='POST' style='margin-bottom:0;' action='?menu=$module_name'>".$htmlForm."</form>";
-    return $contenidoModulo;
+    return $smarty->getTemplateVars('SECURITY_ALERT').$contenidoModulo;
 }
 
 function createFieldForm()
@@ -165,33 +170,25 @@ function createFieldForm()
             "Extension"       => array( "LABEL"                  => _tr("Extension"),
                                         "REQUIRED"               => "no",
                                         "INPUT_TYPE"             => "TEXT",
-                                        "INPUT_EXTRA_PARAM"      => array("style" => "width:90px", "readonly" => "readonly"),
+                                        "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "readonly" => "readonly"),
                                         "VALIDATION_TYPE"        => "text",
                                         "VALIDATION_EXTRA_PARAM" => "",
                                         "EDITABLE"               => "no",
                                             ),
-            "Current_Secret"   => array( "LABEL"                 => _tr("Current Secret"),
-                                        "REQUIRED"               => "no",
-                                        "INPUT_TYPE"             => "PASSWORD",
-                                        "INPUT_EXTRA_PARAM"      => array("style" => "width:90px"),
-                                        "VALIDATION_TYPE"        => "text",
-                                        "VALIDATION_EXTRA_PARAM" => "",
-                                        "EDITABLE"               => "yes",
-                                            ),
             "New_Secret"         => array( "LABEL"               => _tr("New Secret"),
                                         "REQUIRED"               => "yes",
                                         "INPUT_TYPE"             => "PASSWORD",
-                                        "INPUT_EXTRA_PARAM"      => array("style" => "width:90px"),
-                                        "VALIDATION_TYPE"        => "ereg",
-                                        "VALIDATION_EXTRA_PARAM" => "^[[:alnum:]]{5,}$",
+                                        "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "autocomplete" => "new-password"),
+                                        "VALIDATION_TYPE"        => "text",
+                                        "VALIDATION_EXTRA_PARAM" => "",
                                         "EDITABLE"               => "",
                                             ),
             "Confirm_New_Secret" => array( "LABEL"               => _tr("Confirm New Secret"),
                                         "REQUIRED"               => "yes",
                                         "INPUT_TYPE"             => "PASSWORD",
-                                        "INPUT_EXTRA_PARAM"      => array("style" => "width:90px"),
-                                        "VALIDATION_TYPE"        => "ereg",
-                                        "VALIDATION_EXTRA_PARAM" => "^[[:alnum:]]{5,}$",
+                                        "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "autocomplete" => "new-password"),
+                                        "VALIDATION_TYPE"        => "text",
+                                        "VALIDATION_EXTRA_PARAM" => "",
                                         "EDITABLE"               => "",
                                             ),
             );
@@ -200,43 +197,32 @@ function createFieldForm()
 
 function saveNewKey($smarty, $module_name, $local_templates_dir, $pDB)
 {
-    $arrFormNew = createFieldForm($pDB);
     $arrValues['id'] = getParameter("Extension");
-    $arrValues['key'] = getParameter("Current_Secret");
-    $arrValues['new_key'] = getParameter("New_Secret");
-    $confirmation = getParameter("Confirm_New_Secret");
-    $oForm = new paloForm($smarty, $arrFormNew);
-    if(!$oForm->validateForm($_POST)) {
-        // Falla la validación básica del formulario
-        $strErrorMsg = "<b>"._tr('The following fields contain errors').":</b><br/>";
-        $arrErrores = $oForm->arrErroresValidacion;
-        if(is_array($arrErrores) && count($arrErrores) > 0){
-            foreach($arrErrores as $k=>$v) {
-                $strErrorMsg .= "$k: [$v[mensaje]] <br /> ";
-            }
-        }
-        $smarty->assign("mb_title", _tr("Validation Error"));
-        $smarty->assign("mb_message", $strErrorMsg);
-        return editWeakKeys($smarty, $module_name, $local_templates_dir, $pDB, $arrValues['id']);
+    $arrValues['new_key'] = (string)getParameter("New_Secret");
+    $confirmation = (string)getParameter("Confirm_New_Secret");
+
+    $errors = array();
+    if ($arrValues['new_key'] === '' || !preg_match('/^[[:alnum:]]{5,}$/', $arrValues['new_key']))
+        $errors['New_Secret'] = _tr("The secret must have at least 5 alphanumeric characters");
+    if ($confirmation === '')
+        $errors['Confirm_New_Secret'] = sprintf(_tr('%s is required'), _tr("Confirm New Secret"));
+    elseif ($arrValues['new_key'] !== $confirmation)
+        $errors['Confirm_New_Secret'] = _tr("The New Secret does not match with the Confirmation Secret");
+
+    if (count($errors) > 0) {
+        return editWeakKeys($smarty, $module_name, $local_templates_dir, $pDB, $arrValues['id'], $errors);
+    }
+
+    $mensaje = getMensaje($arrValues['id'],$arrValues['new_key']);
+    if($mensaje != "OK"){
+        $errors['New_Secret'] = $mensaje;
+        return editWeakKeys($smarty, $module_name, $local_templates_dir, $pDB, $arrValues['id'], $errors);
     }
 
     $pWeakKeys = new paloSantoWeakKeys($pDB);
     $device = $pWeakKeys->getWeakKeyById($arrValues['id']);
-
-    if($arrValues['new_key'] != $confirmation){
-        $smarty->assign("mb_title", _tr("Error"));
-        $smarty->assign("mb_message", _tr("The New Secret does not match with the Confirmation Secret"));
-        return editWeakKeys($smarty, $module_name, $local_templates_dir, $pDB, $arrValues['id']);
-    }
-    $mensaje = getMensaje($arrValues['id'],$arrValues['new_key']);
-    if($mensaje != "OK"){
-        $smarty->assign("mb_title", _tr("Error"));
-        $smarty->assign("mb_message", $mensaje);
-        return editWeakKeys($smarty, $module_name, $local_templates_dir, $pDB, $arrValues['id']);
-    }
     if(!$pWeakKeys->saveNewKey($arrValues,$device['tech'])){
-        $smarty->assign("mb_title", _tr("Error"));
-        $smarty->assign("mb_message", $pWeakKeys->errMsg);
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pWeakKeys->errMsg));
         return editWeakKeys($smarty, $module_name, $local_templates_dir, $pDB, $arrValues['id']);
     }
 
@@ -259,11 +245,9 @@ function do_reloadAsterisk($pDB, $smarty)
     $o = new paloSantoExtensionsBatch($pDB, $arrAST, $arrAMP);
     $r = $o->applyExtensions();
     if ($r) {
-        $smarty->assign("mb_title", _tr("Message"));
-        $smarty->assign("mb_message", _tr("Successful Secret Update"));
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("Successful Secret Update")));
     } else {
-        $smarty->assign("mb_title", _tr("Error"));
-        $smarty->assign("mb_message", $pLoadExtension->errMsg);
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $o->errMsg));
     }
     return $r;
 }
@@ -309,7 +293,7 @@ function getAction()
 {
     if(getParameter("action") == "change")
         return "change";
-    else if(getParameter("save"))
+    else if($_SERVER['REQUEST_METHOD'] === 'POST' && getParameter("save"))
         return "save";
     else
         return "report"; //cancel

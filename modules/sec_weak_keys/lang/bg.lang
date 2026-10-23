@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s е задължително',
+    'Cancel' => 'Отказ',
+    'Change Key' => 'Промяна на ключа',
+    'Change Secret' => 'Промяна на тайната',
+    'Confirm New Key' => 'Потвърдете нов ключ',
+    'Confirm New Secret' => 'Потвърдете нова тайна',
+    'Current Key' => 'Текущ ключ',
+    'Current Secret' => 'Текуща тайна',
+    'Description' => 'Описание',
+    'ERROR' => 'Error',
+    'Error' => 'Грешка',
+    'Extension' => 'Разширение',
+    'Filter applied: ' => 'Приложен филтър:',
+    'Key' => 'Ключ',
+    'Message' => 'Съобщение',
+    'New Key' => 'Нов ключ',
+    'New Secret' => 'Нова тайна',
+    'Old Key' => 'Стар ключ',
+    'Reason' => 'Причина',
+    'Required field' => 'Задължителни полета',
+    'Same Key' => 'Същият ключ',
+    'Save' => 'Запази',
+    'Search' => 'Търсене',
+    'Short Key' => 'Кратък ключ',
+    'Show' => 'Покажи',
+    'Status' => 'Състояние',
+    'Successful Key Update' => 'Успешна актуализация на ключа',
+    'Successful Secret Update' => 'Успешна тайна актуализация',
+    'The Current Key is invalid' => 'Текущият ключ е невалиден',
+    'The Current Secret is invalid' => 'Текущата тайна е невалидна',
+    'The New Key does not match with the Confirmation Key' => 'Новият ключ не съвпада с ключа за потвърждение',
+    'The New Secret does not match with the Confirmation Secret' => 'Новата тайна не съвпада с тайната за потвърждение',
+    'The following fields contain errors' => 'Следните полета съдържат грешки',
+    'The key does not match with the actual key' => 'Ключът не съвпада с действителния ключ',
+    'The secret must have at least 5 alphanumeric characters' => 'Тайната трябва да има поне 5 буквено-цифрови знака',
+    'Validation Error' => 'Грешка при Потвърждаване',
+    'Weak Key' => 'Слаб ключ',
+    'Weak Keys' => 'Слаби клавиши',
+    'Weak Secrets' => 'Слаби тайни',
+    'You are not authorized to enter to that extension' => 'Не сте упълномощени да влизате в това разширение',
+);

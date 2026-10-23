@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s είναι υποχρεωτικό',
+    'Cancel' => 'Ακύρωση',
+    'Change Key' => 'Αλλαγή κλειδιού',
+    'Change Secret' => 'Αλλαγή μυστικού',
+    'Confirm New Key' => 'Επιβεβαίωση νέου κλειδιού',
+    'Confirm New Secret' => 'Επιβεβαιώστε το νέο μυστικό',
+    'Current Key' => 'Τρέχον κλειδί',
+    'Current Secret' => 'Τρέχον μυστικό',
+    'Description' => 'Περιγραφή',
+    'ERROR' => 'Error',
+    'Error' => 'Σφάλμα',
+    'Extension' => 'Επέκταση',
+    'Filter applied: ' => 'Εφαρμόστηκε φίλτρο:',
+    'Key' => 'Κλειδί',
+    'Message' => 'Μήνυμα',
+    'New Key' => 'Νέο κλειδί',
+    'New Secret' => 'Νέο μυστικό',
+    'Old Key' => 'Παλιό Κλειδί',
+    'Reason' => 'Λόγος',
+    'Required field' => 'Απαιτούμενα Πεδία',
+    'Same Key' => 'Ίδιο κλειδί',
+    'Save' => 'Αποθήκευση',
+    'Search' => 'Αναζήτηση',
+    'Short Key' => 'Σύντομο κλειδί',
+    'Show' => 'Εμφάνιση',
+    'Status' => 'Κατάσταση',
+    'Successful Key Update' => 'Επιτυχής ενημέρωση κλειδιού',
+    'Successful Secret Update' => 'Επιτυχής Μυστική Ενημέρωση',
+    'The Current Key is invalid' => 'Το τρέχον κλειδί δεν είναι έγκυρο',
+    'The Current Secret is invalid' => 'Το τρέχον μυστικό δεν είναι έγκυρο',
+    'The New Key does not match with the Confirmation Key' => 'Το νέο κλειδί δεν ταιριάζει με το κλειδί επιβεβαίωσης',
+    'The New Secret does not match with the Confirmation Secret' => 'Το Νέο Μυστικό δεν ταιριάζει με το Μυστικό Επιβεβαίωσης',
+    'The following fields contain errors' => 'Τα ακόλουθα πεδία περιέχουν λάθη',
+    'The key does not match with the actual key' => 'Το κλειδί δεν ταιριάζει με το πραγματικό κλειδί',
+    'The secret must have at least 5 alphanumeric characters' => 'Το μυστικό πρέπει να έχει τουλάχιστον 5 αλφαριθμητικούς χαρακτήρες',
+    'Validation Error' => 'Σφάλμα Πιστοποίησης',
+    'Weak Key' => 'Αδύναμο κλειδί',
+    'Weak Keys' => 'Αδύναμα κλειδιά',
+    'Weak Secrets' => 'Αδύναμα μυστικά',
+    'You are not authorized to enter to that extension' => 'Δεν έχετε εξουσιοδότηση να εισέλθετε σε αυτήν την επέκταση',
+);

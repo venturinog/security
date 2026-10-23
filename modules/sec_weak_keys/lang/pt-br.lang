@@ -1,0 +1,63 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s é obrigatório',
+    'Cancel' => 'Cancelar',
+    'Change Key' => 'Alterar chave',
+    'Change Secret' => 'Alterar segredo',
+    'Confirm New Key' => 'Confirmar nova chave',
+    'Confirm New Secret' => 'Confirme o novo segredo',
+    'Current Key' => 'Chave atual',
+    'Current Secret' => 'Segredo Atual',
+    'Description' => 'Descrição',
+    'ERROR' => 'Error',
+    'Error' => 'Erro',
+    'Extension' => 'Extensão',
+    'Filter applied: ' => 'Filtro aplicado:',
+    'Key' => 'Chave',
+    'Message' => 'Mensagem',
+    'New Key' => 'Nova chave',
+    'New Secret' => 'Novo segredo',
+    'Old Key' => 'Chave Antiga',
+    'Reason' => 'Razão',
+    'Required field' => 'Campo Requerido',
+    'Same Key' => 'Mesma chave',
+    'Save' => 'Salvar',
+    'Search' => 'Pesquisar',
+    'Short Key' => 'Tecla curta',
+    'Show' => 'Mostrar',
+    'Status' => 'Estado',
+    'Successful Key Update' => 'Atualização de chave bem-sucedida',
+    'Successful Secret Update' => 'Atualização secreta bem-sucedida',
+    'The Current Key is invalid' => 'A chave atual é inválida',
+    'The Current Secret is invalid' => 'O segredo atual é inválido',
+    'The New Key does not match with the Confirmation Key' => 'A nova chave não corresponde à chave de confirmação',
+    'The New Secret does not match with the Confirmation Secret' => 'O Novo Segredo não corresponde ao Segredo de Confirmação',
+    'The following fields contain errors' => 'Os seguintes campos contém erros',
+    'The key does not match with the actual key' => 'A chave não corresponde à chave real',
+    'The secret must have at least 5 alphanumeric characters' => 'O segredo deve ter pelo menos 5 caracteres alfanuméricos',
+    'Validation Error' => 'Erro de Validação',
+    'Weak Key' => 'Chave Fraca',
+    'Weak Keys' => 'Chaves Fracas',
+    'Weak Secrets' => 'Segredos Fracos',
+    'You are not authorized to enter to that extension' => 'Você não está autorizado a entrar nessa extensão',
+);

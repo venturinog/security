@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0.0-31                                               |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,46 +17,47 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  +----------------------------------------------------------------------+
-  $Id: en.lang,v 1.1 2010-12-21 09:08:11 Alberto Santos asantos@palosanto.com Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"Weak Keys" => "Claves Débiles.",
-"Extension" => "Extensión",
-"Description" => "Descripción",
-"Reason" => "Motivo",
-"Same Key" => "Clave y el número de extensión son los mismos.",
-"Short Key" => "Clave es muy corta (menor de 5 dígitos)",
-"Search" => "Buscar",
-"Show" => "Mostrar",
-"Change Key" => "Cambiar Clave",
-"Old Key" => "Clave Antigua",
-"New Key" => "Clave Nueva",
-"Save" => "Guardar",
-"Confirm New Key" => "Confirme la Nueva Clave",
-"Required field" => "Campo Requerido",
-"Key" => "Clave",
-"Validation Error" => "Error de Validación",
-"Error" => "Error",
-"The following fields contain errors" => "Los siguientes campos contienen errores",
-"The key does not match with the actual key" => "La clave no concuerda con la clave actual",
-"The New Key does not match with the Confirmation Key" => "La Nueva clave no concuerda con la Confirmación de Clave",
-"Message" => "Mensaje",
-"Successful Key Update" => "Actualización de Clave Exitosa",
-"Current Key" => "Clave Actual",
-"The Current Key is invalid" => "La Clave Actual es inválida",
-"Cancel" => "Cancelar",
-"You are not authorized to enter to that extension" => "Usted no está autorizado a entrar a esa extensión",
-"Weak Secrets" => "Claves Débiles",
-"Current Secret" => "Clave Actual",
-"New Secret" => "Clave Nueva",
-"Confirm New Secret" => "Confirme la Nueva Clave",
-"The Current Secret is invalid" => "La Clave Actual es inválida",
-"The New Secret does not match with the Confirmation Secret" => "La Nueva clave no concuerda con la Confirmación de Clave",
-"Successful Secret Update" => "Actualización de Clave Exitosa",
-"Change Secret" => "Cambiar Clave",
-"Weak Key" => "Clave Débil",
-"Status" => "Estado" 
+$arrLangModule = array(
+    '%s is required' => '%s es obligatorio',
+    'Cancel' => 'Cancelar',
+    'Change Key' => 'Cambiar Clave',
+    'Change Secret' => 'Cambiar Clave',
+    'Confirm New Key' => 'Confirme la Nueva Clave',
+    'Confirm New Secret' => 'Confirme la Nueva Clave',
+    'Current Key' => 'Clave Actual',
+    'Current Secret' => 'Clave Actual',
+    'Description' => 'Descripción',
+    'ERROR' => 'Error',
+    'Error' => 'Error',
+    'Extension' => 'Extensión',
+    'Filter applied: ' => 'Filtro aplicado: ',
+    'Key' => 'Clave',
+    'Message' => 'Mensaje',
+    'New Key' => 'Clave Nueva',
+    'New Secret' => 'Clave Nueva',
+    'Old Key' => 'Clave Antigua',
+    'Reason' => 'Motivo',
+    'Required field' => 'Campo Requerido',
+    'Same Key' => 'Clave y el número de extensión son los mismos.',
+    'Save' => 'Guardar',
+    'Search' => 'Buscar',
+    'Short Key' => 'Clave es muy corta (menor de 5 dígitos)',
+    'Show' => 'Mostrar',
+    'Status' => 'Estado',
+    'Successful Key Update' => 'Actualización de Clave Exitosa',
+    'Successful Secret Update' => 'Actualización de Clave Exitosa',
+    'The Current Key is invalid' => 'La Clave Actual es inválida',
+    'The Current Secret is invalid' => 'La Clave Actual es inválida',
+    'The New Key does not match with the Confirmation Key' => 'La Nueva clave no concuerda con la Confirmación de Clave',
+    'The New Secret does not match with the Confirmation Secret' => 'La Nueva clave no concuerda con la Confirmación de Clave',
+    'The following fields contain errors' => 'Los siguientes campos contienen errores',
+    'The key does not match with the actual key' => 'La clave no concuerda con la clave actual',
+    'The secret must have at least 5 alphanumeric characters' => 'El secreto debe tener al menos 5 caracteres alfanuméricos',
+    'Validation Error' => 'Error de Validación',
+    'Weak Key' => 'Clave Débil',
+    'Weak Keys' => 'Claves Débiles.',
+    'Weak Secrets' => 'Claves Débiles',
+    'You are not authorized to enter to that extension' => 'Usted no está autorizado a entrar a esa extensión',
 );
-?>

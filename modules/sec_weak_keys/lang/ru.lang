@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                 |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,54 +17,54 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  +----------------------------------------------------------------------+
-  $Id: ru.lang,v 2.5 2016-02-12 15:41:11 Andrey Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"Weak Keys" => "Слабые Пароли",
-"Extension" => "Внутренний номер",
-"Description" => "Описание",
-"Reason" => "Причина",
-"Same Key" => "Пароль совпадает с внутренним номером",
-"Short Key" => "Пароль слишком короткий (длина меньше чем 5 цифр)",
-"Search" => "Искать",
-"Show" => "Показать",
-"Change Key" => "Change Key",
-"Old Key" => "Old Key",
-"New Key" => "New Key",
-"Save" => "Сохранить",
-"Confirm New Key" => "Confirm New Key",
-"Required field" => "Обязательное поле",
-"Key" => "Key",
-"Validation Error" => "Ошибка Валидации",
-"Error" => "Ошибка",
-"The following fields contain errors" => "Следующие поля содержат ошибки",
-"The key does not match with the actual key" => "The key does not match with the actual key",
-"The New Key does not match with the Confirmation Key" => "The New Key does not match with the Confirmation Key",
-"Message" => "Сообщение",
-"Successful Key Update" => "Успешное Обновление Пароля",
-"Current Key" => "Текущий Пароль",
-"The Current Key is invalid" => "Текущий Пароль недействительный",
-"Cancel" => "Отмена",
-"You are not authorized to enter to that extension" => "Вы не авторизованы для входа в этот внутренний номер",
-"Weak Secrets" => "Слабые Пароли",
-"Current Secret" => "Текущий Пароль",
-"New Secret" => "Новый Пароль",
-"Confirm New Secret" => "Подтвердить Новый Пароль",
-"The Current Secret is invalid" => "Текущий Пароль недействительный",
-"The New Secret does not match with the Confirmation Secret" => "Новый Пароль не совпадает с подтвержением пароля",
-"Successful Secret Update" => "Успешное Обновление Пароля",
-"Change Secret" => "Изменить Пароль",
-"Weak Key" => "Слабый Пароль",
-"Status" => "Статус",
-"Show Filter" => "Показать Фильтр",
-"Hide Filter" => "Скрыть Фильтр",
-"Filter applied: " => "Текущий фильтр: ",
-"Page" => "Страница",
-"records" => "записей",
-"of" => "из",
-"No records match the filter criteria" => "Нет записей, соответствующих критериям фильтра",
-"Download" => "Скачать",
+$arrLangModule = array(
+    '%s is required' => '%s обязательно',
+    'Cancel' => 'Отмена',
+    'Change Key' => 'Изменить ключ',
+    'Change Secret' => 'Изменить Пароль',
+    'Confirm New Key' => 'Подтвердить новый ключ',
+    'Confirm New Secret' => 'Подтвердить Новый Пароль',
+    'Current Key' => 'Текущий Пароль',
+    'Current Secret' => 'Текущий Пароль',
+    'Description' => 'Описание',
+    'Download' => 'Скачать',
+    'ERROR' => 'Ошибка',
+    'Error' => 'Ошибка',
+    'Extension' => 'Внутренний номер',
+    'Filter applied: ' => 'Текущий фильтр: ',
+    'Hide Filter' => 'Скрыть Фильтр',
+    'Key' => 'Ключ',
+    'Message' => 'Сообщение',
+    'New Key' => 'Новый ключ',
+    'New Secret' => 'Новый Пароль',
+    'No records match the filter criteria' => 'Нет записей, соответствующих критериям фильтра',
+    'Old Key' => 'Старый ключ',
+    'Page' => 'Страница',
+    'Reason' => 'Причина',
+    'Required field' => 'Обязательное поле',
+    'Same Key' => 'Пароль совпадает с внутренним номером',
+    'Save' => 'Сохранить',
+    'Search' => 'Искать',
+    'Short Key' => 'Пароль слишком короткий (длина меньше чем 5 цифр)',
+    'Show' => 'Показать',
+    'Show Filter' => 'Показать Фильтр',
+    'Status' => 'Статус',
+    'Successful Key Update' => 'Успешное Обновление Пароля',
+    'Successful Secret Update' => 'Успешное Обновление Пароля',
+    'The Current Key is invalid' => 'Текущий Пароль недействительный',
+    'The Current Secret is invalid' => 'Текущий Пароль недействительный',
+    'The New Key does not match with the Confirmation Key' => 'Новый ключ не совпадает с ключом подтверждения.',
+    'The New Secret does not match with the Confirmation Secret' => 'Новый Пароль не совпадает с подтвержением пароля',
+    'The following fields contain errors' => 'Следующие поля содержат ошибки',
+    'The key does not match with the actual key' => 'Ключ не соответствует реальному ключу',
+    'The secret must have at least 5 alphanumeric characters' => 'Секрет должен содержать не менее 5 буквенно-цифровых символов.',
+    'Validation Error' => 'Ошибка Валидации',
+    'Weak Key' => 'Слабый Пароль',
+    'Weak Keys' => 'Слабые Пароли',
+    'Weak Secrets' => 'Слабые Пароли',
+    'You are not authorized to enter to that extension' => 'Вы не авторизованы для входа в этот внутренний номер',
+    'of' => 'из',
+    'records' => 'записей',
 );
-?>
