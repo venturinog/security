@@ -667,6 +667,54 @@ class paloSantoRules {
         return true;
     }
 
+    /**
+     * Indica si existe una copia del último estado aplicado del firewall.
+     */
+    function hasSnapshot()
+    {
+        $query = "SELECT name FROM sqlite_master WHERE type='table' AND name='filter_snapshot'";
+        $result = $this->_DB->getFirstRowQuery($query, false);
+        return is_array($result) && count($result) > 0;
+    }
+
+    /**
+     * Guarda el estado actual de las reglas como "último aplicado".
+     * Se llama sólo después de que fwconfig --load termina bien.
+     */
+    function snapshotApplied()
+    {
+        // Se recrea en cada aplicación para que el snapshot tenga siempre el
+        // esquema vigente de `filter` (por ejemplo, tras una migración).
+        if ($this->_DB->genExec("DROP TABLE IF EXISTS filter_snapshot") === FALSE) {
+            $this->errMsg = $this->_DB->errMsg;
+            return false;
+        }
+        if ($this->_DB->genExec("CREATE TABLE filter_snapshot AS SELECT * FROM filter") === FALSE) {
+            $this->errMsg = $this->_DB->errMsg;
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Restaura las reglas al último estado aplicado y marca la BD como
+     * ejecutada. El firewall que está corriendo ya coincide con el snapshot,
+     * así que no hace falta recargarlo.
+     */
+    function discardChanges()
+    {
+        if (!$this->hasSnapshot()) return false;
+        if ($this->_DB->genExec("DELETE FROM filter") === FALSE) {
+            $this->errMsg = $this->_DB->errMsg;
+            return false;
+        }
+        if ($this->_DB->genExec("INSERT INTO filter SELECT * FROM filter_snapshot") === FALSE) {
+            $this->errMsg = $this->_DB->errMsg;
+            return false;
+        }
+        return $this->updateExecutedInSystem();
+    }
+
     function hasGeoip() {
         $sComando = '/usr/bin/issabel-helper fwconfig --isactivegeoip 2>&1';
         $output = $ret = NULL;

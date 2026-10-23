@@ -26,7 +26,6 @@ include_once "libs/paloSantoGrid.class.php";
 include_once "libs/paloSantoForm.class.php";
 include_once "libs/paloSantoDB.class.php";
 include_once "modules/sec_ports/libs/paloSantoPortService.class.php";
-include_once "libs/paloSantoJSON.class.php";
 require_once "libs/paloSantoNetwork.class.php";
 
 function _moduleContent(&$smarty, $module_name)
@@ -51,6 +50,8 @@ function _moduleContent(&$smarty, $module_name)
     //conexion resource
     $pDB = new paloDB($arrConf['dsn_conn_database']);
 
+    $smarty->assign('SECURITY_ALERT', '');
+
     //actions
     $accion = getAction();
 
@@ -58,120 +59,369 @@ function _moduleContent(&$smarty, $module_name)
         case "new":
             $content = constructForm($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, array());
             break;
+        case "edit":
+            $content = editRulePage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+            break;
         case "desactivatefirewall":
-            $content = desactivateFirewallJSON($smarty,$module_name,$local_templates_dir,$pDB,$arrConf);
+            $content = desactivateFirewall($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
             break;
         case "activatefirewall":
-            $content = activateFirewallJSON($smarty,$module_name,$local_templates_dir,$pDB,$arrConf);
+            $content = activateFirewall($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
             break;
         case "save":
-            $content = saveRulesAjax($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+            $content = saveRulePage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
             break;
-        case "getPorts":
-            $content = getPorts($pDB);
-            break;
-        case "getRules":
-            $content = getRules($pDB);
-            break;
-        case "getRulesGEOIP":
-            $content = getRulesGEOIP($pDB);
-            break;
-        case "sort":
-            $content = dosort($pDB);
-            break;
-        case "deleterules":
+        case "delete":
             $content = deleteRules($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
             break;
-        case "isexecute":
-            $content = isexecute($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+        case "activate":
+        case "deactivate":
+            $content = toggleRule($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $accion);
             break;
+        case "reorder":
+            $content = reorderRules($pDB);
+            break;
+        case "discardchanges":
+            $content = discardChanges($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+            break;
+        case "move_up":
+        case "move_down":
+            $content = moveRule($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $accion);
+            break;
+        case "cancel":
         default:
-            $content = showDataTables($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+            $content = showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
             break;
     }
     return $content;
 }
 
-function dosort($pDB) {
+/**
+ * Página principal: avisos de estado + grilla de reglas + grilla GeoIP.
+ */
+function showRulesPage($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
+{
     $pRules = new paloSantoRules($pDB);
-    $data = json_decode($_POST['json'],1);
-    $sum=0;
-    if(isset($_POST['geoip'])) {
-        $sum=100000;
+
+    $alert = (string)$smarty->getTemplateVars('SECURITY_ALERT');
+    if ($pRules->isFirstTime()) {
+        $alert .= issabel_alert_html('warning', _tr("Firewall"),
+            _tr("The firewall has not been activated yet"));
+    } elseif (!$pRules->isExecutedInSystem()) {
+        $alert .= issabel_alert_html('warning', _tr("Firewall"),
+            _tr("There are changes pending to apply to the firewall"));
     }
-    $pRules->resort($data,$sum);
-    return "{\"message\":\"ok\"}";
+
+    if ($pRules->ObtainNumRulesGEOIP() > 0 && !$pRules->hasGeoip()) {
+        $alert .= issabel_alert_html('error', _tr("GeoIP"),
+            _tr("GeoIP rules are configured but the geoip match is not available. Install xtables-addons and generate /usr/share/xt_geoip, then apply the rules again."));
+    }
+
+    // `paloSantoGrid::setTitle()` no se imprime en la plantilla Modern
+    // (_list.tpl), así que las secciones llevan su propio encabezado. La
+    // grilla GeoIP va primero, como en la interfaz histórica.
+    return $alert
+        . renderToolbar($smarty, $module_name, $pRules)
+        . '<h4 class="fw-grid-title">'._tr('GeoIP').'</h4>'
+        . '<div class="fw-grid" id="geoip_grid">'.renderRulesGrid($smarty, $module_name, $pDB, true).'</div>'
+        . '<h4 class="fw-grid-title">'._tr('Rules').'</h4>'
+        . '<div class="fw-grid" id="rules_grid">'.renderRulesGrid($smarty, $module_name, $pDB, false).'</div>';
+}
+
+/**
+ * Barra única de acciones. Sustituye a las barras que paloSantoGrid genera
+ * por cada grilla para que las dos tablas compartan un solo juego de botones.
+ */
+function renderToolbar($smarty, $module_name, $pRules)
+{
+    $isFirst     = $pRules->isFirstTime();
+    $isExecuted  = $pRules->isExecutedInSystem();
+    $hasSnapshot = $pRules->hasSnapshot();
+    $applyLabel  = $isFirst ? _tr('Activate firewall') : _tr('Apply changes');
+
+    $html  = '<div class="fw-toolbar">';
+    $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_delete" data-empty="'
+           . htmlspecialchars(_tr('No rules were selected'), ENT_COMPAT, 'UTF-8') . '" data-confirm="'
+           . htmlspecialchars(_tr('Are you sure you wish to delete the selected rules?'), ENT_COMPAT, 'UTF-8') . '">'
+           . '<i class="ti ti-trash"></i> '._tr('Delete').'</button>';
+    $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_deactivate" data-confirm="'
+           . htmlspecialchars(_tr('Are you sure you wish to deactivate the firewall?'), ENT_COMPAT, 'UTF-8') . '">'
+           . '<i class="ti ti-power"></i> '._tr('Deactivate firewall').'</button>';
+    $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_apply">'
+           . '<i class="ti ti-check"></i> '.$applyLabel.'</button>';
+    if (!$isFirst && !$isExecuted && $hasSnapshot) {
+        $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_discard" data-confirm="'
+               . htmlspecialchars(_tr('Are you sure you wish to discard the changes?'), ENT_COMPAT, 'UTF-8') . '">'
+               . '<i class="ti ti-arrow-back-up"></i> '._tr('Discard changes').'</button>';
+    }
+    $html .= '<a class="btn btn-sm btn-outline-primary" href="?menu='.$module_name.'&amp;action=new">'
+           . '<i class="ti ti-plus"></i> '._tr('New Rule').'</a>';
+    $html .= '</div>';
+
+    $html .= '<div id="fw_alert" class="iss-alert" style="display:none;" role="status" data-error="'
+           . htmlspecialchars(_tr('The change could not be saved'), ENT_COMPAT, 'UTF-8') . '"></div>';
+    $html .= '<form id="fw_action_form" method="POST" action="?menu='.$module_name.'" style="display:none;">'
+           . issabel_csrf_field()
+           . '<div id="fw_action_fields"></div></form>';
+
+    return $html;
+}
+
+function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo)
+{
+    $pRules = new paloSantoRules($pDB);
+    $oGrid  = new paloSantoGrid($smarty);
+
+    // Cabeceras vacías para Orden/Activado/Opciones, como en la interfaz
+    // anterior; el texto queda sólo para lectores de pantalla.
+    $hidden = function ($text) {
+        return '<span class="fw-sr-only">'.$text.'</span>';
+    };
+
+    $oGrid->setColumns(array(
+        '',
+        $hidden(_tr('Order')),
+        _tr('Traffic'),
+        _tr('Target'),
+        _tr('Interface'),
+        _tr('IP Source'),
+        _tr('IP Destiny'),
+        _tr('Protocol'),
+        _tr('Details'),
+        $hidden(_tr('Activated')),
+        $hidden(_tr('Options')),
+    ));
+
+    $oGrid->pagingShow(false);
+    $oGrid->setURL(array('menu' => $module_name));
+
+    // Mapa id de puerto => nombre, para mostrar los detalles de las reglas.
+    $portNames = array();
+    if (!$isGeo) {
+        $oPort = new paloSantoPortService($pDB);
+        foreach (array($oPort->getTCPortNumbers(), $oPort->getUDPortNumbers()) as $list) {
+            if (is_array($list)) foreach ($list as $p) $portNames[$p['id']] = $p['name'];
+        }
+    }
+
+    $trafficFiles = array(
+        'INPUT'   => 'fw_input.gif',
+        'OUTPUT'  => 'fw_output.gif',
+        'FORWARD' => 'fw_forward.gif',
+    );
+
+    $result = $isGeo ? $pRules->ObtainRulesGEOIP(100000, 0) : $pRules->ObtainRules(100000, 0);
+    $data = array();
+    if (is_array($result)) {
+        foreach ($result as $row) {
+            $id = (int)$row['id'];
+            $activated = ($row['activated'] == '1');
+            $order = $isGeo ? ((int)$row['rule_order'] - 100000) : (int)$row['rule_order'];
+
+            $arrTmp[0] = "<input type='checkbox' name='del_x[]' value='".$id."'>";
+            $arrTmp[1] = $order;
+
+            $traffic = (string)$row['traffic'];
+            if (isset($trafficFiles[$traffic])) {
+                $label = htmlspecialchars(_tr($traffic), ENT_COMPAT, 'UTF-8');
+                $arrTmp[2] = '<img class="fw-icon" src="modules/'.$module_name.'/images/'.$trafficFiles[$traffic]
+                           . '" alt="'.$label.'" title="'.$label.'">';
+            } else {
+                $arrTmp[2] = htmlspecialchars($traffic, ENT_COMPAT, 'UTF-8');
+            }
+
+            $target = (string)$row['target'];
+            $targetFile = ($target === 'ACCEPT') ? 'target_accept.gif' : 'target_drop.gif';
+            $targetLabel = htmlspecialchars(_tr($target), ENT_COMPAT, 'UTF-8');
+            $arrTmp[3] = '<img class="fw-icon" src="modules/'.$module_name.'/images/'.$targetFile
+                       . '" alt="'.$targetLabel.'" title="'.$targetLabel.'">';
+
+            $iface = '';
+            if ((string)$row['eth_in'] !== '') $iface .= _tr('INPUT').': '.htmlspecialchars((string)$row['eth_in'], ENT_COMPAT, 'UTF-8');
+            if ((string)$row['eth_out'] !== '') {
+                if ($iface !== '') $iface .= '<br>';
+                $iface .= _tr('OUTPUT').': '.htmlspecialchars((string)$row['eth_out'], ENT_COMPAT, 'UTF-8');
+            }
+            $arrTmp[4] = $iface;
+
+            $arrTmp[5] = htmlspecialchars((string)$row['ip_source'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[6] = htmlspecialchars((string)$row['ip_destiny'], ENT_COMPAT, 'UTF-8');
+
+            if ((string)$row['protocol'] === 'GEOIP') {
+                $arrTmp[7] = '<span class="fw-protocol" title="GEOIP"><i class="ti ti-world"></i>'
+                           . '<span class="fw-sr-only">GEOIP</span></span>';
+            } else {
+                $arrTmp[7] = htmlspecialchars((string)$row['protocol'], ENT_COMPAT, 'UTF-8');
+            }
+
+            $arrTmp[8] = ruleDetails($row, $portNames);
+
+            $checked = $activated ? ' checked="checked"' : '';
+            $arrTmp[9] = '<div class="form-check form-switch fw-switch">'
+                       . '<input type="checkbox" class="form-check-input fw-toggle" role="switch" data-id="'.$id.'"'
+                       . $checked.' aria-label="'.htmlspecialchars(_tr("Activated"), ENT_COMPAT, 'UTF-8').'"></div>';
+
+            $arrTmp[10] = '<span class="fw-drag" draggable="true" tabindex="0" role="button" data-id="'.$id.'"'
+                        . ' data-grid="'.($isGeo ? 'geoip' : 'rules').'"'
+                        . ' title="'.htmlspecialchars(_tr("Drag to reorder"), ENT_COMPAT, 'UTF-8').'"'
+                        . ' aria-label="'.htmlspecialchars(_tr("Drag to reorder"), ENT_COMPAT, 'UTF-8').'">'
+                        . '<i class="ti ti-grip-vertical"></i></span>'
+                        . '<a class="fw-edit" href="?menu='.$module_name.'&amp;action=edit&amp;id='.$id.'"'
+                        . ' title="'.htmlspecialchars(_tr("Edit"), ENT_COMPAT, 'UTF-8').'"'
+                        . ' aria-label="'.htmlspecialchars(_tr("Edit"), ENT_COMPAT, 'UTF-8').'">'
+                        . '<i class="ti ti-edit"></i></a>';
+
+            $data[] = $arrTmp;
+        }
+    }
+    $oGrid->setData($data);
+
+    return $oGrid->fetchGrid();
+}
+
+function ruleDetails($row, $portNames)
+{
+    $ret = '';
+    if ($row['protocol'] == 'ICMP') {
+        $ret = _tr('Type').': '.htmlspecialchars((string)($row['icmp_type'] ?? ''), ENT_COMPAT, 'UTF-8');
+    } elseif ($row['protocol'] == 'GEOIP') {
+        $continents = (string)($row['continents'] ?? '');
+        $countries  = (string)($row['countries'] ?? '');
+        if ($continents !== '') $ret .= _tr('Continents').': '.htmlspecialchars($continents, ENT_COMPAT, 'UTF-8');
+        if ($countries !== '') {
+            if ($ret !== '') $ret .= '<br>';
+            $ret .= _tr('Countries').': '.htmlspecialchars($countries, ENT_COMPAT, 'UTF-8');
+        }
+    } elseif ($row['protocol'] == 'STATE') {
+        $ret = htmlspecialchars((string)($row['state'] ?? ''), ENT_COMPAT, 'UTF-8');
+    } elseif ($row['protocol'] != 'ALL') {
+        $sport = isset($portNames[$row['sport']]) ? $portNames[$row['sport']] : (string)$row['sport'];
+        $dport = isset($portNames[$row['dport']]) ? $portNames[$row['dport']] : (string)$row['dport'];
+        if ($sport !== '' || $dport !== '') {
+            $ret = _tr('Port Source').': '.htmlspecialchars($sport, ENT_COMPAT, 'UTF-8')
+                 . '<br>'._tr('Port Destine').': '.htmlspecialchars($dport, ENT_COMPAT, 'UTF-8');
+        }
+    }
+    return $ret;
+}
+
+function editRulePage($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
+{
+    $id = (int)getParameter('id');
+    $pRules = new paloSantoRules($pDB);
+    $row = $pRules->getRule($id);
+    if (!is_array($row)) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), _tr("The rule could not be loaded")));
+        return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+    }
+
+    $src = explode('/', $row['ip_source']);
+    $dst = explode('/', $row['ip_destiny']);
+    $values = array(
+        'id_traffic'      => $row['traffic'],
+        'interface_in'    => $row['eth_in'],
+        'interface_out'   => $row['eth_out'],
+        'ip_source'       => isset($src[0]) ? $src[0] : '0.0.0.0',
+        'mask_source'     => isset($src[1]) ? $src[1] : '24',
+        'ip_destin'       => isset($dst[0]) ? $dst[0] : '0.0.0.0',
+        'mask_destin'     => isset($dst[1]) ? $dst[1] : '24',
+        'port_in'         => $row['sport'],
+        'port_out'        => $row['dport'],
+        'type_icmp'       => $row['icmp_type'],
+        'id_ip'           => $row['number_ip'],
+        'id_protocol'     => $row['protocol'],
+        'target'          => $row['target'],
+        'orden'           => $row['rule_order'],
+        'state'           => $row['state'],
+        'geoipcountries'  => $row['countries'] !== '' ? explode(',', $row['countries']) : array(),
+        'geoipcontinents' => $row['continents'] !== '' ? explode(',', $row['continents']) : array(),
+        'established'     => (strpos((string)$row['state'], 'Established') !== false) ? 'on' : '',
+        'related'         => (strpos((string)$row['state'], 'Related') !== false) ? 'on' : '',
+        'id'              => $id,
+    );
+    return constructForm($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $values, 'edit');
 }
 
 function constructForm($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, $arrValues, $action="")
 {
+    // Valores por defecto del formulario nuevo.
+    $arrValues += array(
+        'id_traffic'      => 'INPUT',
+        'id_protocol'     => 'ALL',
+        'ip_source'       => '0.0.0.0',
+        'mask_source'     => '24',
+        'ip_destin'       => '0.0.0.0',
+        'mask_destin'     => '24',
+        'target'          => 'ACCEPT',
+        'id'              => '',
+        'state'           => '',
+        'orden'           => '',
+        'geoipcountries'  => array(),
+        'geoipcontinents' => array(),
+        'established'     => '',
+        'related'         => '',
+    );
+
     $arrFormRules = createFieldForm($pDB,$arrValues);
+
+    // Recuadro rojo por campo, conservando form-control.
+    $errors = isset($arrValues['errors']) ? $arrValues['errors'] : array();
+    foreach ($errors as $f => $msg) {
+        if ($msg === '' || !isset($arrFormRules[$f])) continue;
+        if ($arrFormRules[$f]['INPUT_TYPE'] === 'SELECT') {
+            // En SELECT, INPUT_EXTRA_PARAM es el mapa de opciones: la clase
+            // va en CLASS o se añadiría una opción falsa.
+            $arrFormRules[$f]['CLASS'] = 'is-invalid';
+            continue;
+        }
+        if (!isset($arrFormRules[$f]['INPUT_EXTRA_PARAM']) || !is_array($arrFormRules[$f]['INPUT_EXTRA_PARAM']))
+            $arrFormRules[$f]['INPUT_EXTRA_PARAM'] = array();
+        $cls = isset($arrFormRules[$f]['INPUT_EXTRA_PARAM']['class'])
+            ? $arrFormRules[$f]['INPUT_EXTRA_PARAM']['class'].' ' : 'form-control ';
+        $arrFormRules[$f]['INPUT_EXTRA_PARAM']['class'] = $cls.'is-invalid';
+    }
     $oForm = new paloForm($smarty,$arrFormRules);
     $smarty->assign("SAVE", _tr("Save"));
     $smarty->assign("CANCEL", _tr("Cancel"));
     $smarty->assign("REQUIRED_FIELD", _tr("Required field"));
     $smarty->assign("icon", "modules/$module_name/images/security_firewall_rules.png");
+    $smarty->assign("ERRORS", $errors);
+
     $traffic = isset($arrValues['id_traffic']) ? $arrValues['id_traffic'] : "";
-    $select_traffic_1 = ($traffic == "INPUT"  ) ? "selected" : "";
-    $select_traffic_2 = ($traffic == "OUTPUT" ) ? "selected" : "";
-    $select_traffic_3 = ($traffic == "FORWARD") ? "selected" : "";
-    //************************************************************************
-    $traffic_html =
-        "<select id='id_traffic' name='id_traffic' onChange='showElementByTraffic();' >".
-        "<option value='INPUT'   $select_traffic_1>"._tr("INPUT")."</option>".
-        "<option value='OUTPUT'  $select_traffic_2>"._tr("OUTPUT")."</option>".
-        "<option value='FORWARD' $select_traffic_3>"._tr("FORWARD")."</option>".
-        "</select>";
-    $smarty->assign("action_detail", _tr("ACTION DETAIL"));
-    $smarty->assign("ip_detail", _tr("IP DETAILS"));
-    $smarty->assign("traffic_html", $traffic_html);
-    $smarty->assign("traffic_label", _tr("Traffic"));
-    //************************************************************************
+    $trafficClass = isset($errors['id_traffic']) ? 'form-select is-invalid' : 'form-select';
+    $traffic_html = '<select class="'.$trafficClass.'" id="id_traffic" name="id_traffic" onChange="showElementByTraffic();">'
+        . '<option value="INPUT"'.($traffic == "INPUT" ? ' selected' : '').'>'._tr("INPUT").'</option>'
+        . '<option value="OUTPUT"'.($traffic == "OUTPUT" ? ' selected' : '').'>'._tr("OUTPUT").'</option>'
+        . '<option value="FORWARD"'.($traffic == "FORWARD" ? ' selected' : '').'>'._tr("FORWARD").'</option>'
+        . '</select>';
+
     $protocol = isset($arrValues['id_protocol']) ? $arrValues['id_protocol'] : "";
-    $protocol1 = ($protocol == "ALL") ? "selected" : "";
-    $protocol2 = ($protocol == "TCP") ? "selected" : "";
-    $protocol3 = ($protocol == "UDP") ? "selected" : "";
-    $protocol4 = ($protocol == "ICMP") ? "selected" : "";
-    $protocol5 = ($protocol == "IP") ? "selected" : "";
-    $protocol6 = ($protocol == "STATE") ? "selected" : "";
-    $protocol7 = ($protocol == "GEOIP") ? "selected" : "";
-
-    $protocol_html =
-        "<select id='id_protocol' name='id_protocol' onChange='showElementByProtocol();' >".
-        "<option value='ALL' $protocol1>"._tr("ALL")."</option>".
-        "<option value='TCP' $protocol2>TCP</option>".
-        "<option value='UDP' $protocol3>UDP</option>".
-        "<option value='ICMP' $protocol4>ICMP</option>".
-        "<option value='IP' $protocol5>IP</option>".
-        "<option value='STATE' $protocol6>"._tr("STATE")."</option>".
-        "<option value='GEOIP' $protocol7>"._tr("GEOIP")."</option>".
-        "</select>";
-
-    $smarty->assign("protocol_html", $protocol_html);
-    $smarty->assign("protocol_label", _tr("Protocol"));
-    $smarty->assign("protocol_detail", _tr("PROTOCOL DETAILS"));
-    //************************************************************************
-    $arrValues['ip_source'] = (isset($arrValues['ip_source'])) ? $arrValues['ip_source'] : "0.0.0.0";
-    $arrValues['mask_source'] = (isset($arrValues['mask_source'])) ? $arrValues['mask_source'] : "24";
-    $arrValues['ip_destin'] = (isset($arrValues['ip_destin'])) ? $arrValues['ip_destin'] : "0.0.0.0";
-    $arrValues['mask_destin'] = (isset($arrValues['mask_destin'])) ? $arrValues['mask_destin'] : "24";
-    $arrValues['geoipcountries'] = (isset($arrValues['geoipcountries'])) ? $arrValues['geoipcountries'] : "";
-    $arrValues['geoipcontinents'] = (isset($arrValues['geoipcontinents'])) ? $arrValues['geoipcontinents'] : "";
-
-    if($action == "edit") {
-        $title = _tr("Edit Rule");
-    } else {
-        $title = _tr("New Rule");
+    $protocolClass = isset($errors['id_protocol']) ? 'form-select is-invalid' : 'form-select';
+    $protocol_html = '<select class="'.$protocolClass.'" id="id_protocol" name="id_protocol" onChange="showElementByProtocol();">';
+    foreach (array('ALL','TCP','UDP','ICMP','IP','STATE','GEOIP') as $p) {
+        $protocol_html .= '<option value="'.$p.'"'.($protocol == $p ? ' selected' : '').'>'._tr($p).'</option>';
     }
-    $htmlForm = $oForm->fetchForm("$local_templates_dir/new.tpl",$title, $arrValues);
+    $protocol_html .= '</select>';
+
+    $smarty->assign("traffic_html", $traffic_html);
+    $smarty->assign("protocol_html", $protocol_html);
+    $smarty->assign("traffic_label", _tr("Traffic"));
+    $smarty->assign("protocol_label", _tr("Protocol"));
+    $smarty->assign("ip_detail", _tr("IP DETAILS"));
+    $smarty->assign("protocol_detail", _tr("PROTOCOL DETAILS"));
+    $smarty->assign("action_detail", _tr("ACTION DETAIL"));
+    $smarty->assign("MODE", $action === 'edit' ? 'edit' : 'new');
+    $smarty->assign("VALUES", $arrValues);
+
+    $title = ($action == "edit") ? _tr("Edit Rule") : _tr("New Rule");
+    $htmlForm = $oForm->fetchForm("$local_templates_dir/new.tpl", $title, $arrValues);
     $contenidoModulo = "<form  method='POST' style='margin-bottom:0;' action='?menu=$module_name'>".$htmlForm."</form>";
 
-    return $contenidoModulo;
+    return $smarty->getTemplateVars('SECURITY_ALERT').$contenidoModulo;
 }
 
 function createFieldForm($pDB,$arrValues = array())
 {
-
     global $arrConf;
 
     $pDBcountries = new paloDB($arrConf['dsn_conn_database_countries']);
@@ -180,7 +430,6 @@ function createFieldForm($pDB,$arrValues = array())
     $query.= "ORDER BY continent_code,countries.name";
     $arrCountries = $pDBcountries->fetchTable($query, true);
     $arrPais = array();
-    $continent='';
     foreach($arrCountries as $idx=>$data) {
         $arrPais[$data['continent']][$data['code']]=$data['country'];
     }
@@ -188,7 +437,6 @@ function createFieldForm($pDB,$arrValues = array())
     $query = "SELECT code,name FROM continents";
     $arrContinents = $pDBcountries->fetchTable($query, true);
     $arrContinente = array();
-    $continent='';
     foreach($arrContinents as $idx=>$data) {
         $arrContinente[$data['code']]=$data['name'];
     }
@@ -240,567 +488,486 @@ function createFieldForm($pDB,$arrValues = array())
     foreach($protocol_number as $key => $value){
         $arrIP[$value['id']] = $value['name'];
     }
+
     $arrFields = array(
-            "interface_in"    => array( "LABEL"                  => _tr("Interface IN"),
-                "REQUIRED"               => "no",
-                "INPUT_TYPE"             => "SELECT",
-                "INPUT_EXTRA_PARAM"      => $arrInterface,
-                "VALIDATION_TYPE"        => "text",
-                "VALIDATION_EXTRA_PARAM" => "",
-                "EDITABLE"               => "yes",
-                ),
-            "interface_out"   => array( "LABEL"                  => _tr("Interface OUT"),
-                "REQUIRED"               => "no",
-                "INPUT_TYPE"             => "SELECT",
-                "INPUT_EXTRA_PARAM"      => $arrInterface,
-                "VALIDATION_TYPE"        => "text",
-                "VALIDATION_EXTRA_PARAM" => "",
-                "EDITABLE"               => "yes",
-                ),
-            "ip_source"       => array( "LABEL"                  => _tr("IP Source"),
-                "REQUIRED"               => "no",
-                "INPUT_TYPE"             => "TEXT",
-                "INPUT_EXTRA_PARAM"      => array("style" => "width:110px", "class" => "frm-control"),
-                "VALIDATION_TYPE"        => "ereg",
-                "VALIDATION_EXTRA_PARAM" => "^([[:digit:]]{1,3})\.([[:digit:]]{1,3})\.([[:digit:]]{1,3})\.([[:digit:]]{1,3})$"
-                ),
-            "mask_source"     => array( "LABEL"                  => "mask_source",
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "TEXT",
-                    "INPUT_EXTRA_PARAM"      => array("style" => "width:20px", "class" => "frm-control"),
-                    "VALIDATION_TYPE"        => "numeric",
-                    "VALIDATION_EXTRA_PARAM" => ""
-                    ),
-            "ip_destin"      => array(  "LABEL"                  => _tr("IP Destiny"),
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "TEXT",
-                    "INPUT_EXTRA_PARAM"      => array("style" => "width:110px", "class" => "frm-control"),
-                    "VALIDATION_TYPE"        => "ereg",
-                    "VALIDATION_EXTRA_PARAM" => "^([[:digit:]]{1,3})\.([[:digit:]]{1,3})\.([[:digit:]]{1,3})\.([[:digit:]]{1,3})$"
-                    ),
-            "mask_destin"     => array( "LABEL"                  => "mask_destiny",
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "TEXT",
-                    "INPUT_EXTRA_PARAM"      => array("style" => "width:20px", "class" => "frm-control"),
-                    "VALIDATION_TYPE"        => "numeric",
-                    "VALIDATION_EXTRA_PARAM" => ""
-                    ),
-            "port_in"         => array( "LABEL"                  => _tr("Port Source"),
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "SELECT",
-                    "INPUT_EXTRA_PARAM"      => $arrPort,
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    ),
-            "port_out"        => array( "LABEL"                  => _tr("Port Destine"),
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "SELECT",
-                    "INPUT_EXTRA_PARAM"      => $arrPort,
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    ),
-            "type_icmp"       => array( "LABEL"                  => _tr("Type"),
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "SELECT",
-                    "INPUT_EXTRA_PARAM"      => $arrType,
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    ),
-            "id_ip"           => array( "LABEL"                  => _tr("ID"),
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "SELECT",
-                    "INPUT_EXTRA_PARAM"      => $arrIP,
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    ),
-            "established"     => array( "LABEL"                  => _tr("Established"),
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "CHECKBOX",
-                    "INPUT_EXTRA_PARAM"      => "",
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    ),
-            "related"         => array( "LABEL"                  => _tr("Related"),
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "CHECKBOX",
-                    "INPUT_EXTRA_PARAM"      => "",
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    ),
-            "geoipcountries"  => array( "LABEL"                  => _tr("Countries"),
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "SELECT",
-                    "INPUT_EXTRA_PARAM"      => $arrPais,
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    "MULTIPLE"               => TRUE
-                    ),
-            "geoipcontinents"  => array( "LABEL"                  => _tr("Continents"),
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "SELECT",
-                    "INPUT_EXTRA_PARAM"      => $arrContinente,
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    "MULTIPLE"               => TRUE
-                    ),
-
-            //REJECT, ACCEPT, DROP
-            "target"          => array( "LABEL"                  => _tr("Target"),
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "SELECT",
-                    "INPUT_EXTRA_PARAM"      => $arrTarget,
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    ),
-
-            "orden"           => array(  "LABEL"                  => _tr("Order"),
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "TEXT",
-                    "INPUT_EXTRA_PARAM"      => "",
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    ),
-            "id"              => array(  "LABEL"                  => "",
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "TEXT",
-                    "INPUT_EXTRA_PARAM"      => "",
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    ),
-            "state"           => array(  "LABEL"                  => "",
-                    "REQUIRED"               => "no",
-                    "INPUT_TYPE"             => "TEXT",
-                    "INPUT_EXTRA_PARAM"      => "",
-                    "VALIDATION_TYPE"        => "text",
-                    "VALIDATION_EXTRA_PARAM" => "",
-                    "EDITABLE"               => "yes",
-                    )
-
-                );
+        "interface_in"    => array( "LABEL"                  => _tr("Interface IN"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "SELECT",
+            "INPUT_EXTRA_PARAM"      => $arrInterface,
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
+        "interface_out"   => array( "LABEL"                  => _tr("Interface OUT"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "SELECT",
+            "INPUT_EXTRA_PARAM"      => $arrInterface,
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
+        "ip_source"       => array( "LABEL"                  => _tr("IP Source"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "TEXT",
+            "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "placeholder" => "0.0.0.0"),
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => ""
+            ),
+        "mask_source"     => array( "LABEL"                  => _tr("Mask"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "TEXT",
+            "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "placeholder" => "24"),
+            "VALIDATION_TYPE"        => "numeric",
+            "VALIDATION_EXTRA_PARAM" => ""
+            ),
+        "ip_destin"      => array(  "LABEL"                  => _tr("IP Destiny"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "TEXT",
+            "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "placeholder" => "0.0.0.0"),
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => ""
+            ),
+        "mask_destin"     => array( "LABEL"                  => _tr("Mask"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "TEXT",
+            "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "placeholder" => "24"),
+            "VALIDATION_TYPE"        => "numeric",
+            "VALIDATION_EXTRA_PARAM" => ""
+            ),
+        "port_in"         => array( "LABEL"                  => _tr("Port Source"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "SELECT",
+            "INPUT_EXTRA_PARAM"      => $arrPort,
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
+        "port_out"        => array( "LABEL"                  => _tr("Port Destine"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "SELECT",
+            "INPUT_EXTRA_PARAM"      => $arrPort,
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
+        "type_icmp"       => array( "LABEL"                  => _tr("Type"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "SELECT",
+            "INPUT_EXTRA_PARAM"      => $arrType,
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
+        "id_ip"           => array( "LABEL"                  => _tr("ID"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "SELECT",
+            "INPUT_EXTRA_PARAM"      => $arrIP,
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
+        "established"     => array( "LABEL"                  => _tr("Established"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "CHECKBOX",
+            "INPUT_EXTRA_PARAM"      => "",
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
+        "related"         => array( "LABEL"                  => _tr("Related"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "CHECKBOX",
+            "INPUT_EXTRA_PARAM"      => "",
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
+        "geoipcountries"  => array( "LABEL"                  => _tr("Countries"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "SELECT",
+            "INPUT_EXTRA_PARAM"      => $arrPais,
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            "MULTIPLE"               => TRUE
+            ),
+        "geoipcontinents"  => array( "LABEL"                  => _tr("Continents"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "SELECT",
+            "INPUT_EXTRA_PARAM"      => $arrContinente,
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            "MULTIPLE"               => TRUE
+            ),
+        "target"          => array( "LABEL"                  => _tr("Target"),
+            "REQUIRED"               => "yes",
+            "INPUT_TYPE"             => "SELECT",
+            "INPUT_EXTRA_PARAM"      => $arrTarget,
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
+        "orden"           => array(  "LABEL"                  => _tr("Order"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "TEXT",
+            "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
+        "id"              => array(  "LABEL"                  => "",
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "HIDDEN",
+            "INPUT_EXTRA_PARAM"      => "",
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
+        "state"           => array(  "LABEL"                  => "",
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "HIDDEN",
+            "INPUT_EXTRA_PARAM"      => "",
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            )
+    );
     return $arrFields;
 }
 
-function saveRulesAjax($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
+/**
+ * Valida los valores del formulario. Devuelve un array campo => mensaje.
+ */
+function validateRuleInput(&$values)
 {
-    $arrValues = array();
-    $str_error = "";
-    $arrFormNew = createFieldForm($pDB);
-    $oForm = new paloForm($smarty, $arrFormNew);
-    $id = getParameter("id");
-    $arrValues['id'] = $id;
-    if($id == "") {
-        $state = "new";
-    } else {
-        $state = "edit";
-    }
-    //************************************************************************************************************
-    //** TRAFFIC **
-    //************************************************************************************************************
-    $arrValues['traffic'] = getParameter("id_traffic");
-    if( $arrValues['traffic'] == "INPUT" ){
-        $arrValues['interface_in'] = getParameter("interface_in");
-        if( strlen($arrValues['interface_in']) == 0 )
-            $str_error .= ( strlen($str_error) == 0 ) ? "interface_in" : ", interface_in" ;
+    $errors = array();
+    $traffic = isset($values['traffic']) ? $values['traffic'] : '';
+    if (!in_array($traffic, array('INPUT','OUTPUT','FORWARD'), true))
+        $errors['id_traffic'] = sprintf(_tr('%s is invalid'), _tr('Traffic'));
 
-        $arrValues['interface_out'] = null;
+    if ($traffic == 'INPUT' || $traffic == 'FORWARD') {
+        if (empty($values['interface_in'])) $errors['interface_in'] = sprintf(_tr('%s is required'), _tr('Interface IN'));
     }
-    else if( $arrValues['traffic'] == "OUTPUT" ){
-        $arrValues['interface_out'] = getParameter("interface_out");
-        if( strlen($arrValues['interface_out']) == 0 )
-            $str_error .= ( strlen($str_error) == 0 ) ? "interface_out" : ", interface_out" ;
-
-        $arrValues['interface_in'] = null;
-    }
-    else if( $arrValues['traffic'] == "FORWARD" )
-    {
-        $arrValues['interface_in'] = getParameter("interface_in");
-        if( strlen($arrValues['interface_in']) == 0 )
-            $str_error .= ( strlen($str_error) == 0 ) ? "interface_in" : ", interface_in" ;
-
-        $arrValues['interface_out'] = getParameter("interface_out");
-        if( strlen($arrValues['interface_out']) == 0 )
-            $str_error .= ( strlen($str_error) == 0 ) ? "interface_out" : ", interface_out" ;
+    if ($traffic == 'OUTPUT' || $traffic == 'FORWARD') {
+        if (empty($values['interface_out'])) $errors['interface_out'] = sprintf(_tr('%s is required'), _tr('Interface OUT'));
     }
 
-    //************************************************************************************************************
-    //** SOURCE **
-    //************************************************************************************************************
-
-    $arrValues['ip_source'] = getParameter("ip_source");
-    $arrValues['mask_source'] = getParameter("mask_source");
-    $arrValues['ip_destin'] = getParameter("ip_destin");
-    $arrValues['mask_destin'] = getParameter("mask_destin");
-
-    //************************************************************************************************************
-    //** PROTOCOL **
-    //************************************************************************************************************
-
-    $arrValues['protocol'] = getParameter("id_protocol");
-    if( $arrValues['protocol'] == 'TCP' || $arrValues['protocol'] == 'UDP' )
-    {
-        $arrValues['port_in'] = getParameter("port_in");
-        if( strlen($arrValues['port_in']) == 0 ) $str_error .= ( strlen($str_error) == 0 ) ? "port_in" : ", port_in" ;
-
-        $arrValues['port_out'] = getParameter("port_out");
-        if(strlen($arrValues['port_out']) == 0) $str_error .= ( strlen($str_error) == 0 ) ? "port_out" : ", port_out" ;
-
-        $arrValues['type_icmp'] = null;
-        $arrValues['id_ip'] = null;
-        $arrValues['state'] = "";
+    foreach (array('ip_source' => 'IP Source', 'ip_destin' => 'IP Destiny') as $f => $label) {
+        $v = isset($values[$f]) ? trim((string)$values[$f]) : '';
+        if ($v !== '' && !filter_var($v, FILTER_VALIDATE_IP))
+            $errors[$f] = sprintf(_tr('%s is invalid'), _tr($label));
     }
-    else if( $arrValues['protocol'] == 'ICMP' )
-    {
-        $arrValues['port_in'] = null;
-        $arrValues['port_out'] = null;
-        $arrValues['state'] = "";
-
-        $arrValues['type_icmp'] = getParameter("type_icmp");
-        if( strlen($arrValues['type_icmp']) == 0 ) $str_error .= ( strlen($str_error) == 0) ? "type" : ", type";
-
-        $arrValues['id_ip'] = null;
+    foreach (array('mask_source' => 'Mask', 'mask_destin' => 'Mask') as $f => $label) {
+        $v = isset($values[$f]) ? trim((string)$values[$f]) : '';
+        if ($v !== '' && (!preg_match('/^[0-9]{1,2}$/', $v) || (int)$v > 32))
+            $errors[$f] = sprintf(_tr('%s is invalid'), _tr($label));
     }
-    else if( $arrValues['protocol'] == 'IP' )
-    {
-        $arrValues['port_in'] = null;
-        $arrValues['port_out'] = null;
-        $arrValues['type_icmp'] = null;
-        $arrValues['state'] = "";
+    // Una IP concreta con máscara 0 no es una regla válida.
+    if (!empty($values['ip_source']) && $values['ip_source'] !== '0.0.0.0'
+        && isset($values['mask_source']) && (string)$values['mask_source'] === '0')
+        $errors['mask_source'] = _tr('Wrong Mask');
+    if (!empty($values['ip_destin']) && $values['ip_destin'] !== '0.0.0.0'
+        && isset($values['mask_destin']) && (string)$values['mask_destin'] === '0')
+        $errors['mask_destin'] = _tr('Wrong Mask');
 
-        $arrValues['id_ip'] = getParameter("id_ip");
-        if( strlen($arrValues['id_ip']) == 0 ) $str_error .= ( strlen($str_error) == 0) ? "id" : ", id";
-    }
-    else if($arrValues['protocol'] == 'STATE'){
-        $arrValues['port_in'] = null;
-        $arrValues['port_out'] = null;
-        $arrValues['type_icmp'] = null;
-        $arrValues['id_ip'] = null;
-        $established = getParameter("established");
-        $related = getParameter("related");
-        if($established == "on"){
-            $arrValues['state'] = "Established";
-            if($related == "on")
-                $arrValues['state'].= ",Related";
-        }
-        else{
-            if($related == "on")
-                $arrValues['state'] = "Related";
-            else{
-                $str_error .= ( strlen($str_error) == 0) ? _tr("You have to select at least one state") : ", "._tr("You have to select at least one state");
-            }
-        }
-    } else if($arrValues['protocol'] == 'GEOIP') {
-        $arrValues['port_in'] = null;
-        $arrValues['port_out'] = null;
-        $arrValues['type_icmp'] = null;
-        $arrValues['id_ip'] = null;
-        $geoipcountries = getParameter("geoipcountries");
-        $geoipcontinents = getParameter("geoipcontinents");
-
-        if($geoipcountries == '' && $geoipcontinents == '') {
-            $str_error .= _tr("You have to list some countries or continents");
-        }
-
-        $arrValues['geoipcountries'] = $geoipcountries;
-        $arrValues['geoipcontinents'] = $geoipcontinents;
-
-    } else {
-        $arrValues['port_in'] = "";
-        $arrValues['port_out'] = "";
-        $arrValues['type_icmp'] = "";
-        $arrValues['id_ip'] = "";
-        $arrValues['state'] = "";
+    $protocol = isset($values['protocol']) ? $values['protocol'] : '';
+    if (!in_array($protocol, array('ALL','TCP','UDP','ICMP','IP','STATE','GEOIP'), true))
+        $errors['id_protocol'] = sprintf(_tr('%s is invalid'), _tr('Protocol'));
+    if ($protocol == 'TCP' || $protocol == 'UDP') {
+        if (empty($values['port_in']))  $errors['port_in'] = sprintf(_tr('%s is required'), _tr('Port Source'));
+        if (empty($values['port_out'])) $errors['port_out'] = sprintf(_tr('%s is required'), _tr('Port Destine'));
+    } elseif ($protocol == 'ICMP') {
+        if (empty($values['type_icmp'])) $errors['type_icmp'] = sprintf(_tr('%s is required'), _tr('Type'));
+    } elseif ($protocol == 'IP') {
+        if (empty($values['id_ip'])) $errors['id_ip'] = sprintf(_tr('%s is required'), _tr('ID'));
+    } elseif ($protocol == 'STATE') {
+        if (empty($values['state'])) $errors['state'] = _tr("You have to select at least one state");
+    } elseif ($protocol == 'GEOIP') {
+        if (empty($values['geoipcountries']) && empty($values['geoipcontinents']))
+            $errors['geoipcountries'] = _tr("You have to list some countries or continents");
     }
 
-    //************************************************************************************************************
-    //** TARGET **
-    //************************************************************************************************************
+    if (empty($values['target'])) $errors['target'] = sprintf(_tr('%s is required'), _tr('Target'));
 
-    $arrValues['target'] = getParameter("target");
-    if( strlen($arrValues['target']) == 0 ) $str_error .= ( strlen($str_error) == 0) ? "target" : ", target";
-
-    $arrValues['orden'] = getParameter("orden");
-    //**********************
-    //MENSSAGE ERROR
-    //**********************
-
-    if( strlen($str_error) != 0 ){
-        $mb_title = "ERROR";
-        $mb_message =  $str_error;
-        return "{\"status\":\"error\", \"title\":\"$mb_title\", \"message\": \"$mb_message\"}";
-    }
-
-    if(!$oForm->validateForm($_POST)) {
-        // Falla la validación básica del formulario
-        $strErrorMsg = "<b>"._tr('The following fields contain errors').":</b><br/>";
-        $arrErrores = $oForm->arrErroresValidacion;
-        if(is_array($arrErrores) && count($arrErrores) > 0){
-            foreach($arrErrores as $k=>$v) {
-                $strErrorMsg .= "$k: [$v[mensaje]] <br /> ";
-            }
-        }
-        $mb_title   = _tr("Validation Error");
-        $mb_message = $strErrorMsg;
-        return "{\"status\":\"error\", \"title\":\"$mb_title\", \"message\": \"$mb_message\"}";
-
-    }
-    else if($arrValues['mask_source'] > 32 || $arrValues['mask_destin'] > 32){
-        $mb_title   = _tr("Validation Error");
-        $mb_message = _tr("The bit masks must be values less than 33");
-        return "{\"status\":\"error\", \"title\":\"$mb_title\", \"message\": \"$mb_message\"}";
-    }
-    else if(($arrValues['ip_source'] != "0.0.0.0" && $arrValues['ip_source'] != "" && $arrValues['mask_source'] == "0")||($arrValues['ip_destin'] != "0.0.0.0" && $arrValues['ip_destin'] != "" && $arrValues['mask_destin'] == "0")){
-        $mb_title   = _tr("Validation Error");
-        $mb_message = _tr("Wrong Mask");
-        return "{\"status\":\"error\", \"title\":\"$mb_title\", \"message\": \"$mb_message\"}";
-    }
-
-    $arrValues['ip_source'] = ($arrValues['ip_source'] == "")? "0.0.0.0" : $arrValues['ip_source'];
-    $arrValues['ip_destin'] = ($arrValues['ip_destin'] == "")? "0.0.0.0" : $arrValues['ip_destin'];
-    $ipOrigen = explode(".",$arrValues['ip_source']);
-    $ipDestino = explode(".",$arrValues['ip_destin']);
-    if($ipOrigen[0]>255 || $ipOrigen[1]>255 || $ipOrigen[2]>255 || $ipOrigen[3]>255 || $ipDestino[0]>255 || $ipDestino[1]>255 || $ipDestino[2]>255 || $ipDestino[3]>255){
-        $mb_title   = _tr("Validation Error");
-        $mb_message = _tr("Wrong value for ip");
-        return "{\"status\":\"error\", \"title\":\"$mb_title\", \"message\": \"$mb_message\"}";
-    }
-    $arrValues['mask_source'] = ($arrValues['ip_source'] == "0.0.0.0") ? "0" : $arrValues['mask_source'];
-    $arrValues['mask_destin'] = ($arrValues['ip_destin'] == "0.0.0.0") ? "0" : $arrValues['mask_destin'];
-    $pNet = new paloNetwork();
-    $oPalo = new paloSantoRules($pDB);
-    if($arrValues['ip_source'] != "0.0.0.0" && $arrValues['mask_source'] != "" && $arrValues['ip_source'] != ""){
-        $arrValues['ip_source'] = $pNet->getNetAdress($arrValues['ip_source'],$arrValues['mask_source']);
-    }
-    if($arrValues['ip_destin'] != "0.0.0.0" && $arrValues['mask_destin'] != "" && $arrValues['ip_destin'] != ""){
-        $arrValues['ip_destin'] = $pNet->getNetAdress($arrValues['ip_destin'],$arrValues['mask_destin']);
-    }
-    if($id == ""){
-        if( $oPalo->saveRule( $arrValues ) == true )
-        {
-            $mb_title   = _tr("Message");
-            $mb_message = _tr("Successful Save");
-            return "{\"status\":\"success\", \"title\":\"$mb_title\", \"message\": \"$mb_message\"}";
-        }
-        else
-        {
-            $mb_title   = "ERROR";
-            $mb_message = $oPalo->errMsg;
-            return "{\"status\":\"error\", \"title\":\"$mb_title\", \"message\": \"$mb_message\"}";
-        }
-    } else {
-        if( $oPalo->updateRule($arrValues,$id) == true )
-        {
-            $mb_title   = _tr("Message");
-            $mb_message = _tr("Successful Update");
-            return "{\"status\":\"success\", \"title\":\"$mb_title\", \"message\": \"$mb_message\"}";
-        }
-        else
-        {
-            $mb_title   = "ERROR";
-            $mb_message = $oPalo->errMsg;
-            return "{\"status\":\"error\", \"title\":\"$mb_title\", \"message\": \"$mb_message\"}";
-        }
-    }
+    return $errors;
 }
 
-function isexecute($smarty,$module_name,$local_templates_dir,$pDB,$arrConf)
+function saveRulePage($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
+{
+    $id = trim((string)getParameter('id'));
+    $traffic = getParameter('id_traffic');
+    $protocol = getParameter('id_protocol');
+    $ip_source = trim((string)getParameter('ip_source'));
+    $ip_destin = trim((string)getParameter('ip_destin'));
+    $mask_source = trim((string)getParameter('mask_source'));
+    $mask_destin = trim((string)getParameter('mask_destin'));
+    $geoipCountriesRaw = getParameter('geoipcountries');
+    $geoipContinentsRaw = getParameter('geoipcontinents');
+
+    $values = array(
+        'id'              => $id,
+        'id_traffic'      => $traffic,
+        'traffic'         => $traffic,
+        'interface_in'    => getParameter('interface_in'),
+        'interface_out'   => getParameter('interface_out'),
+        'ip_source'       => $ip_source === '' ? '0.0.0.0' : $ip_source,
+        'mask_source'     => $mask_source,
+        'ip_destin'       => $ip_destin === '' ? '0.0.0.0' : $ip_destin,
+        'mask_destin'     => $mask_destin,
+        'port_in'         => getParameter('port_in'),
+        'port_out'        => getParameter('port_out'),
+        'type_icmp'       => getParameter('type_icmp'),
+        'id_ip'           => getParameter('id_ip'),
+        'id_protocol'     => $protocol,
+        'protocol'        => $protocol,
+        'target'          => getParameter('target'),
+        'orden'           => getParameter('orden'),
+        'geoipcountries'  => $geoipCountriesRaw,
+        'geoipcontinents' => $geoipContinentsRaw,
+    );
+
+    if ($protocol == 'STATE') {
+        $established = getParameter('established');
+        $related = getParameter('related');
+        $state = array();
+        if ($established == 'on') $state[] = 'Established';
+        if ($related == 'on') $state[] = 'Related';
+        $values['state'] = implode(',', $state);
+        $values['established'] = ($established == 'on') ? 'on' : '';
+        $values['related'] = ($related == 'on') ? 'on' : '';
+    } elseif ($protocol == 'GEOIP') {
+        // saveRule()/updateRule() reciben los arrays y hacen el implode.
+        $values['geoipcountries'] = is_array($geoipCountriesRaw) ? $geoipCountriesRaw : array();
+        $values['geoipcontinents'] = is_array($geoipContinentsRaw) ? $geoipContinentsRaw : array();
+        $values['state'] = '';
+    } else {
+        $values['state'] = '';
+        $values['geoipcountries'] = array();
+        $values['geoipcontinents'] = array();
+    }
+
+    $errors = validateRuleInput($values);
+    if (count($errors) > 0) {
+        // Conserva las selecciones múltiples tal como llegaron.
+        if (is_array($geoipCountriesRaw))  $values['geoipcountries']  = $geoipCountriesRaw;
+        if (is_array($geoipContinentsRaw)) $values['geoipcontinents'] = $geoipContinentsRaw;
+        $values['errors'] = $errors;
+        return constructForm($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $values, $id === '' ? 'new' : 'edit');
+    }
+
+    // Normaliza red/máscara igual que la versión anterior.
+    $pNet = new paloNetwork();
+    $pRules = new paloSantoRules($pDB);
+    $ip_source = ($values['ip_source'] == '') ? '0.0.0.0' : $values['ip_source'];
+    $ip_destin = ($values['ip_destin'] == '') ? '0.0.0.0' : $values['ip_destin'];
+    if ($ip_source != '0.0.0.0' && $values['mask_source'] !== '' && $values['mask_source'] !== '0') {
+        $ip_source = $pNet->getNetAdress($ip_source, $values['mask_source']);
+    }
+    if ($ip_destin != '0.0.0.0' && $values['mask_destin'] !== '' && $values['mask_destin'] !== '0') {
+        $ip_destin = $pNet->getNetAdress($ip_destin, $values['mask_destin']);
+    }
+    // saveRule()/updateRule() añaden la máscara: se pasan por separado.
+    $values['ip_source'] = $ip_source;
+    $values['ip_destin'] = $ip_destin;
+    if ($ip_source == '0.0.0.0') $values['mask_source'] = '0';
+    if ($ip_destin == '0.0.0.0') $values['mask_destin'] = '0';
+
+    // Sólo se guardan los campos que aplican al tráfico y al protocolo.
+    if ($values['traffic'] != 'OUTPUT' && $values['traffic'] != 'FORWARD') $values['interface_out'] = null;
+    if ($values['traffic'] != 'INPUT'  && $values['traffic'] != 'FORWARD') $values['interface_in'] = null;
+    if ($values['protocol'] != 'TCP' && $values['protocol'] != 'UDP') {
+        $values['port_in'] = null;
+        $values['port_out'] = null;
+    }
+    if ($values['protocol'] != 'ICMP') $values['type_icmp'] = null;
+    if ($values['protocol'] != 'IP')   $values['id_ip'] = null;
+
+    $ok = ($id === '') ? $pRules->saveRule($values) : $pRules->updateRule($values, $id);
+    if ($ok) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"),
+            $id === '' ? _tr("Successful Save") : _tr("Successful Update")));
+    } else {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pRules->errMsg));
+    }
+
+    return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+}
+
+function toggleRule($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, $action)
+{
+    $id = (int)getParameter($action);
+    $pRules = new paloSantoRules($pDB);
+    $ok = ($action == 'activate') ? $pRules->setActivated($id) : $pRules->setDesactivated($id);
+
+    if (getParameter('ajax')) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(array(
+            'status'  => $ok ? 'success' : 'error',
+            'message' => $ok ? _tr('Update correctly')
+                                  : ($pRules->errMsg !== '' ? $pRules->errMsg : _tr('The change could not be saved')),
+        ));
+        return NULL;
+    }
+
+    $smarty->assign("SECURITY_ALERT", $ok
+        ? issabel_alert_html('success', _tr("Message"), _tr("Update correctly"))
+        : issabel_alert_html('error', _tr("ERROR"), $pRules->errMsg));
+    return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+}
+
+/**
+ * Guarda el nuevo orden que llega del drag-and-drop o del teclado.
+ * Los ids deben ser de la misma familia (reglas o GeoIP) que la grilla.
+ */
+function reorderRules(&$pDB)
+{
+    header('Content-Type: application/json; charset=utf-8');
+    $ids = json_decode((string)getParameter('ids'), true);
+    $isGeo = ((int)getParameter('geoip') === 1);
+
+    if (!is_array($ids) || count($ids) === 0) {
+        echo json_encode(array('status' => 'error', 'message' => _tr('The order could not be saved')));
+        return NULL;
+    }
+
+    $pRules = new paloSantoRules($pDB);
+    $seen = array();
+    foreach ($ids as $id) {
+        $id = (int)$id;
+        if ($id <= 0 || isset($seen[$id])) {
+            echo json_encode(array('status' => 'error', 'message' => _tr('The order could not be saved')));
+            return NULL;
+        }
+        $rule = $pRules->getRule($id);
+        if (!is_array($rule) || (($rule['protocol'] === 'GEOIP') !== $isGeo)) {
+            echo json_encode(array('status' => 'error', 'message' => _tr('The order could not be saved')));
+            return NULL;
+        }
+        $seen[$id] = true;
+    }
+
+    $order = ($isGeo ? 100000 : 0) + 1;
+    foreach ($ids as $id) {
+        if (!$pRules->updateOrder((int)$id, $order++)) {
+            echo json_encode(array('status' => 'error', 'message' => $pRules->errMsg));
+            return NULL;
+        }
+    }
+
+    echo json_encode(array('status' => 'success', 'message' => _tr('Update correctly')));
+    return NULL;
+}
+
+function discardChanges($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
     $pRules = new paloSantoRules($pDB);
-    if($pRules->isExecutedInSystem()){
-        $ret = "{\"status\":\"success\",\"message\":\"yes\"}";
+    if (!$pRules->hasSnapshot()) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('warning', _tr('Message'),
+            _tr('There is no applied state to restore')));
+    } elseif ($pRules->discardChanges()) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr('Message'),
+            _tr('Changes discarded')));
     } else {
-        $ret = "{\"status\":\"success\",\"message\":\"no\"}";
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr('ERROR'),
+            _tr('The changes could not be discarded')));
     }
-    return $ret;
+    return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
 }
 
-function activateFirewallJSON($smarty,$module_name,$local_templates_dir,$pDB,$arrConf)
+function moveRule($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, $action)
+{
+    $id = (int)getParameter($action);
+    $pRules = new paloSantoRules($pDB);
+    $rule = $pRules->getRule($id);
+    if (is_array($rule)) {
+        $isGeo = ($rule['protocol'] == 'GEOIP');
+        $list = $isGeo ? $pRules->ObtainRulesGEOIP(100000, 0) : $pRules->ObtainRules(100000, 0);
+        $index = -1;
+        foreach ($list as $i => $row) if ((int)$row['id'] === $id) { $index = $i; break; }
+        $swap = ($action == 'move_up') ? $index - 1 : $index + 1;
+        if ($index >= 0 && isset($list[$swap])) {
+            $a = $list[$index]['rule_order'];
+            $b = $list[$swap]['rule_order'];
+            $pRules->updateOrder($list[$index]['id'], $b);
+            $pRules->updateOrder($list[$swap]['id'], $a);
+        }
+    }
+    return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+}
+
+function activateFirewall($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
     $pRules = new paloSantoRules($pDB);
     $bFirstTime = $pRules->isFirstTime();
     $pRules->noMoreFirstTime();
     if (!$pRules->activateRules()) {
-        $ret = "{\"status\":\"error\",\"title\":\"". _tr("Error during execution of rules")."\",\"message\":\"".$pRules->errMsg."\"}";
-        return $ret;
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pRules->errMsg));
+        return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
     }
-    if ($bFirstTime) {
-        $ret = "{\"status\":\"success\",\"message\":\"". _tr("The firewall has been activated")."\"}";
-    } else {
-        $ret = "{\"status\":\"success\",\"message\":\"". _tr("The rules have been executed in the system")."\"}";
-    }
+    $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"),
+        $bFirstTime ? _tr("The firewall has been activated") : _tr("The rules have been executed in the system")));
     $pRules->updateExecutedInSystem();
-    return $ret;
+    // Snapshot del estado que acaba de quedar aplicado; es la base de
+    // "Descartar cambios".
+    if (!$pRules->snapshotApplied()) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('warning', _tr('Message'),
+            _tr('The applied state could not be saved')));
+    }
+    return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+}
 
+function desactivateFirewall($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
+{
+    $pRules = new paloSantoRules($pDB);
+    if ($pRules->flushRules() && $pRules->setFirstTime()) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("The firewall has been desactivated")));
+    } else {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), _tr("The firewall could not be desactivated")));
+    }
+    return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
 }
 
 function deleteRules($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
     $pRules = new paloSantoRules($pDB);
-    $reglas = preg_split("/,/",$_POST['rules']);
-    $count=0;
-    foreach($reglas as $regla_id){
-        $count++;
-        $pRules->deleteRule($regla_id);
+    $ids = isset($_POST['del_x']) && is_array($_POST['del_x']) ? $_POST['del_x'] : array();
+    if (count($ids) === 0) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('warning', _tr("Message"), _tr("No rules were selected")));
+        return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
     }
-    return "{\"status\":\"success\", \"message\":\"".sprintf(_tr("%d rules were deleted"),$count)."\"}";
-}
-
-function getPorts($pDB)
-{
-    $jsonObject = new PaloSantoJSON();
-    $oPort = new paloSantoPortService($pDB);
-
-    $protocol = getParameter("protocol");
-    if($protocol == "TCP")
-        $Ports = $oPort->getTCPortNumbers();
-    else
-        $Ports = $oPort->getUDPortNumbers();
-    $arrPort['ANY'] = _tr('ANY');
-    foreach($Ports as $key => $value){
-        $arrPort[$value['id']] = $value['name'];
+    $count = 0;
+    $failed = array();
+    foreach ($ids as $id) {
+        if ($pRules->deleteRule((int)$id)) $count++;
+        else $failed[] = htmlspecialchars((string)$pRules->errMsg, ENT_COMPAT, 'UTF-8');
     }
-    $jsonObject->set_message($arrPort);
-    return $jsonObject->createJSON();
-}
-
-function getRules($pDB)
-{
-    $jsonObject = new PaloSantoJSON();
-    $pRules = new paloSantoRules($pDB);
-
-    $arrResult = $pRules->ObtainRules(1000000,0);
-    $jsonObject->set_message($arrResult);
-    return $jsonObject->createJSON();
-}
-
-function getRulesGEOIP($pDB)
-{
-    $jsonObject = new PaloSantoJSON();
-    $pRules = new paloSantoRules($pDB);
-
-    $arrResult = $pRules->ObtainRulesGEOIP(1000000,0);
-    $jsonObject->set_message($arrResult);
-    return $jsonObject->createJSON();
-}
-
-function desactivateFirewallJSON($smarty,$module_name,$local_templates_dir,$pDB,$arrConf)
-{
-    $pRules = new paloSantoRules($pDB);
-    if($pRules->flushRules() && $pRules->setFirstTime()){
-        $ret = "{\"status\":\"success\",\"message\":\"". _tr("The firewall has been desactivated")."\"}";
-    }else{
-        $ret = "{\"status\":\"error\",  \"message\":\"". _tr("The firewall could not be desactivated")."\"}";
-    }
-    return $ret;
-}
-
-function escapeQuote($val) {
-   $val = addcslashes($val, '"');
-   return $val;
-}
-
-function showDataTables($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf) {
-
-    global $arrLang;
-
-    $pRules = new paloSantoRules($pDB);
-    $action = getParameter("action");
-    $id     = getParameter("id");
-
-    $arrLangEscaped = array_map('escapeQuote', $arrLang);
-
-    $smarty->assign("ID", $id);
-    $smarty->assign("LANG", $arrLangEscaped);
-
-    if($pRules->hasGeoip()==true) {
-        $smarty->assign("HASGEOIP", "yes");
+    if (count($failed) === 0) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"),
+            sprintf(_tr("%d rules were deleted"), $count)));
     } else {
-        $smarty->assign("HASGEOIP", "no");
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), implode(' ', $failed)));
     }
-
-    if($pRules->isExecutedInSystem()==true) {
-        $smarty->assign("EXECUTED", "no");
-    } else {
-        $smarty->assign("EXECUTED", "yes");
-    }
-
-    if($pRules->isFirstTime()==true) { 
-        $smarty->assign("FIRSTTIME", "yes");
-    } else {
-        $smarty->assign("FIRSTTIME", "no");
-    }
-
-    if($action == 'edit'){
-        $arrtmp = $pRules->getRule($id);
-        $arripsource = explode("/",$arrtmp['ip_source']);
-        $arripdst = explode("/",$arrtmp['ip_destiny']);
-        $arrValues['id_traffic']=$arrtmp['traffic'];
-        $arrValues['interface_in']=$arrtmp['eth_in'];
-        $arrValues['interface_out']=$arrtmp['eth_out'];
-        $arrValues['ip_source']=$arripsource[0];
-        $arrValues['mask_source']=$arripsource[1];
-        $arrValues['port_in']=$arrtmp['sport'];
-        $arrValues['ip_destin']=$arripdst[0];
-        $arrValues['mask_destin']=$arripdst[1];
-        $arrValues['port_out']=$arrtmp['dport'];
-        $arrValues['type_icmp']=$arrtmp['icmp_type'];
-        $arrValues['id_ip']=$arrtmp['number_ip'];
-        $arrValues['id_protocol']=$arrtmp['protocol'];
-        $arrValues['target']=$arrtmp['target'];
-        $arrValues['orden']=$arrtmp['rule_order'];
-        $arrValues['state']=$arrtmp['state'];
-        $arrValues['geoipcountries']=explode(",",$arrtmp['countries']);
-        $arrValues['geoipcontinents']=explode(",",$arrtmp['continents']);
-        $arrValues['id']=$id;
-        $content = constructForm($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $arrValues, $action);
-        return $content;
-    }elseif($action == 'Activate'){
-        $pRules->setActivated($id);
-    }
-    elseif($action == 'Desactivate'){
-        $pRules->setDesactivated($id);
-    }
-
-    $smarty->assign('module_name', $module_name);
-    $content = $smarty->fetch("$local_templates_dir/datatables.tpl");
-    return $content;
+    return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
 }
 
 function getAction()
 {
-    if(getParameter("new"))
-        return "new";
-    else if(getParameter("save"))
-        return "save";
-    else if(getParameter("action") == "getPorts")
-        return "getPorts";
-    else if(getParameter("action") == "getRules")
-        return "getRules";
-    else if(getParameter("action") == "getRulesGEOIP")
-        return "getRulesGEOIP";
-    else if(getParameter("action") == "sort")
-        return "sort";
-    else if(getParameter("action") == "deleterules")
-        return "deleterules";
-    else if(getParameter("action") == "isexecute")
-        return "isexecute";
-    else if(getParameter("action")=="show") 
-        return "show";
-    else if(getParameter("desactivatefirewall"))
-        return "desactivatefirewall";
-    else if(getParameter("activatefirewall"))
-        return "activatefirewall";
-    else
-        return "report";
+    $isPost = ($_SERVER['REQUEST_METHOD'] === 'POST');
+    if($isPost && getParameter("save"))            return "save";
+    else if(getParameter("new"))        return "new";
+    else if($isPost && getParameter("delete"))     return "delete";
+    else if($isPost && getParameter("activatefirewall")) return "activatefirewall";
+    else if($isPost && getParameter("desactivatefirewall")) return "desactivatefirewall";
+    else if($isPost && getParameter("activate"))   return "activate";
+    else if($isPost && getParameter("deactivate")) return "deactivate";
+    else if($isPost && getParameter("reorder"))    return "reorder";
+    else if($isPost && getParameter("discardchanges")) return "discardchanges";
+    else if($isPost && getParameter("move_up"))    return "move_up";
+    else if($isPost && getParameter("move_down"))  return "move_down";
+    else if(getParameter("cancel"))     return "cancel";
+    else if(getParameter("action") == "edit") return "edit";
+    else if(getParameter("action") == "new")  return "new";
+    else return "report";
 }
 ?>
