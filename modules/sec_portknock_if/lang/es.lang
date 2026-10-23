@@ -2,10 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0.2                                               |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,35 +17,39 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  +----------------------------------------------------------------------+
-  $Id: paloSantoPortKnockUsers.class.php,v 1.1 2010-12-13 03:09:33  Exp $ */
-
+*/
 global $arrLangModule;
 $arrLangModule = array(
-'PortKnock Protected Interfaces' => 'Interfaces Protegidas por Portknock',
-'Interface' => 'Interfaz',
-'Protection' => 'Protección',
-'Port to Knock' => 'Puerto a tocar',
-'Authorizations' => 'Autorizaciones',
-'Are you sure you wish to unprotect the interface?' => '¿Está usted seguro de que desea desproteger la interfaz?',
-'Unprotect interface' => 'Desproteger interfaz',
-'ERROR' => 'ERROR',
-'Inactive' => 'Inactiva',
-'Active' => 'Activa',
-'Enable Protection' => 'Activar protección',
-'View authorizations' => 'Ver autorizaciones',
-'Port' => 'Puerto',
-'Port must be in range 0-65535' => 'Puerto debe estar en el rango 0-65535',
-'Invalid interface' => 'Interfaz inválida',
-'Assign Knocking Port' => 'Asignar puerto a tocar',
-'PortKnock Interface Authorizations' => 'Autorizaciones de portknocking sobre interfaz',
-'IP' => 'IP',
-'User' => 'Usuario',
-'Ports' => 'Puerto',
-'Since' => 'Desde',
-'Are you sure you wish to revoke this authorization?' => '¿Está usted seguro de que desea revocar esta autorización?',
-'Revoke authorization' => 'Revocar autorización',
-'Failed to restart portknock service' => 'Fallo al reiniciar servicio de portknock',
+    '%s is required' => '%s es obligatorio',
+    'Active' => 'Activa',
+    'Are you sure you wish to revoke this authorization?' => '¿Está usted seguro de que desea revocar esta autorización?',
+    'Are you sure you wish to unprotect the interface?' => '¿Está usted seguro de que desea desproteger la interfaz?',
+    'Assign Knocking Port' => 'Asignar puerto a tocar',
+    'Authorizations' => 'Autorizaciones',
+    'Cancel' => 'Cancelar',
+    'ERROR' => 'ERROR',
+    'Enable Protection' => 'Activar protección',
+    'Failed to restart portknock service' => 'Fallo al reiniciar servicio de portknock',
+    'IP' => 'IP',
+    'Inactive' => 'Inactiva',
+    'Interface' => 'Interfaz',
+    'Invalid interface' => 'Interfaz inválida',
+    'Message' => 'Mensaje',
+    'Options' => 'Opciones',
+    'Port' => 'Puerto',
+    'Port must be in range 0-65535' => 'Puerto debe estar en el rango 0-65535',
+    'Port to Knock' => 'Puerto a tocar',
+    'PortKnock Interface Authorizations' => 'Autorizaciones de portknocking sobre interfaz',
+    'PortKnock Protected Interfaces' => 'Interfaces Protegidas por Portknock',
+    'Ports' => 'Puerto',
+    'Protection' => 'Protección',
+    'Required field' => 'Campo requerido',
+    'Revocation successful' => 'Revocación exitosa',
+    'Revoke authorization' => 'Revocar autorización',
+    'Save' => 'Guardar',
+    'Since' => 'Desde',
+    'Unprotect interface' => 'Desproteger interfaz',
+    'Update correctly' => 'Actualizar correctamente',
+    'User' => 'Usuario',
+    'View authorizations' => 'Ver autorizaciones',
 );
-?>

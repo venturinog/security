@@ -1,54 +1,55 @@
 <?php
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
-   Codificación: UTF-8
+  Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
   | compliance with the License. You may obtain a copy of the License at |
   | http://www.opensource.org/licenses/gpl-license.php                   |
   |                                                                      |
-  | Software distributed under the License is distributed on "AS IS"     |
+  | Software distributed under the License is distributed on an "AS IS"  |
   | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  |                                                                      |
-  | Translated by: LLC LeNET                                             |
-  | Email: support@lenet.com.ua                                          |
-  +----------------------------------------------------------------------+
-  $Id: uk.lang,v 1.7 2023-10-30 00:59:49 LLC LENET support@lenet.ua Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-	"PortKnock Protected Interfaces" => "Захищені інтерфейси PortKnock",
-	"Interface" => "Інтерфейс",
-	"Protection" => "Захищеність",
-	"Port to Knock" => "Порт для Cтуку",
-	"Authorizations" => "Авторизації",
-	"Are you sure you wish to unprotect the interface?" => "Ви впевнені що хочете зняти захист з інтерфейсу?",
-	"Unprotect interface" => "Зняти захист інтерфейсу",
-	"ERROR" => "ПОМИЛКА",
-	"Inactive" => "Неактивний",
-	"Active" => "Активний",
-	"Enable Protection" => "Увімкнути Захист",
-	"View authorizations" => "Перегляд Авторизації",
-	"Port" => "Порт",
-	"Port must be in range 0-65535" => "Порт повинен бути в діапазоні 0-65535",
-	"Invalid interface" => "Неправильний інтерфейс",
-	"Assign Knocking Port" => "Призначити Порт Стуку",
-	"PortKnock Interface Authorizations" => "Авторизації Інтерфейсу PortKnock",
-	"IP" => "IP",
-	"User" => "Користувач",
-	"Ports" => "Порти",
-	"Since" => "Since",
-	"Are you sure you wish to revoke this authorization?" => "Ви впевнені що хочете відкликати цей дозвіл?",
-	"Revoke authorization" => "Відкликати дозвіл",
-	"Failed to restart portknock service" => "Не вдалося перезапустити службу portknock",
+$arrLangModule = array(
+    '%s is required' => '%s обовʼязково',
+    'Active' => 'Активний',
+    'Are you sure you wish to revoke this authorization?' => 'Ви впевнені що хочете відкликати цей дозвіл?',
+    'Are you sure you wish to unprotect the interface?' => 'Ви впевнені що хочете зняти захист з інтерфейсу?',
+    'Assign Knocking Port' => 'Призначити Порт Стуку',
+    'Authorizations' => 'Авторизації',
+    'Cancel' => 'Скасувати',
+    'ERROR' => 'ПОМИЛКА',
+    'Enable Protection' => 'Увімкнути Захист',
+    'Failed to restart portknock service' => 'Не вдалося перезапустити службу portknock',
+    'IP' => 'IP',
+    'Inactive' => 'Неактивний',
+    'Interface' => 'Інтерфейс',
+    'Invalid interface' => 'Неправильний інтерфейс',
+    'Message' => 'повідомлення',
+    'Options' => 'Опції',
+    'Port' => 'Порт',
+    'Port must be in range 0-65535' => 'Порт повинен бути в діапазоні 0-65535',
+    'Port to Knock' => 'Порт для Cтуку',
+    'PortKnock Interface Authorizations' => 'Авторизації Інтерфейсу PortKnock',
+    'PortKnock Protected Interfaces' => 'Захищені інтерфейси PortKnock',
+    'Ports' => 'Порти',
+    'Protection' => 'Захищеність',
+    'Required field' => 'Обов\'язкове поле',
+    'Revocation successful' => 'Відкликання успішно',
+    'Revoke authorization' => 'Відкликати дозвіл',
+    'Save' => 'Зберегти',
+    'Since' => 'Оскільки',
+    'Unprotect interface' => 'Зняти захист інтерфейсу',
+    'Update correctly' => 'Правильно оновлювати',
+    'User' => 'Користувач',
+    'View authorizations' => 'Перегляд Авторизації',
 );
-?>

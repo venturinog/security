@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s είναι υποχρεωτικό',
+    'Active' => 'Ενεργός',
+    'Are you sure you wish to revoke this authorization?' => 'Είστε βέβαιοι ότι θέλετε να ανακαλέσετε αυτήν την εξουσιοδότηση;',
+    'Are you sure you wish to unprotect the interface?' => 'Είστε βέβαιοι ότι θέλετε να καταργήσετε την προστασία της διεπαφής;',
+    'Assign Knocking Port' => 'Εκχώρηση Knocking Port',
+    'Authorizations' => 'Εξουσιοδοτήσεις',
+    'Cancel' => 'Ακύρωση',
+    'ERROR' => 'Error',
+    'Enable Protection' => 'Ενεργοποίηση Προστασίας',
+    'Failed to restart portknock service' => 'Αποτυχία επανεκκίνησης της υπηρεσίας portknock',
+    'IP' => 'IP',
+    'Inactive' => 'Ανενεργό',
+    'Interface' => 'Διασύνδεση',
+    'Invalid interface' => 'Μη έγκυρη διεπαφή',
+    'Message' => 'Μήνυμα',
+    'Options' => 'Επιλογές',
+    'Port' => 'Θύρα',
+    'Port must be in range 0-65535' => 'Η θύρα πρέπει να είναι στην περιοχή 0-65535',
+    'Port to Knock' => 'Θύρα για χτύπημα',
+    'PortKnock Interface Authorizations' => 'Εξουσιοδοτήσεις διεπαφής PortKnock',
+    'PortKnock Protected Interfaces' => 'Προστατευμένες διεπαφές PortKnock',
+    'Ports' => 'λιμάνια',
+    'Protection' => 'Προστασία',
+    'Required field' => 'Απαιτούμενα Πεδία',
+    'Revocation successful' => 'Επιτυχής ανάκληση',
+    'Revoke authorization' => 'Ανάκληση εξουσιοδότησης',
+    'Save' => 'Αποθήκευση',
+    'Since' => 'Από τότε',
+    'Unprotect interface' => 'Κατάργηση προστασίας της διεπαφής',
+    'Update correctly' => 'Ενημερώστε σωστά',
+    'User' => 'Χρήστης',
+    'View authorizations' => 'Προβολή εξουσιοδοτήσεων',
+);

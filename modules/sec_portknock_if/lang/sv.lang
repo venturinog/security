@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s krävs',
+    'Active' => 'Aktiv',
+    'Are you sure you wish to revoke this authorization?' => 'Är du säker på att du vill återkalla denna auktorisering?',
+    'Are you sure you wish to unprotect the interface?' => 'Är du säker på att du vill ta bort skyddet från gränssnittet?',
+    'Assign Knocking Port' => 'Tilldela knackande port',
+    'Authorizations' => 'Behörigheter',
+    'Cancel' => 'Avbryt',
+    'ERROR' => 'Error',
+    'Enable Protection' => 'Aktivera skydd',
+    'Failed to restart portknock service' => 'Det gick inte att starta om portknock-tjänsten',
+    'IP' => 'IP',
+    'Inactive' => 'Inaktiv',
+    'Interface' => 'Gränssnitt',
+    'Invalid interface' => 'Ogiltigt gränssnitt',
+    'Message' => 'Meddelande',
+    'Options' => 'Inställningar',
+    'Port' => 'Port',
+    'Port must be in range 0-65535' => 'Port måste vara inom intervallet 0-65535',
+    'Port to Knock' => 'Port till Knock',
+    'PortKnock Interface Authorizations' => 'PortKnock-gränssnittsbehörigheter',
+    'PortKnock Protected Interfaces' => 'PortKnock-skyddade gränssnitt',
+    'Ports' => 'Hamnar',
+    'Protection' => 'Skydd',
+    'Required field' => 'Obligatoriskt fält',
+    'Revocation successful' => 'Återkallelsen lyckades',
+    'Revoke authorization' => 'Återkalla auktorisation',
+    'Save' => 'Spara',
+    'Since' => 'Sedan',
+    'Unprotect interface' => 'Avskydda gränssnittet',
+    'Update correctly' => 'Uppdatera korrekt',
+    'User' => 'Användare',
+    'View authorizations' => 'Visa auktoriseringar',
+);

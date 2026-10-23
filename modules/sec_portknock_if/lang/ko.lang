@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s은(는) 필수입니다',
+    'Active' => '활성',
+    'Are you sure you wish to revoke this authorization?' => '이 승인을 취소하시겠습니까?',
+    'Are you sure you wish to unprotect the interface?' => '인터페이스 보호를 해제하시겠습니까?',
+    'Assign Knocking Port' => '노킹 포트 할당',
+    'Authorizations' => '승인',
+    'Cancel' => '취소',
+    'ERROR' => 'Error',
+    'Enable Protection' => '보호 활성화',
+    'Failed to restart portknock service' => '포트노크 서비스를 다시 시작하지 못했습니다.',
+    'IP' => 'IP',
+    'Inactive' => '비활성',
+    'Interface' => '인터페이스',
+    'Invalid interface' => '잘못된 인터페이스',
+    'Message' => '메시지',
+    'Options' => '옵션',
+    'Port' => '포트',
+    'Port must be in range 0-65535' => '포트는 0-65535 범위에 있어야 합니다.',
+    'Port to Knock' => '포트 투 노크',
+    'PortKnock Interface Authorizations' => 'PortKnock 인터페이스 인증',
+    'PortKnock Protected Interfaces' => 'PortKnock 보호 인터페이스',
+    'Ports' => '포트',
+    'Protection' => '보호',
+    'Required field' => '요구된 필드',
+    'Revocation successful' => '취소 성공',
+    'Revoke authorization' => '승인 취소',
+    'Save' => '저장',
+    'Since' => '이후',
+    'Unprotect interface' => '인터페이스 보호 해제',
+    'Update correctly' => '올바르게 업데이트하세요',
+    'User' => '사용자',
+    'View authorizations' => '승인 보기',
+);

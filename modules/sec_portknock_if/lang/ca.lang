@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s és obligatori',
+    'Active' => 'Actius',
+    'Are you sure you wish to revoke this authorization?' => 'Esteu segur que voleu revocar aquesta autorització?',
+    'Are you sure you wish to unprotect the interface?' => 'Esteu segur que voleu desprotegir la interfície?',
+    'Assign Knocking Port' => 'Assigna un port de trucada',
+    'Authorizations' => 'Autoritzacions',
+    'Cancel' => 'Cancel·la',
+    'ERROR' => 'Error',
+    'Enable Protection' => 'Activa la protecció',
+    'Failed to restart portknock service' => 'No s\'ha pogut reiniciar el servei portknock',
+    'IP' => 'IP',
+    'Inactive' => 'Inactiu',
+    'Interface' => 'Interfície',
+    'Invalid interface' => 'Interfície no vàlida',
+    'Message' => 'Missatge',
+    'Options' => 'Opcions',
+    'Port' => 'Port',
+    'Port must be in range 0-65535' => 'El port ha d\'estar entre 0 i 65535',
+    'Port to Knock' => 'Port a Toc',
+    'PortKnock Interface Authorizations' => 'Autoritzacions de la interfície PortKnock',
+    'PortKnock Protected Interfaces' => 'Interfícies protegides PortKnock',
+    'Ports' => 'Ports',
+    'Protection' => 'Protecció',
+    'Required field' => 'Camp requerit',
+    'Revocation successful' => 'Revocació reeixida',
+    'Revoke authorization' => 'Revocar l\'autorització',
+    'Save' => 'Desa',
+    'Since' => 'Des de',
+    'Unprotect interface' => 'Desprotegeix la interfície',
+    'Update correctly' => 'Actualitzar correctament',
+    'User' => 'Usuari',
+    'View authorizations' => 'Veure autoritzacions',
+);

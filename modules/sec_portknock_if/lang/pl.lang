@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s jest wymagane',
+    'Active' => 'Aktywny',
+    'Are you sure you wish to revoke this authorization?' => 'Czy na pewno chcesz cofnąć to upoważnienie?',
+    'Are you sure you wish to unprotect the interface?' => 'Czy na pewno chcesz wyłączyć ochronę interfejsu?',
+    'Assign Knocking Port' => 'Przypisz port pukający',
+    'Authorizations' => 'Autoryzacje',
+    'Cancel' => 'Anuluj',
+    'ERROR' => 'Error',
+    'Enable Protection' => 'Włącz ochronę',
+    'Failed to restart portknock service' => 'Nie udało się ponownie uruchomić usługi portknock',
+    'IP' => 'IP',
+    'Inactive' => 'Nieaktywny',
+    'Interface' => 'Interfejs',
+    'Invalid interface' => 'Nieprawidłowy interfejs',
+    'Message' => 'Wiadomość',
+    'Options' => 'Opcje',
+    'Port' => 'Port',
+    'Port must be in range 0-65535' => 'Port musi należeć do zakresu 0–65535',
+    'Port to Knock' => 'Port do zapukania',
+    'PortKnock Interface Authorizations' => 'Autoryzacje interfejsu PortKnock',
+    'PortKnock Protected Interfaces' => 'Interfejsy chronione przez PortKnock',
+    'Ports' => 'Porty',
+    'Protection' => 'Ochrona',
+    'Required field' => 'Wymagane pole',
+    'Revocation successful' => 'Cofnięcie powiodło się',
+    'Revoke authorization' => 'Cofnij autoryzację',
+    'Save' => 'Zapisz',
+    'Since' => 'Od',
+    'Unprotect interface' => 'Wyłącz ochronę interfejsu',
+    'Update correctly' => 'Aktualizuj poprawnie',
+    'User' => 'Użytkownik',
+    'View authorizations' => 'Zobacz autoryzacje',
+);

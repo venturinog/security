@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s е задължително',
+    'Active' => 'Включен',
+    'Are you sure you wish to revoke this authorization?' => 'Сигурни ли сте, че искате да отмените това разрешение?',
+    'Are you sure you wish to unprotect the interface?' => 'Сигурни ли сте, че искате да премахнете защитата на интерфейса?',
+    'Assign Knocking Port' => 'Присвояване на Knocking Port',
+    'Authorizations' => 'Разрешения',
+    'Cancel' => 'Отказ',
+    'ERROR' => 'Error',
+    'Enable Protection' => 'Активирайте защитата',
+    'Failed to restart portknock service' => 'Неуспешно рестартиране на услугата portknock',
+    'IP' => 'IP',
+    'Inactive' => 'Неактивен',
+    'Interface' => 'Интерфейс',
+    'Invalid interface' => 'Невалиден интерфейс',
+    'Message' => 'Съобщение',
+    'Options' => 'Опции',
+    'Port' => 'Порт',
+    'Port must be in range 0-65535' => 'Портът трябва да е в диапазона 0-65535',
+    'Port to Knock' => 'Отвор за почукване',
+    'PortKnock Interface Authorizations' => 'Разрешения за интерфейс PortKnock',
+    'PortKnock Protected Interfaces' => 'Защитени интерфейси на PortKnock',
+    'Ports' => 'Портове',
+    'Protection' => 'защита',
+    'Required field' => 'Задължителни полета',
+    'Revocation successful' => 'Отмяната е успешна',
+    'Revoke authorization' => 'Отмяна на разрешението',
+    'Save' => 'Запази',
+    'Since' => 'Тъй като',
+    'Unprotect interface' => 'Премахване на защитата на интерфейса',
+    'Update correctly' => 'Актуализирайте правилно',
+    'User' => 'Потребител',
+    'View authorizations' => 'Преглед на разрешенията',
+);

@@ -73,13 +73,15 @@ function listPortKnockInterfaces(&$smarty, $module_name, $local_templates_dir, &
         isset($recordset[$_POST['eth_in']])) {
     	$bExito = $pk->removeProtectedInterface($_POST['eth_in']);
         if (!$bExito) {
-            $smarty->assign("mb_title", _tr("ERROR"));
-            $smarty->assign("mb_message", $pk->errMsg);
+            $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pk->errMsg));
+        } else {
+            $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("Update correctly")));
         }
         $recordset = $pk->listProtectedInterfaces();
     }
 
     $data = array();
+    $smarty->assign('SECURITY_ALERT', $smarty->getTemplateVars('SECURITY_ALERT'));
     if (is_array($recordset)) {
         foreach (array_keys($listaIf) as $eth_in) {
         	if (!isset($recordset[$eth_in])) {
@@ -92,13 +94,14 @@ function listPortKnockInterfaces(&$smarty, $module_name, $local_templates_dir, &
         }
         ksort($recordset);
     	foreach ($recordset as $eth_in => $eth_info) {
+            $eth = htmlspecialchars($eth_in, ENT_COMPAT, 'UTF-8');
     		$data[] = array(
-                is_null($eth_info['udp_port']) ? '' : '<input type="radio" name="eth_in" value="'.$eth_in.'" />',
-                $eth_in,
+                is_null($eth_info['udp_port']) ? '' : '<input type="radio" name="eth_in" value="'.$eth.'" />',
+                $eth,
                 is_null($eth_info['udp_port']) ? _tr('Inactive') : _tr('Active'),
-                "<a href=\"?menu=$module_name&amp;action=setport&amp;eth_in=$eth_in\">".(is_null($eth_info['udp_port']) ? '['._tr('Enable Protection').']' : $eth_info['udp_port']).'</a>',
-                ($eth_info['num_auth'] > 0) ? $eth_info['num_auth'] : '-',
-                ($eth_info['num_auth'] > 0) ? "<a href=\"?menu=$module_name&amp;action=viewauths&amp;eth_in=$eth_in\">["._tr('View authorizations').']</a>': '-',
+                "<a href=\"?menu=$module_name&amp;action=setport&amp;eth_in=".urlencode($eth_in)."\">".(is_null($eth_info['udp_port']) ? '['._tr('Enable Protection').']' : (int)$eth_info['udp_port']).'</a>',
+                ($eth_info['num_auth'] > 0) ? (int)$eth_info['num_auth'] : '-',
+                ($eth_info['num_auth'] > 0) ? "<a href=\"?menu=$module_name&amp;action=viewauths&amp;eth_in=".urlencode($eth_in)."\">["._tr('View authorizations').']</a>': '-',
             );
     	}
     }
@@ -109,20 +112,20 @@ function listPortKnockInterfaces(&$smarty, $module_name, $local_templates_dir, &
     );    
     $oGrid->setURL($url);
     $oGrid->setData($data);
-    return $oGrid->fetchGrid();
+    return $smarty->getTemplateVars('SECURITY_ALERT').$oGrid->fetchGrid();
 }
 
 function setPortKnockPort(&$smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
     if (isset($_POST['cancel'])) {
         Header("Location: ?menu=$module_name");
-    	return NULL;
+        return NULL;
     }
 
     $listaIf = PaloNetwork::obtener_interfases_red_fisicas();
     $cbo_eth = array();
     foreach ($listaIf as $eth_in => $eth_info) {
-    	$cbo_eth[$eth_in] = $eth_info['Name'].' - '.$eth_info['Inet Addr'];
+        $cbo_eth[$eth_in] = $eth_info['Name'].' - '.$eth_info['Inet Addr'];
     }
 
     $requested_eth_in = getParameter('eth_in');
@@ -133,16 +136,42 @@ function setPortKnockPort(&$smarty, $module_name, $local_templates_dir, &$pDB, $
     $pk = new paloSantoPortKnockInterfaces($pDB);
     $recordset = $pk->listProtectedInterfaces();
     if (!isset($_POST['port'])) {
-    	if (!is_null($requested_eth_in) && isset($recordset[$requested_eth_in])) {
-    		$_POST['port'] = $recordset[$requested_eth_in]['udp_port'];
-    	} else {
-    		// Generar un número aleatorio entre 32768 y 65535
-            $bColision = FALSE;
+        if (!is_null($requested_eth_in) && isset($recordset[$requested_eth_in])) {
+            $_POST['port'] = $recordset[$requested_eth_in]['udp_port'];
+        } else {
+            // Generar un número aleatorio entre 32768 y 65535
             $_POST['port'] = rand(32768, 65535);
-    	}
+        }
     }
-    
-	$camposFormulario = array(
+
+    $errors = array();
+    if (isset($_POST['save'])) {
+        $port = trim((string)getParameter('port'));
+        if ($requested_eth_in === NULL) {
+            $errors['eth_in'] = sprintf(_tr('%s is required'), _tr('Interface'));
+        } elseif (!in_array($_POST['eth_in'], array_keys($listaIf))) {
+            $errors['eth_in'] = _tr('Invalid interface');
+        }
+        if ($port === '') {
+            $errors['port'] = sprintf(_tr('%s is required'), _tr('Port'));
+        } elseif (!preg_match('/^[0-9]{1,5}$/', $port) || (int)$port < 1 || (int)$port > 65535) {
+            $errors['port'] = _tr('Port must be in range 0-65535');
+        }
+
+        if (count($errors) === 0) {
+            $bExito = $pk->setProtectedInterfacePort($_POST['eth_in'], $port);
+            if (!$bExito) {
+                $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pk->errMsg));
+            } else {
+                Header("Location: ?menu=$module_name");
+                return NULL;
+            }
+        } else {
+            $_POST['port'] = $port;
+        }
+    }
+
+    $camposFormulario = array(
         "eth_in"    =>  array(
             "LABEL"                 => _tr("Interface"),
             "REQUIRED"              => "yes",
@@ -155,52 +184,35 @@ function setPortKnockPort(&$smarty, $module_name, $local_templates_dir, &$pDB, $
             "LABEL"                  => _tr("Port"),
             "REQUIRED"               => "yes",
             "INPUT_TYPE"             => "TEXT",
-            "INPUT_EXTRA_PARAM"      => array("style" => "width:76px"),
-            "VALIDATION_TYPE"        => "numeric",
+            "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
+            "VALIDATION_TYPE"        => "text",
             "VALIDATION_EXTRA_PARAM" => ""
         ),
     );
+    foreach (array('eth_in','port') as $f) {
+        if (!isset($errors[$f])) continue;
+        if ($camposFormulario[$f]['INPUT_TYPE'] === 'SELECT') {
+            $camposFormulario[$f]['CLASS'] = 'is-invalid';
+            continue;
+        }
+        if (!isset($camposFormulario[$f]['INPUT_EXTRA_PARAM']) || !is_array($camposFormulario[$f]['INPUT_EXTRA_PARAM']))
+            $camposFormulario[$f]['INPUT_EXTRA_PARAM'] = array();
+        $cls = isset($camposFormulario[$f]['INPUT_EXTRA_PARAM']['class'])
+            ? $camposFormulario[$f]['INPUT_EXTRA_PARAM']['class'].' ' : 'form-control ';
+        $camposFormulario[$f]['INPUT_EXTRA_PARAM']['class'] = $cls.'is-invalid';
+    }
     $oForm = new paloForm($smarty, $camposFormulario);
     $smarty->assign(array(
         'MODULE_NAME'   =>  $module_name,
         'CANCEL'        =>  _tr('Cancel'),
         'SAVE'          =>  _tr('Save'),
         'REQUIRED_FIELD'=>  _tr('Required field'),
+        'ERRORS'        => array_merge(array('eth_in' => '', 'port' => ''), $errors),
         'icon'          =>  'images/list.png',
     ));
 
-    // Guardar los cambios
-    if (isset($_POST['save'])) {
-        if (!$oForm->validateForm($_POST)) {
-            // Falla la validación básica del formulario
-            $strErrorMsg = "<b>"._tr('The following fields contain errors').":</b><br/>";
-            $arrErrores = $oForm->arrErroresValidacion;
-            if (is_array($arrErrores) && count($arrErrores) > 0) {
-                foreach($arrErrores as $k=>$v) {
-                    $strErrorMsg .= "$k: [$v[mensaje]] <br /> ";
-                }
-            }
-            $smarty->assign("mb_title", _tr("Validation Error"));
-            $smarty->assign("mb_message", $strErrorMsg);
-        } elseif ($_POST['port'] > 65535) {
-            $smarty->assign("mb_title", _tr("Validation Error"));
-            $smarty->assign("mb_message", _tr('Port must be in range 0-65535'));
-        } elseif (!in_array($_POST['eth_in'], array_keys($listaIf))) {
-            $smarty->assign("mb_title", _tr("Validation Error"));
-            $smarty->assign("mb_message", _tr('Invalid interface'));
-        } else {
-        	$bExito = $pk->setProtectedInterfacePort($_POST['eth_in'], $_POST['port']);
-            if (!$bExito) {
-                $smarty->assign("mb_title", _tr("Error"));
-                $smarty->assign("mb_message", $pk->errMsg);
-            } else {
-            	Header("Location: ?menu=$module_name");
-                return NULL;
-            }
-        }
-    }
-
-    return $oForm->fetchForm("$local_templates_dir/form.tpl", _tr('Assign Knocking Port'), $_POST);
+    return $smarty->getTemplateVars('SECURITY_ALERT')
+        . $oForm->fetchForm("$local_templates_dir/form.tpl", _tr('Assign Knocking Port'), $_POST);
 }
 
 function listPortKnockCurrentAuths(&$smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
@@ -228,9 +240,9 @@ function listPortKnockCurrentAuths(&$smarty, $module_name, $local_templates_dir,
         if (count($l) >= 2) {
         	$bExito = $pk->removeAuthorizationsUserInterface($l[0], $l[1]);
             if (!$bExito) {
-                $smarty->assign("mb_title", _tr("Error"));
-                $smarty->assign("mb_message", $pk->errMsg);
+                $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pk->errMsg));
             } else {
+                $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("Revocation successful")));
                 Header("Location: ?menu=$module_name");
                 return NULL;
             }
@@ -250,12 +262,13 @@ function listPortKnockCurrentAuths(&$smarty, $module_name, $local_templates_dir,
     				$listaProto[] = $info_auth['name'];
                     $ruleStart = $info_auth['rule_start'];
     			}
+                $value = htmlspecialchars($id_user.'-'.$ip_source, ENT_COMPAT, 'UTF-8');
                 $data[] = array(
-                    '<input type="radio" name="id_user_ip" value="'.$id_user.'-'.$ip_source.'" />',
-                    $ip_source,
-                    $userinfo[0][1],
-                    implode(' ', $listaProto),
-                    $ruleStart,
+                    '<input type="radio" name="id_user_ip" value="'.$value.'" />',
+                    htmlspecialchars($ip_source, ENT_COMPAT, 'UTF-8'),
+                    htmlspecialchars(isset($userinfo[0][1]) ? $userinfo[0][1] : '', ENT_COMPAT, 'UTF-8'),
+                    htmlspecialchars(implode(' ', $listaProto), ENT_COMPAT, 'UTF-8'),
+                    htmlspecialchars((string)$ruleStart, ENT_COMPAT, 'UTF-8'),
                 );
     		}
     	}
@@ -267,6 +280,6 @@ function listPortKnockCurrentAuths(&$smarty, $module_name, $local_templates_dir,
     );    
     $oGrid->setURL($url);
     $oGrid->setData($data);
-    return $oGrid->fetchGrid();
+    return $smarty->getTemplateVars('SECURITY_ALERT').$oGrid->fetchGrid();
 }
 ?>

@@ -2,10 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0.2                                               |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,35 +17,41 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
+  | The Initial Developer of the Original Code is Issabel Foundation     |
   +----------------------------------------------------------------------+
-  $Id: paloSantoPortKnockUsers.class.php,v 1.1 2010-12-13 03:09:33  Exp $ */
-
+*/
 global $arrLangModule;
 $arrLangModule = array(
-'PortKnock Protected Interfaces' => 'PortKnock Protected Interfaces',
-'Interface' => 'Interface',
-'Protection' => 'Protection',
-'Port to Knock' => 'Port to Knock',
-'Authorizations' => 'Authorizations',
-'Are you sure you wish to unprotect the interface?' => 'Are you sure you wish to unprotect the interface?',
-'Unprotect interface' => 'Unprotect interface',
-'ERROR' => 'ERROR',
-'Inactive' => 'Inactive',
-'Active' => 'Active',
-'Enable Protection' => 'Enable Protection',
-'View authorizations' => 'View authorizations',
-'Port' => 'Port',
-'Port must be in range 0-65535' => 'Port must be in range 0-65535',
-'Invalid interface' => 'Invalid interface',
-'Assign Knocking Port' => 'Assign Knocking Port',
-'PortKnock Interface Authorizations' => 'PortKnock Interface Authorizations',
-'IP' => 'IP',
-'User' => 'User',
-'Ports' => 'Ports',
-'Since' => 'Since',
-'Are you sure you wish to revoke this authorization?' => 'Are you sure you wish to revoke this authorization?',
-'Revoke authorization' => 'Revoke authorization',
-'Failed to restart portknock service' => 'Failed to restart portknock service',
+    '%s is required' => '%s is required',
+    'Active' => 'Active',
+    'Are you sure you wish to revoke this authorization?' => 'Are you sure you wish to revoke this authorization?',
+    'Are you sure you wish to unprotect the interface?' => 'Are you sure you wish to unprotect the interface?',
+    'Assign Knocking Port' => 'Assign Knocking Port',
+    'Authorizations' => 'Authorizations',
+    'Cancel' => 'Cancel',
+    'ERROR' => 'ERROR',
+    'Enable Protection' => 'Enable Protection',
+    'Failed to restart portknock service' => 'Failed to restart portknock service',
+    'IP' => 'IP',
+    'Inactive' => 'Inactive',
+    'Interface' => 'Interface',
+    'Invalid interface' => 'Invalid interface',
+    'Message' => 'Message',
+    'Options' => 'Options',
+    'Port' => 'Port',
+    'Port must be in range 0-65535' => 'Port must be in range 0-65535',
+    'Port to Knock' => 'Port to Knock',
+    'PortKnock Interface Authorizations' => 'PortKnock Interface Authorizations',
+    'PortKnock Protected Interfaces' => 'PortKnock Protected Interfaces',
+    'Ports' => 'Ports',
+    'Protection' => 'Protection',
+    'Required field' => 'Required field',
+    'Revocation successful' => 'Revocation successful',
+    'Revoke authorization' => 'Revoke authorization',
+    'Save' => 'Save',
+    'Since' => 'Since',
+    'Unprotect interface' => 'Unprotect interface',
+    'Update correctly' => 'Update correctly',
+    'User' => 'User',
+    'View authorizations' => 'View authorizations',
 );
-?>

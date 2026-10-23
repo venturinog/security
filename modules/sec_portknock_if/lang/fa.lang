@@ -2,11 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2019 Issabel Foundation                                |
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -18,37 +17,39 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  | Translate by: Haamed Kouhfallah                                      |
-  | Email: k.haamed@gmail.com                                            |
-  +----------------------------------------------------------------------+
-  $Id: fa.lang,v 1.1 2019-11-30 04:08:50 Haamed Kouhfallah k.haamed@gmail.com Exp $
 */
 global $arrLangModule;
 $arrLangModule = array(
-'PortKnock Protected Interfaces' => 'PortKnock Protected Interfaces',
-'Interface' => 'Interface',
-'Protection' => 'Protection',
-'Port to Knock' => 'Port to Knock',
-'Authorizations' => 'Authorizations',
-'Are you sure you wish to unprotect the interface?' => 'Are you sure you wish to unprotect the interface?',
-'Unprotect interface' => 'Unprotect interface',
-'ERROR' => 'ERROR',
-'Inactive' => 'Inactive',
-'Active' => 'Active',
-'Enable Protection' => 'Enable Protection',
-'View authorizations' => 'View authorizations',
-'Port' => 'Port',
-'Port must be in range 0-65535' => 'Port must be in range 0-65535',
-'Invalid interface' => 'Invalid interface',
-'Assign Knocking Port' => 'Assign Knocking Port',
-'PortKnock Interface Authorizations' => 'PortKnock Interface Authorizations',
-'IP' => 'IP',
-'User' => 'User',
-'Ports' => 'Ports',
-'Since' => 'Since',
-'Are you sure you wish to revoke this authorization?' => 'Are you sure you wish to revoke this authorization?',
-'Revoke authorization' => 'Revoke authorization',
-'Failed to restart portknock service' => 'Failed to restart portknock service',
+    '%s is required' => '%s الزامی است',
+    'Active' => 'فعال',
+    'Are you sure you wish to revoke this authorization?' => 'آیا مطمئنید که می خواهید این مجوز را لغو کنید؟',
+    'Are you sure you wish to unprotect the interface?' => 'آیا مطمئن هستید که می خواهید از رابط کاربری محافظت کنید؟',
+    'Assign Knocking Port' => 'پورت ضربه را تعیین کنید',
+    'Authorizations' => 'مجوزها',
+    'Cancel' => 'انصراف',
+    'ERROR' => 'ERROR',
+    'Enable Protection' => 'Protection را فعال کنید',
+    'Failed to restart portknock service' => 'راه اندازی مجدد سرویس portknock انجام نشد',
+    'IP' => 'IP',
+    'Inactive' => 'غیر فعال',
+    'Interface' => 'رابط',
+    'Invalid interface' => 'رابط نامعتبر است',
+    'Message' => 'پیام',
+    'Options' => 'گزینه ها',
+    'Port' => 'بندر',
+    'Port must be in range 0-65535' => 'پورت باید در محدوده 0-65535 باشد',
+    'Port to Knock' => 'بندر به ضربه',
+    'PortKnock Interface Authorizations' => 'مجوزهای رابط PortKnock',
+    'PortKnock Protected Interfaces' => 'رابط های محافظت شده PortKnock',
+    'Ports' => 'پورت ها',
+    'Protection' => 'حفاظت',
+    'Required field' => 'فيلد مورد نياز',
+    'Revocation successful' => 'لغو با موفقیت انجام شد',
+    'Revoke authorization' => 'لغو مجوز',
+    'Save' => 'ذخيره',
+    'Since' => 'از آنجایی که',
+    'Unprotect interface' => 'رابط کاربری را لغو محافظت کنید',
+    'Update correctly' => 'درست آپدیت کنید',
+    'User' => 'کاربر',
+    'View authorizations' => 'مشاهده مجوزها',
 );
-?>

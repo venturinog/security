@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s je obavezno',
+    'Active' => 'Aktivno',
+    'Are you sure you wish to revoke this authorization?' => 'Jeste li sigurni da želite opozvati ovu autorizaciju?',
+    'Are you sure you wish to unprotect the interface?' => 'Jeste li sigurni da želite poništiti zaštitu sučelja?',
+    'Assign Knocking Port' => 'Dodijelite Knocking Port',
+    'Authorizations' => 'Ovlaštenja',
+    'Cancel' => 'Odustani',
+    'ERROR' => 'Error',
+    'Enable Protection' => 'Omogući zaštitu',
+    'Failed to restart portknock service' => 'Ponovno pokretanje usluge portknock nije uspjelo',
+    'IP' => 'IP',
+    'Inactive' => 'Neaktivan',
+    'Interface' => 'sučelje',
+    'Invalid interface' => 'Nevažeće sučelje',
+    'Message' => 'Poruka',
+    'Options' => 'Opcije',
+    'Port' => 'Port',
+    'Port must be in range 0-65535' => 'Port mora biti u rasponu 0-65535',
+    'Port to Knock' => 'Port to Knock',
+    'PortKnock Interface Authorizations' => 'Autorizacije sučelja PortKnock',
+    'PortKnock Protected Interfaces' => 'PortKnock zaštićena sučelja',
+    'Ports' => 'luke',
+    'Protection' => 'zaštita',
+    'Required field' => 'Obvezatno polje',
+    'Revocation successful' => 'Opoziv uspješan',
+    'Revoke authorization' => 'Opozovi autorizaciju',
+    'Save' => 'Spremi',
+    'Since' => 'Budući da',
+    'Unprotect interface' => 'Ukloni zaštitu sučelja',
+    'Update correctly' => 'Ažurirajte ispravno',
+    'User' => 'Korisnik',
+    'View authorizations' => 'Pregledajte ovlaštenja',
+);

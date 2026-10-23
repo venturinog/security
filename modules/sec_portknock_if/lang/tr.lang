@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s zorunludur',
+    'Active' => 'Aktif',
+    'Are you sure you wish to revoke this authorization?' => 'Bu yetkiyi iptal etmek istediğinizden emin misiniz?',
+    'Are you sure you wish to unprotect the interface?' => 'Arayüzün korumasını kaldırmak istediğinizden emin misiniz?',
+    'Assign Knocking Port' => 'Vuruş Bağlantı Noktasını Ata',
+    'Authorizations' => 'Yetkiler',
+    'Cancel' => 'İptal',
+    'ERROR' => 'Hata',
+    'Enable Protection' => 'Korumayı Etkinleştir',
+    'Failed to restart portknock service' => 'Portknock hizmeti yeniden başlatılamadı',
+    'IP' => 'IP',
+    'Inactive' => 'Etkin değil',
+    'Interface' => 'Arayüz',
+    'Invalid interface' => 'Geçersiz arayüz',
+    'Message' => 'Mesaj',
+    'Options' => 'Seçenekler',
+    'Port' => 'Bağlantı noktası',
+    'Port must be in range 0-65535' => 'Bağlantı noktası 0-65535 aralığında olmalıdır',
+    'Port to Knock' => 'Vurulacak Liman',
+    'PortKnock Interface Authorizations' => 'PortKnock Arayüzü Yetkileri',
+    'PortKnock Protected Interfaces' => 'PortKnock Korumalı Arayüzler',
+    'Ports' => 'Limanlar',
+    'Protection' => 'Koruma',
+    'Required field' => 'Gerekli alan',
+    'Revocation successful' => 'İptal başarılı',
+    'Revoke authorization' => 'Yetkiyi iptal et',
+    'Save' => 'Kaydet',
+    'Since' => 'O zamandan beri',
+    'Unprotect interface' => 'Arayüzün korumasını kaldır',
+    'Update correctly' => 'Doğru şekilde güncelleyin',
+    'User' => 'Kullanıcı',
+    'View authorizations' => 'Yetkileri görüntüle',
+);

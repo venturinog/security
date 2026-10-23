@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s kötelező',
+    'Active' => 'Aktív',
+    'Are you sure you wish to revoke this authorization?' => 'Biztosan visszavonja ezt az engedélyt?',
+    'Are you sure you wish to unprotect the interface?' => 'Biztosan feloldja a felület védelmét?',
+    'Assign Knocking Port' => 'Kopogtatási port hozzárendelése',
+    'Authorizations' => 'Engedélyek',
+    'Cancel' => 'Mégse',
+    'ERROR' => 'Error',
+    'Enable Protection' => 'Védelem engedélyezése',
+    'Failed to restart portknock service' => 'Nem sikerült újraindítani a portknock szolgáltatást',
+    'IP' => 'IP',
+    'Inactive' => 'Inaktív',
+    'Interface' => 'Interfész',
+    'Invalid interface' => 'Érvénytelen felület',
+    'Message' => 'Üzenet',
+    'Options' => 'Opciók',
+    'Port' => 'Port',
+    'Port must be in range 0-65535' => 'A portnak a 0-65535 tartományban kell lennie',
+    'Port to Knock' => 'Kikötő Knockba',
+    'PortKnock Interface Authorizations' => 'PortKnock interfész jogosultságok',
+    'PortKnock Protected Interfaces' => 'PortKnock védett interfészek',
+    'Ports' => 'Portok',
+    'Protection' => 'Védelem',
+    'Required field' => 'Szükséges mező',
+    'Revocation successful' => 'A visszavonás sikeres',
+    'Revoke authorization' => 'Engedély visszavonása',
+    'Save' => 'Mentés',
+    'Since' => 'Mivel',
+    'Unprotect interface' => 'Feloldja az interfész védelmét',
+    'Update correctly' => 'Frissítse helyesen',
+    'User' => 'Felhasználó',
+    'View authorizations' => 'Engedélyek megtekintése',
+);

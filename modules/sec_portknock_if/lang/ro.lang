@@ -1,0 +1,55 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    '%s is required' => '%s este obligatoriu',
+    'Active' => 'Activ',
+    'Are you sure you wish to revoke this authorization?' => 'Sigur doriți să revocați această autorizație?',
+    'Are you sure you wish to unprotect the interface?' => 'Sigur doriți să deprotejați interfața?',
+    'Assign Knocking Port' => 'Atribuiți portul de batere',
+    'Authorizations' => 'Autorizații',
+    'Cancel' => 'Anulează',
+    'ERROR' => 'Error',
+    'Enable Protection' => 'Activați Protecția',
+    'Failed to restart portknock service' => 'Serviciul portknock a eșuat',
+    'IP' => 'IP',
+    'Inactive' => 'Inactiv',
+    'Interface' => 'Interfață',
+    'Invalid interface' => 'Interfață nevalidă',
+    'Message' => 'Mesaj',
+    'Options' => 'Opțiuni',
+    'Port' => 'Port',
+    'Port must be in range 0-65535' => 'Portul trebuie să fie în intervalul 0-65535',
+    'Port to Knock' => 'Port to Knock',
+    'PortKnock Interface Authorizations' => 'Autorizări de interfață PortKnock',
+    'PortKnock Protected Interfaces' => 'Interfețe protejate PortKnock',
+    'Ports' => 'Porturi',
+    'Protection' => 'Protecție',
+    'Required field' => 'Camp Obligatoriu',
+    'Revocation successful' => 'Revocare reușită',
+    'Revoke authorization' => 'Revocați autorizația',
+    'Save' => 'Salvează',
+    'Since' => 'Din moment ce',
+    'Unprotect interface' => 'Deprotejați interfața',
+    'Update correctly' => 'Actualizați corect',
+    'User' => 'Utilizator',
+    'View authorizations' => 'Vedeți autorizațiile',
+);
