@@ -2,9 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0.0                                                |
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -16,29 +17,33 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  $Id: br.lang,v 1.2 2021-25-10 12:55:00 Leandro Saltori - Prisma Telecom leandro@prismatelecom.com Exp $
 */
 global $arrLangModule;
-$arrLangModule=array(
-"Jail" => "Jail",
-"IP" => "IP",
-"Fail2Ban Banned IPs" => "Fail2Ban IPs Banidos",
-"Unbanned correctly" => "Desbanido corretamente",
-"Unban" => "Unban",
-"Error" => "Error",
-"Name" => "Nome",
-"Country" => "País",
-"The following fields contain errors" => "Os campos a seguir contêm erros",
-"Validation Error" => "Erro de Validação",
-"Public address" => "Endereço público",
-"Private network" => "Rede privada",
-"Loopback" => "Loopback",
-"Link local" => "Local de enlace",
-"Carrier Grade NAT" => "Carrier Grade NAT",
-"Documentation" => "Documentação",
-"Benchmarking" => "Benchmarking",
-"Multicast" => "Multicast",
-"Reserved" => "Reservado",
-"IPv6 address" => "Endereço IPv6",
+$arrLangModule = array(
+    'Address type' => 'Tipo de endereço',
+    'Are you sure you wish to unban the record(s)?' => 'Tem certeza de que deseja remover a proibição do (s) registro(s)?',
+    'Benchmarking' => 'Comparativo de mercado',
+    'Carrier Grade NAT' => 'NAT de grau de operadora',
+    'Country' => 'País',
+    'Documentation' => 'Documentação',
+    'ERROR' => 'Erro',
+    'Error' => 'Erro',
+    'Fail2Ban Banned IPs' => 'Fail2Ban IPs Banidos',
+    'IP' => 'IP',
+    'IPv6 address' => 'Endereço IPv6',
+    'Jail' => 'Prisão',
+    'Link local' => 'Local de enlace',
+    'Loopback' => 'Loopback',
+    'Message' => 'Mensagem',
+    'Multicast' => 'Multitransmissão',
+    'Name' => 'Nome',
+    'No records were selected' => 'Nenhum registro foi selecionado',
+    'Private network' => 'Rede privada',
+    'Public address' => 'Endereço público',
+    'Rejected IP' => 'IP rejeitado',
+    'Reserved' => 'Reservado',
+    'The following fields contain errors' => 'Os campos a seguir contêm erros',
+    'Unban' => 'Desbanir',
+    'Unbanned correctly' => 'Desbanido corretamente',
+    'Validation Error' => 'Erro de Validação',
 );
-?>

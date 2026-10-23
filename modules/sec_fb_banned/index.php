@@ -91,7 +91,7 @@ function reportBloqueados($smarty, $module_name, $local_templates_dir, &$pDB, $a
     //begin grid parameters
     $oGrid  = new paloSantoGrid($smarty);
 
-    $oGrid->deleteList("Are you sure you wish to unban the record(s).?","delete",_tr("Unban"));
+    $oGrid->deleteList(_tr("Are you sure you wish to unban the record(s)?"),"delete",_tr("Unban"));
 
     $rejected=fail2ban_rejected();
 
@@ -115,26 +115,23 @@ function reportBloqueados($smarty, $module_name, $local_templates_dir, &$pDB, $a
     
     $arrResult = array_slice($rejected, $offset, ($totalBloqueados-$offset) < $limit ? ($totalBloqueados-$offset) : $limit);    
     $button_eliminar = "";
-    $arrColumns = array($button_eliminar,_tr("Jail"),_tr("IP"),_tr("Country"));
+    $arrColumns = array($button_eliminar,_tr("Jail"),_tr("IP"),_tr("Address type"));
     $oGrid->setColumns($arrColumns);
     if( is_array($arrResult) && $total>0 ){
         foreach($arrResult as $key => $value){
-            $arrTmp[0] = "<input type='checkbox' name='".$value['id']."' id='".$value['id']."'>";
-            $arrTmp[1] = $value['jail'];
-            $arrTmp[2] = $value['ip'];
-            $arrTmp[3] = _getCountryLabel($value['ip']);
+            $id = (int)$value['id'];
+            $arrTmp[0] = "<input type='checkbox' name='del_x[]' value='".$id."'>";
+            $arrTmp[1] = htmlspecialchars($value['jail'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[2] = htmlspecialchars($value['ip'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[3] = htmlspecialchars(_getCountryLabel($value['ip']), ENT_COMPAT, 'UTF-8');
 
             $arrData[] = $arrTmp;
         }
     }
     $oGrid->setData($arrData);
 
-    $contenidoModulo = $oGrid->fetchGrid();
-    if (strpos($contenidoModulo, '<form') === FALSE)
-        $contenidoModulo = "<form  method='POST' style='margin-bottom:0;' action=$url>$contenidoModulo</form>";
     //end grid parameters
-
-    return $contenidoModulo;
+    return $smarty->getTemplateVars('SECURITY_ALERT').$oGrid->fetchGrid();
 }
 
 /**
@@ -195,26 +192,29 @@ function _getCountryLabel($ip)
 
 function deleteBloqueados($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
-    $str_msj_error = "Error";
+    $str_msj_error = _tr("ERROR");
 
     $rejected=fail2ban_rejected();
     $error=0;
-    foreach( $_POST as $key => $value ){
-        if( $value == "on" ){
-            $jail = strtolower($rejected[$key]["jail"]);
-            $ip   = $rejected[$key]["ip"];    
+    $ids = isset($_POST['del_x']) && is_array($_POST['del_x']) ? $_POST['del_x'] : array();
+    if (count($ids) === 0) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('warning', _tr("Message"), _tr("No records were selected")));
+        return reportBloqueados($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+    }
+    foreach( $ids as $id ){
+        $id = (int)$id;
+        if (!isset($rejected[$id])) continue;
+        $jail = strtolower($rejected[$id]["jail"]);
+        $ip   = $rejected[$id]["ip"];
 
-            exec("/usr/bin/issabel-helper fb_client unban ".escapeshellarg($jail)." ".escapeshellarg($ip), $respuesta, $retorno);
-            if($retorno==1) { $error=1; }
-        }
+        exec("/usr/bin/issabel-helper fb_client unban ".escapeshellarg($jail)." ".escapeshellarg($ip), $respuesta, $retorno);
+        if($retorno==1) { $error=1; }
     }
     if( $error == 0 ){
-        $smarty->assign("mb_title", _tr("Message"));
-        $smarty->assign("mb_message", _tr("Unbanned correctly"));
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("Unbanned correctly")));
     }
     else{
-        $smarty->assign("mb_title", _tr("ERROR"));
-        $smarty->assign("mb_message", $str_msj_error);
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $str_msj_error));
     }
 
     return reportBloqueados($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
@@ -222,9 +222,9 @@ function deleteBloqueados($smarty, $module_name, $local_templates_dir, &$pDB, $a
 
 function getAction()
 {
-    if(getParameter("delete")) //Get parameter by POST (submit)
+    if($_SERVER['REQUEST_METHOD'] === 'POST' && getParameter("delete")) //Get parameter by POST (submit)
         return "delete";
-    else 
+    else
         return "report";
 }
 ?>

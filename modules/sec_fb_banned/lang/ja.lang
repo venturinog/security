@@ -1,0 +1,49 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Address type' => 'アドレスの種類',
+    'Are you sure you wish to unban the record(s)?' => 'レコードの禁止を解除してもよろしいですか？',
+    'Benchmarking' => 'ベンチマーク',
+    'Carrier Grade NAT' => 'キャリアグレードのNAT',
+    'Country' => '国',
+    'Documentation' => 'ドキュメント',
+    'ERROR' => 'Error',
+    'Error' => 'エラー',
+    'Fail2Ban Banned IPs' => 'Fail2Ban 禁止 IP',
+    'IP' => 'IP',
+    'IPv6 address' => 'IPv6アドレス',
+    'Jail' => '刑務所',
+    'Link local' => 'ローカルにリンクする',
+    'Loopback' => 'ループバック',
+    'Message' => 'メッセージ',
+    'Multicast' => 'マルチキャスト',
+    'Name' => '名前',
+    'No records were selected' => 'レコードが選択されていませんでした',
+    'Private network' => 'プライベートネットワーク',
+    'Public address' => 'パブリックアドレス',
+    'Rejected IP' => '拒否されたIP',
+    'Reserved' => '予約済み',
+    'The following fields contain errors' => '以下の内容に間違いがあります',
+    'Unban' => '禁止を解除する',
+    'Unbanned correctly' => '正しく禁止解除されました',
+    'Validation Error' => '検証エラー',
+);

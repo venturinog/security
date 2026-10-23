@@ -1,0 +1,49 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Address type' => 'Врста адресе',
+    'Are you sure you wish to unban the record(s)?' => 'Želite li zaista da opozovete zabranu zapisa?',
+    'Benchmarking' => 'Бенцхмаркинг',
+    'Carrier Grade NAT' => 'Царриер Граде НАТ',
+    'Country' => 'Држава',
+    'Documentation' => 'Документација',
+    'ERROR' => 'Error',
+    'Error' => 'Грешка',
+    'Fail2Ban Banned IPs' => 'Фаил2Бан забрањене ИП адресе',
+    'IP' => 'IP',
+    'IPv6 address' => 'ИПв6 адреса',
+    'Jail' => 'Затвор',
+    'Link local' => 'Локална веза',
+    'Loopback' => 'Лоопбацк',
+    'Message' => 'Порука',
+    'Multicast' => 'Мултицаст',
+    'Name' => 'Име',
+    'No records were selected' => 'Није изабран ниједан запис',
+    'Private network' => 'Приватна мрежа',
+    'Public address' => 'Јавно обраћање',
+    'Rejected IP' => 'Одбијена ИП адреса',
+    'Reserved' => 'Резервисано',
+    'The following fields contain errors' => 'Sledeca polja sadrze greske',
+    'Unban' => 'Унбан',
+    'Unbanned correctly' => 'Уклоњено исправно',
+    'Validation Error' => 'Validacijona greska',
+);

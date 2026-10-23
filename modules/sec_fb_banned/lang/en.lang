@@ -2,9 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0.0                                                |
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -16,28 +17,35 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
+  | The Initial Developer of the Original Code is Issabel Foundation     |
+  +----------------------------------------------------------------------+
 */
 global $arrLangModule;
-$arrLangModule=array(
-"Jail" => "Jail",
-"IP" => "IP",
-"Fail2Ban Banned IPs" => "Fail2Ban Banned IPs",
-"Unbanned correctly" => "Unbanned correctly",
-"Unban" => "Unban",
-"Error" => "Error",
-"Name" => "Name",
-"Country" => "Country",
-"The following fields contain errors" => "The following fields contain errors",
-"Validation Error" => "Validation Error",
-"Public address" => "Public address",
-"Private network" => "Private network",
-"Loopback" => "Loopback",
-"Link local" => "Link local",
-"Carrier Grade NAT" => "Carrier Grade NAT",
-"Documentation" => "Documentation",
-"Benchmarking" => "Benchmarking",
-"Multicast" => "Multicast",
-"Reserved" => "Reserved",
-"IPv6 address" => "IPv6 address",
+$arrLangModule = array(
+    'Address type' => 'Address type',
+    'Are you sure you wish to unban the record(s)?' => 'Are you sure you wish to unban the record(s)?',
+    'Benchmarking' => 'Benchmarking',
+    'Carrier Grade NAT' => 'Carrier Grade NAT',
+    'Country' => 'Country',
+    'Documentation' => 'Documentation',
+    'ERROR' => 'ERROR',
+    'Error' => 'Error',
+    'Fail2Ban Banned IPs' => 'Fail2Ban Banned IPs',
+    'IP' => 'IP',
+    'IPv6 address' => 'IPv6 address',
+    'Jail' => 'Jail',
+    'Link local' => 'Link local',
+    'Loopback' => 'Loopback',
+    'Message' => 'Message',
+    'Multicast' => 'Multicast',
+    'Name' => 'Name',
+    'No records were selected' => 'No records were selected',
+    'Private network' => 'Private network',
+    'Public address' => 'Public address',
+    'Rejected IP' => 'Rejected IP',
+    'Reserved' => 'Reserved',
+    'The following fields contain errors' => 'The following fields contain errors',
+    'Unban' => 'Unban',
+    'Unbanned correctly' => 'Unbanned correctly',
+    'Validation Error' => 'Validation Error',
 );
-?>

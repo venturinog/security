@@ -2,9 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel Version 4.0.0                                                |
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 Issabel Foundation                                |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -18,26 +19,31 @@
   +----------------------------------------------------------------------+
 */
 global $arrLangModule;
-$arrLangModule=array(
-"Jail" => "Jaula",
-"IP" => "IP",
-"Fail2Ban Banned IPs" => "Fail2Ban IP Bloqueadas",
-"Unbanned correctly" => "Desbloqueado correctamente",
-"Unban" => "Desbloquear",
-"Error" => "Error",
-"Name" => "Name",
-"Country" => "Country",
-"The following fields contain errors" => "The following fields contain errors",
-"Validation Error" => "Validation Error",
-"Public address" => "Dirección pública",
-"Private network" => "Red privada",
-"Loopback" => "Loopback",
-"Link local" => "Enlace local",
-"Carrier Grade NAT" => "Carrier Grade NAT",
-"Documentation" => "Documentación",
-"Benchmarking" => "Benchmarking",
-"Multicast" => "Multicast",
-"Reserved" => "Reservado",
-"IPv6 address" => "Dirección IPv6",
+$arrLangModule = array(
+    'Address type' => 'Tipo de dirección',
+    'Are you sure you wish to unban the record(s)?' => '¿Está seguro de que desea desbloquear el (los) registro(s)?',
+    'Benchmarking' => 'Evaluación comparativa',
+    'Carrier Grade NAT' => 'NAT de grado de operador',
+    'Country' => 'País',
+    'Documentation' => 'Documentación',
+    'ERROR' => 'Error',
+    'Error' => 'Error',
+    'Fail2Ban Banned IPs' => 'Fail2Ban IP Bloqueadas',
+    'IP' => 'IP',
+    'IPv6 address' => 'Dirección IPv6',
+    'Jail' => 'Jaula',
+    'Link local' => 'Enlace local',
+    'Loopback' => 'Bucle invertido',
+    'Message' => 'Mensaje',
+    'Multicast' => 'Multidifusión',
+    'Name' => 'Nombre',
+    'No records were selected' => 'No se seleccionaron registros',
+    'Private network' => 'Red privada',
+    'Public address' => 'Dirección pública',
+    'Rejected IP' => 'IP rechazada',
+    'Reserved' => 'Reservado',
+    'The following fields contain errors' => 'Los siguientes campos contienen errores.',
+    'Unban' => 'Desbloquear',
+    'Unbanned correctly' => 'Desbloqueado correctamente',
+    'Validation Error' => 'Error de validación',
 );
-?>

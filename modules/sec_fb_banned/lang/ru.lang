@@ -1,0 +1,49 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Address type' => 'Тип адреса',
+    'Are you sure you wish to unban the record(s)?' => 'Вы уверены, что хотите разблокировать записи?',
+    'Benchmarking' => 'Бенчмаркинг',
+    'Carrier Grade NAT' => 'NAT операторского класса',
+    'Country' => 'Страна',
+    'Documentation' => 'Документация',
+    'ERROR' => 'Ошибка',
+    'Error' => 'Ошибка',
+    'Fail2Ban Banned IPs' => 'Запрещенные IP-адреса Fail2Ban',
+    'IP' => 'IP',
+    'IPv6 address' => 'IPv6-адрес',
+    'Jail' => 'Тюрьма',
+    'Link local' => 'Ссылка локальная',
+    'Loopback' => 'петлевая проверка',
+    'Message' => 'Сообщение',
+    'Multicast' => 'Многоадресная рассылка',
+    'Name' => 'Имя',
+    'No records were selected' => 'Никакие записи не были выбраны',
+    'Private network' => 'Частная сеть',
+    'Public address' => 'Публичное обращение',
+    'Rejected IP' => 'Отклоненный IP-адрес',
+    'Reserved' => 'Зарезервировано',
+    'The following fields contain errors' => 'Следующие поля содержат ошибки',
+    'Unban' => 'Разбанить',
+    'Unbanned correctly' => 'Разбанили правильно',
+    'Validation Error' => 'Ошибка валидации',
+);

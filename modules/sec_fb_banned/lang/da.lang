@@ -1,0 +1,49 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Address type' => 'Adressetype',
+    'Are you sure you wish to unban the record(s)?' => 'Er du sikker på, at du vil fjerne forbuddet mod optegnelsen/optegnelserne?',
+    'Benchmarking' => 'Benchmarking',
+    'Carrier Grade NAT' => 'Carrier Grade nat',
+    'Country' => 'Land',
+    'Documentation' => 'Dokumentation',
+    'ERROR' => 'Error',
+    'Error' => 'Fejl',
+    'Fail2Ban Banned IPs' => 'Fail2Ban forbudte IP\'er',
+    'IP' => 'IP',
+    'IPv6 address' => 'IPv6-adresse',
+    'Jail' => 'Fængsel',
+    'Link local' => 'Link lokalt',
+    'Loopback' => 'Loopback',
+    'Message' => 'Besked',
+    'Multicast' => 'Multicast',
+    'Name' => 'Navn',
+    'No records were selected' => 'Ingen poster blev valgt',
+    'Private network' => 'Privat netværk',
+    'Public address' => 'Offentlig adresse',
+    'Rejected IP' => 'Afvist IP',
+    'Reserved' => 'Reserveret',
+    'The following fields contain errors' => 'Følgende felter indeholder fejl',
+    'Unban' => 'Ophæv forbuddet',
+    'Unbanned correctly' => 'Ophævet forbuddet korrekt',
+    'Validation Error' => 'Valideringsfejl',
+);

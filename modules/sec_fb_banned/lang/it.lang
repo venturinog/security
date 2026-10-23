@@ -1,0 +1,49 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Address type' => 'Tipo di indirizzo',
+    'Are you sure you wish to unban the record(s)?' => 'Sei sicuro di voler annullare il ban dei record?',
+    'Benchmarking' => 'Benchmarking',
+    'Carrier Grade NAT' => 'Grado operatore NAT',
+    'Country' => 'Paese',
+    'Documentation' => 'Documentazione',
+    'ERROR' => 'Error',
+    'Error' => 'Errore',
+    'Fail2Ban Banned IPs' => 'Fail2Ban IP vietati',
+    'IP' => 'IP',
+    'IPv6 address' => 'Indirizzo IPv6',
+    'Jail' => 'Prigione',
+    'Link local' => 'Collegamento locale',
+    'Loopback' => 'Loopback',
+    'Message' => 'Messaggio',
+    'Multicast' => 'Multicast',
+    'Name' => 'Nome',
+    'No records were selected' => 'Nessun record selezionato',
+    'Private network' => 'Rete privata',
+    'Public address' => 'Indirizzo pubblico',
+    'Rejected IP' => 'IP rifiutato',
+    'Reserved' => 'Riservato',
+    'The following fields contain errors' => 'I seguenti campi contengono errori',
+    'Unban' => 'Sbancare',
+    'Unbanned correctly' => 'Non bannato correttamente',
+    'Validation Error' => 'Errore di Validazione',
+);

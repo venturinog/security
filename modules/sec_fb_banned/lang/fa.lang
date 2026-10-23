@@ -2,11 +2,10 @@
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2019 Issabel Foundation                                |
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -18,33 +17,33 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  | Translate by: Haamed Kouhfallah                                      |
-  | Email: k.haamed@gmail.com                                            |
-  +----------------------------------------------------------------------+
-  $Id: fa.lang,v 1.1 2019-11-30 04:08:50 Haamed Kouhfallah k.haamed@gmail.com Exp $
 */
 global $arrLangModule;
-$arrLangModule=array(
-"Jail" => "زندان",
-"IP" => "آی پی",
-"Fail2Ban Banned IPs" => "آی پی های بسته شده",
-"Unbanned correctly" => "به درستی آزاد شد",
-"Unban" => "آزاد شود",
-"Error" => "خطا",
-"Name" => "نام",
-"Country" => "کشور",
-"The following fields contain errors" => "فیلد های زیر دارای خطا هستند",
-"Validation Error" => "خطا در اعتبار سنجی",
-"Public address" => "آدرس عمومی",
-"Private network" => "شبکه خصوصی",
-"Loopback" => "Loopback",
-"Link local" => "پیوند محلی",
-"Carrier Grade NAT" => "Carrier Grade NAT",
-"Documentation" => "مستندات",
-"Benchmarking" => "Benchmarking",
-"Multicast" => "چندپخشی",
-"Reserved" => "رزرو شده",
-"IPv6 address" => "آدرس IPv6",
+$arrLangModule = array(
+    'Address type' => 'نوع آدرس',
+    'Are you sure you wish to unban the record(s)?' => 'Are you sure you wish to unban the record(s)?',
+    'Benchmarking' => 'محک زدن',
+    'Carrier Grade NAT' => 'درجه حامل NAT',
+    'Country' => 'کشور',
+    'Documentation' => 'مستندات',
+    'ERROR' => 'خطا',
+    'Error' => 'خطا',
+    'Fail2Ban Banned IPs' => 'آی پی های بسته شده',
+    'IP' => 'آی پی',
+    'IPv6 address' => 'آدرس IPv6',
+    'Jail' => 'زندان',
+    'Link local' => 'پیوند محلی',
+    'Loopback' => 'دور زدنNAME OF TRANSLATORS',
+    'Message' => 'پیام',
+    'Multicast' => 'چندپخشی',
+    'Name' => 'نام',
+    'No records were selected' => 'هیچ رکوردی انتخاب نشد',
+    'Private network' => 'شبکه خصوصی',
+    'Public address' => 'آدرس عمومی',
+    'Rejected IP' => 'Rejected IP',
+    'Reserved' => 'رزرو شده',
+    'The following fields contain errors' => 'فیلد های زیر دارای خطا هستند',
+    'Unban' => 'آزاد شود',
+    'Unbanned correctly' => 'به درستی آزاد شد',
+    'Validation Error' => 'خطا در اعتبار سنجی',
 );
-?>

@@ -1,0 +1,49 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Address type' => '地址类型',
+    'Are you sure you wish to unban the record(s)?' => '您确定要解禁记录吗？',
+    'Benchmarking' => '标杆管理',
+    'Carrier Grade NAT' => '运营商级 NAT',
+    'Country' => '国家',
+    'Documentation' => '文档',
+    'ERROR' => 'Error',
+    'Error' => '错误',
+    'Fail2Ban Banned IPs' => 'Fail2Ban 禁止的 IP',
+    'IP' => 'IP',
+    'IPv6 address' => 'IPv6地址',
+    'Jail' => '监狱',
+    'Link local' => '链接本地',
+    'Loopback' => '环回',
+    'Message' => '留言',
+    'Multicast' => '组播',
+    'Name' => '名称',
+    'No records were selected' => '没有选择任何记录',
+    'Private network' => '专网',
+    'Public address' => '公共广播',
+    'Rejected IP' => '被拒绝的IP',
+    'Reserved' => '保留',
+    'The following fields contain errors' => '以下项目有误',
+    'Unban' => '解禁',
+    'Unbanned correctly' => '正确解禁',
+    'Validation Error' => '确认出错',
+);

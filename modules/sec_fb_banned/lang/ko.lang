@@ -1,0 +1,49 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Address type' => '주소 유형',
+    'Are you sure you wish to unban the record(s)?' => '기록을 차단 해제하시겠습니까?',
+    'Benchmarking' => '벤치마킹',
+    'Carrier Grade NAT' => '캐리어 등급 NAT',
+    'Country' => '국가',
+    'Documentation' => '문서',
+    'ERROR' => 'Error',
+    'Error' => '오류',
+    'Fail2Ban Banned IPs' => 'Fail2Ban 금지된 IP',
+    'IP' => 'IP',
+    'IPv6 address' => 'IPv6 주소',
+    'Jail' => '감옥',
+    'Link local' => '로컬 링크',
+    'Loopback' => '루프백',
+    'Message' => '메시지',
+    'Multicast' => '멀티캐스트',
+    'Name' => '이름',
+    'No records were selected' => '선택한 레코드가 없습니다.',
+    'Private network' => '사설망',
+    'Public address' => '공개 주소',
+    'Rejected IP' => '거부된 IP',
+    'Reserved' => '예약됨',
+    'The following fields contain errors' => '다음 필드는 에러을 나타냅니다.',
+    'Unban' => '금지 해제',
+    'Unbanned correctly' => '올바르게 금지 해제됨',
+    'Validation Error' => '유효 에러',
+);

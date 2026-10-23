@@ -1,0 +1,49 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+*/
+global $arrLangModule;
+$arrLangModule = array(
+    'Address type' => 'Adres türü',
+    'Are you sure you wish to unban the record(s)?' => 'Kayıtların yasağını kaldırmak istediğinizden emin misiniz?',
+    'Benchmarking' => 'Karşılaştırma',
+    'Carrier Grade NAT' => 'Taşıyıcı Sınıfı NAT',
+    'Country' => 'Ülke',
+    'Documentation' => 'Dokümantasyon',
+    'ERROR' => 'Hata',
+    'Error' => 'Hata',
+    'Fail2Ban Banned IPs' => 'Fail2Ban Yasaklanan IP\'ler',
+    'IP' => 'IP',
+    'IPv6 address' => 'IPv6 adresi',
+    'Jail' => 'Hapishane',
+    'Link local' => 'Yerel bağlantı',
+    'Loopback' => 'Geri döngü',
+    'Message' => 'Mesaj',
+    'Multicast' => 'Çok noktaya yayın',
+    'Name' => 'İsim',
+    'No records were selected' => 'Hiçbir kayıt seçilmedi',
+    'Private network' => 'Özel ağ',
+    'Public address' => 'Genel adres',
+    'Rejected IP' => 'Reddedilen IP',
+    'Reserved' => 'Ayrılmış',
+    'The following fields contain errors' => 'Şu alanlar hatalı',
+    'Unban' => 'Yasağı kaldır',
+    'Unbanned correctly' => 'Yasak doğru şekilde kaldırıldı',
+    'Validation Error' => 'Geçerli değil',
+);
