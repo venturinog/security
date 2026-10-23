@@ -3,19 +3,28 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 10
+Release: 16
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildArch: noarch
-Requires(pre): issabel-framework >= 5.0.0
+Requires(pre): issabel-framework >= 6.0.0-89
 Requires(pre): issabelPBX >= 2.12.0
-Requires(pre): iptables
-# On CentOS 7 only, iptables does *not* install any service files
-Requires(pre): iptables-services
+# EL10 no publica los nombres historicos "iptables"/"iptables-services":
+# los proveen iptables-nft y iptables-nft-services (iptables.service incluido).
+Requires(pre): iptables-nft
+Requires(pre): iptables-nft-services
 Requires: issabel-system
 Requires: issabel-portknock
+# sec_accessaudit incluye modules/asterisk_log/libs/LogParser_Full.class.php,
+# que se distribuye en issabel-reports. Sin esta dependencia, instalar solo
+# issabel-security deja la pagina Audit sin el parser del log.
+Requires: issabel-reports
+# Trae el DKMS de xt_geoip y construye /usr/share/xt_geoip (B9).
+Requires: issabel-geoip
+Requires: php-pdo
+Requires: iproute
 Requires: net-tools
 Requires: fail2ban-server
 Requires: fail2ban-sendmail
@@ -213,6 +222,7 @@ fi
 
 %files
 %defattr(-, root, root)
+%doc README.md docs/geoip-map.md
 %{_localstatedir}/www/html/*
 %{_datadir}/issabel/module_installer/*
 %defattr(644, root, root)
@@ -233,6 +243,61 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-16
+- Fix reversed implode() arguments in fwconfig GeoIP rule generation. PHP 8
+  throws a TypeError when a GeoIP rule has fewer than 10 countries, so applying
+  the firewall aborted before loading any rule.
+
+* Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-15
+- Send rawmode=yes in the firewall rules AJAX calls. Without it the Modern
+  iframe layout did not dispatch the module, so the drag-and-drop reorder and
+  the activation switch were applied only in the DOM and reloaded with the
+  previous database state.
+
+* Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-14
+- Require issabel-reports: sec_accessaudit includes LogParser_Full from the
+  asterisk_log module, so installing only issabel-security left the Audit page
+  unable to load the log parser.
+- Require issabel-framework >= 6.0.0-89, which no longer replaces the audit log
+  on upgrades.
+- sec_accessaudit: handle an empty audit log without PHP warnings and show an
+  explicit empty state instead of a filter with no dates.
+
+* Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-13
+- Restore the firewall grid UX on top of paloSantoGrid: single action bar,
+  GeoIP grid first with its own heading, traffic/target icons, switch for
+  activation, edit icon and drag-and-drop (plus keyboard) reordering.
+- Add "Discard changes": a filter_snapshot is saved after each successful
+  apply and restored on demand.
+- Harden the GeoIP preflight in fwconfig: check the userspace match, the
+  kernel module and /usr/share/xt_geoip, abort instead of silently skipping
+  GeoIP rules, and report a clear message. Use geoiplookup instead of the
+  removed php-geoip function and avoid the external myip.issabel.org call.
+- Require php-pdo and iproute, used by fwconfig.
+
+* Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-12
+- Require iptables-nft and iptables-nft-services explicitly; EL10 does not
+  ship the legacy "iptables"/"iptables-services" package names.
+- Require issabel-geoip, which brings the xtables-addons DKMS package and the
+  /usr/share/xt_geoip data used by the GeoIP firewall rules.
+
+* Thu Oct 22 2026 Issabel Foundation <info@issabel.org> - 6.0.0-11
+- Add the CSRF token to the security forms and guard the Let's Encrypt
+  endpoint; state changes (fail2ban start/stop, firewall activate/deactivate,
+  GeoIP block/unblock) are POST only.
+- Use issabelAlert and issabel-validate: page alerts keep their success,
+  warning or error variant, and invalid fields show the error under the
+  control without losing the page.
+- Add the compact view / edit split to whitelist, ports, jails and GeoIP key.
+- Port the firewall rules page to paloSantoGrid: drop the vendored DataTables,
+  chosen and toastr stack and all hardcoded colors.
+- Replace amCharts in the GeoIP map with a theme SVG and a Chart.js chart; the
+  reasons are documented in docs/geoip-map.md. No external IP lookup remains.
+- Complete the language files for the 25 languages of the framework and add
+  the missing en.lang keys.
+- Fix the undefined $mode in sec_whitelist, the "Array" error message in
+  sec_ports, the copied validation messages in sec_fb_admin, the unescaped
+  exec in sec_geoip_key and the unescaped staging value in installcert.php.
 * Mon Oct 19 2026 Issabel Foundation <info@issabel.org> - 6.0.0-10
 - Let's Encrypt: use the theme alert primitives. The page used the Bootstrap 3
   "alert alert-*" classes, which Tabler does not have, so the notices showed
