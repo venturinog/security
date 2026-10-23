@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0.3                                                |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,26 +17,24 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
+  | The Initial Developer of the Original Code is Issabel Foundation     |
   +----------------------------------------------------------------------+
-  $Id: en.lang,v 1.1 2010-12-18 05:12:07 Bruno Macias bmacias@palosanto.com Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"Audit" => "Audit",
-"Date" => "Date",
-"Type" => "Type",
-"User" => "User",
-"Message" => "Message",
-
-'Search string' =>  'Search string',
-'Search' => 'Search',
-'Search next' => 'Search next',
-"offset" => "offset",
-"Asterisk Logs" => "Asterisk Logs",
-"Date"=>"Date",
-"Show"=>"Show",
-"Message"=>"Message",
-"Type"=>"Type",
-"Source"=>"Source",
+$arrLangModule = array(
+    'Access audit' => 'Access audit',
+    'Asterisk Logs' => 'Asterisk Logs',
+    'Audit' => 'Audit',
+    'Date' => 'Date',
+    'Filter applied: ' => 'Filter applied: ',
+    'Message' => 'Message',
+    'Search' => 'Search',
+    'Search next' => 'Search next',
+    'Search string' => 'Search string',
+    'Show' => 'Show',
+    'Source' => 'Source',
+    'The access audit log is empty. Entries are recorded when a user logs in, logs out or runs an audited action.' => 'The access audit log is empty. Entries are recorded when a user logs in, logs out or runs an audited action.',
+    'Type' => 'Type',
+    'User' => 'User',
+    'offset' => 'offset',
 );
-?>

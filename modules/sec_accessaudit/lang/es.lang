@@ -1,41 +1,38 @@
 <?php
 /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
-   Codificación: UTF-8
+  Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 2.3                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
   | compliance with the License. You may obtain a copy of the License at |
   | http://www.opensource.org/licenses/gpl-license.php                   |
   |                                                                      |
-  | Software distributed under the License is distributed on "AS IS"     |
+  | Software distributed under the License is distributed on an "AS IS"  |
   | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  |                                                                      |
-  | Translated by: José Briones                                        |
-  | Email: jbriones@elastix.com                                         |
-  +----------------------------------------------------------------------+
-  $Id: es.lang,v 1.7 2013-08-07 15:59:46 username Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"Audit" => "Auditoría",
-"Date" => "Fecha",
-"Type" => "Tipo",
-"User" => "Usuario",
-"Message" => "Mensaje",
-
-'Search string' =>  'Cadena de Búsqueda',
-'Search' => 'Buscar',
-'Search next' => 'Buscar Siguiente',
-"offset" => "offset",
-"Asterisk Logs" => "Logs de Asterisk",
-"Source" => "Origen",
+$arrLangModule = array(
+    'Access audit' => 'Auditoría de acceso',
+    'Asterisk Logs' => 'Logs de Asterisk',
+    'Audit' => 'Auditoría',
+    'Date' => 'Fecha',
+    'Filter applied: ' => 'Filtro aplicado: ',
+    'Message' => 'Mensaje',
+    'Search' => 'Buscar',
+    'Search next' => 'Buscar Siguiente',
+    'Search string' => 'Cadena de Búsqueda',
+    'Show' => 'Mostrar',
+    'Source' => 'Origen',
+    'The access audit log is empty. Entries are recorded when a user logs in, logs out or runs an audited action.' => 'El registro de auditoría de accesos está vacío. Se agregan entradas cuando un usuario inicia o cierra sesión o ejecuta una acción auditada.',
+    'Type' => 'Tipo',
+    'User' => 'Usuario',
+    'offset' => 'compensar',
 );
-?>

@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0                                                  |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,30 +17,28 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  +----------------------------------------------------------------------+
-  $Id: ru.lang,v 2.5. 2016-02-12 15:28:07 Andrey Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"Audit" => "Аудит",
-"Date" => "Дата",
-"Type" => "Тип",
-"User" => "Пользователь",
-"Message" => "Сообщение",
-"Download" => "Скачать",
-'Search string' =>  'Строка поиска',
-'Search' => 'Искать',
-'Search next' => 'Искать далее',
-"offset" => "offset",
-"Asterisk Logs" => "Asterisk Logs",
-"Show"=>"Показать",
-"Source"=>"Источник",
-"Show Filter" => "Показать Фильтр",
-"Hide Filter" => "Скрыть Фильтр",
-"Filter applied: " => "Текущий фильтр: ",
-"Page" => "Страница",
-"records" => "записей",
-"of" => "из",
-"No records match the filter criteria" => "Нет записей, соответствующих критериям фильтра",
+$arrLangModule = array(
+    'Access audit' => 'Аудит доступа',
+    'Asterisk Logs' => 'Asterisk Logs',
+    'Audit' => 'Аудит',
+    'Date' => 'Дата',
+    'Download' => 'Скачать',
+    'Filter applied: ' => 'Текущий фильтр: ',
+    'Hide Filter' => 'Скрыть Фильтр',
+    'Message' => 'Сообщение',
+    'No records match the filter criteria' => 'Нет записей, соответствующих критериям фильтра',
+    'Page' => 'Страница',
+    'Search' => 'Искать',
+    'Search next' => 'Искать далее',
+    'Search string' => 'Строка поиска',
+    'Show' => 'Показать',
+    'Show Filter' => 'Показать Фильтр',
+    'Source' => 'Источник',
+    'Type' => 'Тип',
+    'User' => 'Пользователь',
+    'of' => 'из',
+    'offset' => 'компенсация',
+    'records' => 'записей',
 );
-?>

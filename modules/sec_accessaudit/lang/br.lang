@@ -1,11 +1,11 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Issabel version 4.0.3                                                |
+  | Issabel version 6                                                    |
   | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
   | The contents of this file are subject to the General Public License  |
   | (GPL) Version 2 (the "License"); you may not use this file except in |
@@ -17,26 +17,21 @@
   | the License for the specific language governing rights and           |
   | limitations under the License.                                       |
   +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  +----------------------------------------------------------------------+
-  $Id: en.lang,v 1.1 2010-12-18 05:12:07 Bruno Macias bmacias@palosanto.com Exp $ */
+*/
 global $arrLangModule;
-$arrLangModule=array(
-"Audit" => "Audit",
-"Date" => "Data",
-"Type" => "Tipo",
-"User" => "User",
-"Message" => "Mensagem",
-
-'Search string' =>  'Search string',
-'Search' => 'Pesquisar',
-'Search next' => 'Próxima pesquisa',
-"offset" => "offset",
-"Asterisk Logs" => "Logs Asterisk",
-"Date"=>"Data",
-"Show"=>"Vizualizar",
-"Message"=>"Mensagem",
-"Type"=>"Tipo",
-"Source"=>"Entrada",
+$arrLangModule = array(
+    'Access audit' => 'Auditoria de acesso',
+    'Asterisk Logs' => 'Logs Asterisk',
+    'Audit' => 'Auditoria',
+    'Date' => 'Data',
+    'Filter applied: ' => 'Filtro aplicado: ',
+    'Message' => 'Mensagem',
+    'Search' => 'Pesquisar',
+    'Search next' => 'Próxima pesquisa',
+    'Search string' => 'Sequência de pesquisa',
+    'Show' => 'Vizualizar',
+    'Source' => 'Entrada',
+    'Type' => 'Tipo',
+    'User' => 'Usuário',
+    'offset' => 'deslocamento',
 );
-?>

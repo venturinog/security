@@ -56,15 +56,33 @@ function _moduleContent(&$smarty, $module_name)
 
 function report_AccessAudit($smarty, $module_name, $local_templates_dir)
 {
-    $pAccessLogs   = new paloSantoAccessaudit();
-    $listaFechas     = $pAccessLogs->astLog->listarFechas();
+    $pAccessLogs = new paloSantoAccessaudit();
+    $listaFechas = $pAccessLogs->astLog->listarFechas();
+    sort($listaFechas);
+    $smarty->assign('SECURITY_ALERT', '');
+
+    /* Sin registros no hay fechas para el filtro: se evita leer
+       $listaFechas[-1] (warning en PHP 8) y se muestra un estado vacío. */
+    if (count($listaFechas) == 0) {
+        $oGrid = new paloSantoGrid($smarty);
+        $oGrid->setTitle(_tr("Audit"));
+        $oGrid->setIcon("modules/$module_name/images/security_audit.png");
+        $oGrid->setColumns(array(_tr("Date"), _tr("Type"), _tr("User"), _tr("Message")));
+        $oGrid->setData(null);
+        $oGrid->pagingShow(false);
+        $smarty->assign('SECURITY_ALERT', issabel_alert_html('info', _tr('Audit'),
+            _tr('The access audit log is empty. Entries are recorded when a user logs in, logs out or runs an audited action.')));
+        return $smarty->getTemplateVars('SECURITY_ALERT').$oGrid->fetchGrid();
+    }
+
+    $fechaPorDefecto = $listaFechas[count($listaFechas) - 1];
     $arrFormElements = createFieldFilter($listaFechas);
-    $field_pattern   = getParameter("filter");
-    $busqueda        = getParameter('busqueda');
+    $field_pattern   = (string)getParameter("filter");
+    $busqueda        = (string)getParameter('busqueda');
     $sUltimaBusqueda = getParameter('ultima_busqueda');
     $iUltimoOffset   = getParameter('ultimo_offset');
 
-    if (is_null($busqueda) || trim($busqueda) == '') $busqueda = '';
+    if (trim($busqueda) == '') $busqueda = '';
     if ($busqueda != '') $_POST['busqueda'] = $busqueda;
 
     /* Última búsqueda, si existe */
@@ -75,7 +93,7 @@ function report_AccessAudit($smarty, $module_name, $local_templates_dir)
     }
 
     if (!preg_match("/".$arrFormElements['filter']['VALIDATION_EXTRA_PARAM']."/", $field_pattern))
-        $field_pattern = $listaFechas[count($listaFechas) - 1];
+        $field_pattern = $fechaPorDefecto;
 
     $_POST['filter']   = $field_pattern;
     $oFilterForm = new paloForm($smarty, $arrFormElements);
@@ -224,9 +242,9 @@ function report_AccessAudit($smarty, $module_name, $local_templates_dir)
     $arrData = null;
     if(is_array($arrResult) && $totalBytes>0){
         foreach($arrResult as $key => $value){
-            $arrTmp[0] = $value['fecha'];
-            $arrTmp[1] = $value['tipo'];
-            $arrTmp[2] = $value['origen'];
+            $arrTmp[0] = htmlspecialchars($value['fecha'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[1] = htmlspecialchars($value['tipo'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[2] = htmlspecialchars($value['origen'], ENT_COMPAT, 'UTF-8');
             $arrTmp[3] = $isExport ? $value['linea'] : formatLogEntry($value['linea'], (($busqueda != '') ? $busqueda : NULL));
             $arrData[] = $arrTmp;
         }
@@ -248,19 +266,23 @@ function report_AccessAudit($smarty, $module_name, $local_templates_dir)
 
     $smarty->assign("SHOW", _tr("Show"));
 
-    $oGrid->addFilterControl(_tr("Filter applied: ")._tr("Date")." = ".$_POST['filter'], $_POST, array('filter' => $listaFechas[count($listaFechas) - 1]),true);
+    $oGrid->addFilterControl(_tr("Filter applied: ")._tr("Date")." = ".$_POST['filter'], $_POST, array('filter' => $fechaPorDefecto),true);
     $oGrid->addFilterControl(_tr("Filter applied: ")._tr('Search string')." = ".$busqueda, $_POST, array('busqueda' => ""));
 
     $htmlFilter = $oFilterForm->fetchForm("$local_templates_dir/filter.tpl", "", $_POST);
     $oGrid->showFilter(trim($htmlFilter));
-    return $oGrid->fetchGrid();
+    return $smarty->getTemplateVars('SECURITY_ALERT').$oGrid->fetchGrid();
 }
 
 function formatLogEntry($s, $sCadenaHighlight)
 {
     $s = htmlentities($s, ENT_COMPAT, 'UTF-8');
-    if (!is_null($sCadenaHighlight) && trim($sCadenaHighlight) != '')
-        $s = str_replace($sCadenaHighlight, "<span style=\"background:#ffff00;\">$sCadenaHighlight</span>", $s);
+    if (!is_null($sCadenaHighlight) && trim($sCadenaHighlight) != '') {
+        // El texto de búsqueda también se escapa: si no, se inyecta tal cual
+        // dentro del HTML del registro.
+        $needle = htmlentities($sCadenaHighlight, ENT_COMPAT, 'UTF-8');
+        $s = str_replace($needle, '<mark>'.$needle.'</mark>', $s);
+    }
     $s = '<pre>'.$s.'</pre>';
     return $s;
 }
