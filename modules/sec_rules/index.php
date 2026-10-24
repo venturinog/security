@@ -33,6 +33,7 @@ function _moduleContent(&$smarty, $module_name)
     //include module files
     include_once "modules/$module_name/configs/default.conf.php";
     include_once "modules/$module_name/libs/paloSantoRules.class.php";
+    include_once "modules/$module_name/libs/issabelFwAudit.class.php";
 
     load_language_module($module_name);
 
@@ -719,6 +720,81 @@ function validateRuleInput(&$values)
     return $errors;
 }
 
+/**
+ * Datos de una regla para audit.log, leídos de la BD (ya normalizados).
+ * Si la regla no existe sólo se devuelve el id y, si hay, el error.
+ */
+function fwAuditRuleDetails(&$pDB, $ruleId, $errMsg = '')
+{
+    $details = array('id' => (int)$ruleId);
+    if ($ruleId > 0) {
+        $pRules = new paloSantoRules($pDB);
+        $row = $pRules->getRule($ruleId);
+        if (is_array($row) && count($row) > 0) {
+            $details['traffic']  = $row['traffic'];
+            $details['protocol'] = $row['protocol'];
+            $details['target']   = $row['target'];
+            if ((string)$row['eth_in'] !== '')  $details['iface_in']  = $row['eth_in'];
+            if ((string)$row['eth_out'] !== '') $details['iface_out'] = $row['eth_out'];
+            $details['src'] = ((string)$row['ip_source'] !== '') ? $row['ip_source'] : 'ANY';
+            $details['dst'] = ((string)$row['ip_destiny'] !== '') ? $row['ip_destiny'] : 'ANY';
+
+            $protocol = (string)$row['protocol'];
+            if ($protocol === 'TCP' || $protocol === 'UDP') {
+                $details['sport'] = fwAuditPortName($pDB, $row['sport']);
+                $details['dport'] = fwAuditPortName($pDB, $row['dport']);
+            } elseif ($protocol === 'ICMP') {
+                $details['icmp_type'] = $row['icmp_type'];
+            } elseif ($protocol === 'IP') {
+                $details['ip_proto'] = $row['number_ip'];
+            } elseif ($protocol === 'STATE') {
+                $details['state'] = $row['state'];
+            } elseif ($protocol === 'GEOIP') {
+                $details['countries']  = fwAuditList($row['countries']);
+                $details['continents'] = fwAuditList($row['continents']);
+            }
+        }
+    }
+    if ($errMsg !== '') $details['msg'] = $errMsg;
+    return $details;
+}
+
+/**
+ * Traduce el id de puerto de una regla a su nombre. En `filter`, sport/dport
+ * son ids de la tabla `port`, no números de puerto: registrarlos en crudo en
+ * audit.log daría una lectura equivocada.
+ */
+function fwAuditPortName(&$pDB, $value)
+{
+    $value = (string)$value;
+    if ($value === '') return '';
+    if (strcasecmp($value, 'ANY') === 0) return 'ANY';
+
+    static $names = NULL;
+    if ($names === NULL) {
+        $names = array();
+        $oPort = new paloSantoPortService($pDB);
+        foreach (array($oPort->getTCPortNumbers(), $oPort->getUDPortNumbers()) as $list) {
+            if (is_array($list)) foreach ($list as $p) $names[(string)$p['id']] = $p['name'];
+        }
+    }
+    return isset($names[$value]) ? $names[$value] : '#'.$value;
+}
+
+/** Lista de países/continentes acotada para la línea de auditoría. */
+function fwAuditList($value)
+{
+    $list = array();
+    foreach (explode(',', (string)$value) as $item) {
+        $item = trim($item);
+        if ($item !== '') $list[] = $item;
+    }
+    if (count($list) === 0) return '';
+    $shown = array_slice($list, 0, 10);
+    if (count($list) > 10) $shown[] = '+'.(count($list) - 10);
+    return implode(',', $shown);
+}
+
 function saveRulePage($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
     $id = trim((string)getParameter('id'));
@@ -809,12 +885,23 @@ function saveRulePage($smarty, $module_name, $local_templates_dir, &$pDB, $arrCo
     if ($values['protocol'] != 'ICMP') $values['type_icmp'] = null;
     if ($values['protocol'] != 'IP')   $values['id_ip'] = null;
 
-    $ok = ($id === '') ? $pRules->saveRule($values) : $pRules->updateRule($values, $id);
+    $isNew = ($id === '');
+    $ok = $isNew ? $pRules->saveRule($values) : $pRules->updateRule($values, $id);
     if ($ok) {
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"),
             $id === '' ? _tr("Successful Save") : _tr("Successful Update")));
+        $ruleId = $isNew ? (int)$pRules->lastInsertId : (int)$id;
+        issabelFwAudit::log($isNew ? 'rule.create' : 'rule.update', 'ok',
+            fwAuditRuleDetails($pDB, $ruleId));
     } else {
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pRules->errMsg));
+        issabelFwAudit::log($isNew ? 'rule.create' : 'rule.update', 'error', array(
+            'id'       => $id,
+            'traffic'  => $values['traffic'],
+            'protocol' => $values['protocol'],
+            'target'   => $values['target'],
+            'msg'      => $pRules->errMsg,
+        ));
     }
 
     return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
@@ -825,6 +912,13 @@ function toggleRule($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf
     $id = (int)getParameter($action);
     $pRules = new paloSantoRules($pDB);
     $ok = ($action == 'activate') ? $pRules->setActivated($id) : $pRules->setDesactivated($id);
+
+    // Se audita antes de responder por AJAX: el switch del grid pasa por aquí.
+    issabelFwAudit::log(($action == 'activate') ? 'rule.enable' : 'rule.disable',
+        $ok ? 'ok' : 'error', array(
+            'id'  => $id,
+            'msg' => $ok ? '' : $pRules->errMsg,
+        ));
 
     if (getParameter('ajax')) {
         header('Content-Type: application/json; charset=utf-8');
@@ -851,8 +945,10 @@ function reorderRules(&$pDB)
     header('Content-Type: application/json; charset=utf-8');
     $ids = json_decode((string)getParameter('ids'), true);
     $isGeo = ((int)getParameter('geoip') === 1);
+    $audit = array('geoip' => $isGeo ? 1 : 0, 'count' => is_array($ids) ? count($ids) : 0);
 
     if (!is_array($ids) || count($ids) === 0) {
+        issabelFwAudit::log('rule.reorder', 'error', $audit + array('msg' => 'missing rule list'));
         echo json_encode(array('status' => 'error', 'message' => _tr('The order could not be saved')));
         return NULL;
     }
@@ -862,11 +958,13 @@ function reorderRules(&$pDB)
     foreach ($ids as $id) {
         $id = (int)$id;
         if ($id <= 0 || isset($seen[$id])) {
+            issabelFwAudit::log('rule.reorder', 'error', $audit + array('msg' => 'invalid rule id'));
             echo json_encode(array('status' => 'error', 'message' => _tr('The order could not be saved')));
             return NULL;
         }
         $rule = $pRules->getRule($id);
         if (!is_array($rule) || (($rule['protocol'] === 'GEOIP') !== $isGeo)) {
+            issabelFwAudit::log('rule.reorder', 'error', $audit + array('msg' => 'rule does not match the grid'));
             echo json_encode(array('status' => 'error', 'message' => _tr('The order could not be saved')));
             return NULL;
         }
@@ -876,11 +974,13 @@ function reorderRules(&$pDB)
     $order = ($isGeo ? 100000 : 0) + 1;
     foreach ($ids as $id) {
         if (!$pRules->updateOrder((int)$id, $order++)) {
+            issabelFwAudit::log('rule.reorder', 'error', $audit + array('msg' => $pRules->errMsg));
             echo json_encode(array('status' => 'error', 'message' => $pRules->errMsg));
             return NULL;
         }
     }
 
+    issabelFwAudit::log('rule.reorder', 'ok', $audit);
     echo json_encode(array('status' => 'success', 'message' => _tr('Update correctly')));
     return NULL;
 }
@@ -889,12 +989,15 @@ function discardChanges($smarty, $module_name, $local_templates_dir, &$pDB, $arr
 {
     $pRules = new paloSantoRules($pDB);
     if (!$pRules->hasSnapshot()) {
+        issabelFwAudit::log('rules.discard', 'error', array('msg' => 'there is no applied state'));
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('warning', _tr('Message'),
             _tr('There is no applied state to restore')));
     } elseif ($pRules->discardChanges()) {
+        issabelFwAudit::log('rules.discard', 'ok');
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr('Message'),
             _tr('Changes discarded')));
     } else {
+        issabelFwAudit::log('rules.discard', 'error', array('msg' => $pRules->errMsg));
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr('ERROR'),
             _tr('The changes could not be discarded')));
     }
@@ -906,6 +1009,7 @@ function moveRule($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, 
     $id = (int)getParameter($action);
     $pRules = new paloSantoRules($pDB);
     $rule = $pRules->getRule($id);
+    $moved = false;
     if (is_array($rule)) {
         $isGeo = ($rule['protocol'] == 'GEOIP');
         $list = $isGeo ? $pRules->ObtainRulesGEOIP(100000, 0) : $pRules->ObtainRules(100000, 0);
@@ -915,10 +1019,16 @@ function moveRule($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, 
         if ($index >= 0 && isset($list[$swap])) {
             $a = $list[$index]['rule_order'];
             $b = $list[$swap]['rule_order'];
-            $pRules->updateOrder($list[$index]['id'], $b);
-            $pRules->updateOrder($list[$swap]['id'], $a);
+            $okFirst  = $pRules->updateOrder($list[$index]['id'], $b);
+            $okSecond = $pRules->updateOrder($list[$swap]['id'], $a);
+            $moved = ($okFirst && $okSecond);
         }
     }
+    issabelFwAudit::log('rule.move', $moved ? 'ok' : 'error', array(
+        'id'  => $id,
+        'dir' => ($action == 'move_up') ? 'up' : 'down',
+        'msg' => $moved ? '' : 'the rule could not be moved',
+    ));
     return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
 }
 
@@ -926,17 +1036,21 @@ function activateFirewall($smarty, $module_name, $local_templates_dir, &$pDB, $a
 {
     $pRules = new paloSantoRules($pDB);
     $bFirstTime = $pRules->isFirstTime();
+    $mode = $bFirstTime ? 'first' : 'apply';
     $pRules->noMoreFirstTime();
     if (!$pRules->activateRules()) {
+        issabelFwAudit::log('rules.apply', 'error', array('mode' => $mode, 'msg' => $pRules->errMsg));
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pRules->errMsg));
         return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
     }
+    issabelFwAudit::log('rules.apply', 'ok', array('mode' => $mode));
     $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"),
         $bFirstTime ? _tr("The firewall has been activated") : _tr("The rules have been executed in the system")));
     $pRules->updateExecutedInSystem();
     // Snapshot del estado que acaba de quedar aplicado; es la base de
     // "Descartar cambios".
     if (!$pRules->snapshotApplied()) {
+        issabelFwAudit::log('rules.snapshot', 'error', array('msg' => $pRules->errMsg));
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('warning', _tr('Message'),
             _tr('The applied state could not be saved')));
     }
@@ -947,8 +1061,11 @@ function desactivateFirewall($smarty, $module_name, $local_templates_dir, &$pDB,
 {
     $pRules = new paloSantoRules($pDB);
     if ($pRules->flushRules() && $pRules->setFirstTime()) {
+        issabelFwAudit::log('firewall.disable', 'ok');
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("The firewall has been desactivated")));
     } else {
+        $msg = ($pRules->errMsg !== '') ? $pRules->errMsg : 'the firewall could not be deactivated';
+        issabelFwAudit::log('firewall.disable', 'error', array('msg' => $msg));
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), _tr("The firewall could not be desactivated")));
     }
     return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
@@ -963,11 +1080,25 @@ function deleteRules($smarty, $module_name, $local_templates_dir, &$pDB, $arrCon
         return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
     }
     $count = 0;
+    $deleted = array();
     $failed = array();
+    $failedRaw = array();
     foreach ($ids as $id) {
-        if ($pRules->deleteRule((int)$id)) $count++;
-        else $failed[] = htmlspecialchars((string)$pRules->errMsg, ENT_COMPAT, 'UTF-8');
+        if ($pRules->deleteRule((int)$id)) {
+            $count++;
+            $deleted[] = (int)$id;
+        } else {
+            $failedRaw[] = (string)$pRules->errMsg;
+            $failed[] = htmlspecialchars((string)$pRules->errMsg, ENT_COMPAT, 'UTF-8');
+        }
     }
+    $auditIds = array_slice($deleted, 0, 20);
+    if (count($deleted) > 20) $auditIds[] = '+'.(count($deleted) - 20);
+    issabelFwAudit::log('rule.delete', count($failedRaw) === 0 ? 'ok' : 'error', array(
+        'ids'   => implode(',', $auditIds),
+        'count' => $count,
+        'msg'   => implode(' ', $failedRaw),
+    ));
     if (count($failed) === 0) {
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"),
             sprintf(_tr("%d rules were deleted"), $count)));

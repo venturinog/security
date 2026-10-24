@@ -26,6 +26,7 @@ function _moduleContent(&$smarty, $module_name) {
     //include module files
     include_once "modules/$module_name/configs/default.conf.php";
     include_once "modules/$module_name/libs/issabelAttacks.class.php";
+    include_once "modules/sec_rules/libs/issabelFwAudit.class.php";
 
     load_language_module($module_name);
 
@@ -73,6 +74,13 @@ function _moduleContent(&$smarty, $module_name) {
                 $message = trim(implode("\n", $output));
                 if ($message === '') $message = _tr('The change could not be applied');
             }
+            // Las tres acciones modifican el firewall en caliente.
+            $auditEvent = ($action === 'block') ? 'country.block'
+                        : (($action === 'unblock') ? 'country.unblock' : 'country.none');
+            issabelFwAudit::log($auditEvent, $ret == 0 ? 'ok' : 'error', array(
+                'cc'  => $pais,
+                'msg' => ($ret == 0) ? '' : $message,
+            ));
             return json_encode(array(
                 'status' => $ret == 0 ? 'success' : 'error',
                 'message' => $message,

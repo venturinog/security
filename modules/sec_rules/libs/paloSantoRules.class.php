@@ -28,6 +28,7 @@ require_once "libs/paloSantoNetwork.class.php";
 class paloSantoRules {
     var $_DB;       // Reference to the active DB
     var $errMsg;    // Variable where the errors are stored
+    var $lastInsertId = 0; // id de la última regla creada por saveRule()
 
      /**
      * Constructor of the class, receives as a parameter the database, which is stored in the class variable $_DB
@@ -146,7 +147,7 @@ class paloSantoRules {
             $this->errMsg = $this->_DB->errMsg;
             return array();
         }
-        return $result[0];
+        return isset($result[0]) ? $result[0] : null;
     }
 
     /**
@@ -289,6 +290,10 @@ class paloSantoRules {
             $this->errMsg = $this->_DB->errMsg;
             return false;
         }
+
+        // Se guarda para que la capa de auditoría pueda citar la regla creada.
+        $rowId = $this->_DB->getFirstRowQuery("SELECT last_insert_rowid()");
+        if (is_array($rowId) && count($rowId) > 0) $this->lastInsertId = (int)$rowId[0];
 
         if( $result == FALSE )
         {

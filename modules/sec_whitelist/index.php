@@ -28,6 +28,7 @@ function _moduleContent(&$smarty, $module_name)
     //include module files
     include_once "modules/$module_name/configs/default.conf.php";
     include_once "modules/$module_name/libs/Issabelwhitelist.class.php";
+    include_once "modules/sec_rules/libs/issabelFwAudit.class.php";
 
     load_language_module($module_name);
 
@@ -184,11 +185,24 @@ function deletewhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $ar
         return reportwhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
     }
 
+    $deletedIps = array();
+    $failedRaw = array();
     foreach( $ips as $value ){
+        if (!is_scalar($value)) continue;
         if( $oIssa->deletewhitelist($value) == false ) {
+            $failedRaw[] = (string)$oIssa->errMsg;
             $str_msj_error .= htmlspecialchars((string)$oIssa->errMsg, ENT_COMPAT, 'UTF-8')."<br />";
+        } else {
+            $deletedIps[] = (string)$value;
         }
     }
+
+    // Cada borrado quita la regla de aceptación del firewall en caliente.
+    issabelFwAudit::log('whitelist.delete', count($failedRaw) === 0 ? 'ok' : 'error', array(
+        'ips'   => implode(',', array_slice($deletedIps, 0, 20)),
+        'count' => count($deletedIps),
+        'msg'   => implode(' ', $failedRaw),
+    ));
 
     if( strlen($str_msj_error) == 0 ){
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr('Message'), _tr('Delete correctly')));
@@ -231,6 +245,15 @@ function savewhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     $ok = $isEdit
         ? $oIssa->updatewhitelist($old_ip, $ip_address, $note)
         : $oIssa->savewhitelist($ip_address, $note);
+
+    // Las dos variantes tocan el firewall (fwconfig --add_wl / --remove_wl).
+    $auditDetails = array(
+        'ip'  => $ip_address,
+        'msg' => $ok ? '' : $oIssa->errMsg,
+    );
+    if ($isEdit) $auditDetails['old'] = $old_ip;
+    issabelFwAudit::log($isEdit ? 'whitelist.update' : 'whitelist.add',
+        $ok ? 'ok' : 'error', $auditDetails);
 
     if ($ok) {
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr('Message'),

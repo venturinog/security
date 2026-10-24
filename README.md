@@ -22,6 +22,52 @@ Notas de diseño
   sustituyó por un SVG del tema + Chart.js (licencia, i18n, modo oscuro,
   privacidad, peso y accesibilidad).
 
+Firewall change auditing
+----
+
+Changes that affect the firewall are recorded in `/var/log/issabel/audit.log`
+and can be reviewed in **Security → Audit**. There is one line per user action,
+not per database row: dragging a rule leaves a single entry, not one per rule
+touched.
+
+Format:
+
+```
+FIREWALL <user>: <event> <key=value ...> result=<ok|error> from <ip>.
+```
+
+| Module | Events |
+|---|---|
+| `sec_rules` | `rule.create`, `rule.update`, `rule.delete`, `rule.enable`, `rule.disable`, `rule.reorder`, `rule.move`, `rules.discard`, `rules.apply`, `rules.snapshot`, `firewall.disable` |
+| `sec_geoip_map` | `country.block`, `country.unblock`, `country.none` |
+| `sec_whitelist` | `whitelist.add`, `whitelist.update`, `whitelist.delete` |
+
+Examples:
+
+```
+FIREWALL admin: rule.create id=42 traffic=INPUT protocol=TCP target=DROP src=192.0.2.0/24 dst=0.0.0.0/0 sport=ANY dport=ssh result=ok from 192.0.2.10.
+FIREWALL admin: rules.apply mode=first result=ok from 192.0.2.10.
+FIREWALL admin: firewall.disable result=ok from 192.0.2.10.
+```
+
+The lines are written by `modules/sec_rules/libs/issabelFwAudit.class.php`.
+Every value is sanitized (no control characters, no line breaks, length
+capped): `audit.log` is read by the `issabel-gui` fail2ban jail, so a free-text
+rule field must not be able to inject a fake `LOGIN ...` line and get an
+arbitrary IP banned. The **Audit** viewer needs no changes: the entry type is
+`FIREWALL` and the user shows up in the "User" column.
+
+Useful queries:
+
+```sh
+grep 'FIREWALL ' /var/log/issabel/audit.log
+grep 'result=error' /var/log/issabel/audit.log
+grep 'FIREWALL admin: rules.apply' /var/log/issabel/audit.log | tail
+```
+
+Rotation is handled by `framework` (`/etc/logrotate.d/issabelAudit.logrotate`,
+monthly, 24 copies).
+
 
 License
 ----

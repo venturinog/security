@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 22
+Release: 23
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -243,6 +243,13 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Sat Oct 24 2026 Issabel Foundation <info@issabel.org> - 6.0.0-23
+- Log firewall changes in /var/log/issabel/audit.log: rule create, update,
+  delete, enable/disable, reorder, move, discard and apply, firewall
+  deactivation, GeoIP country block/unblock and whitelist add/update/delete.
+  Every field is sanitized before being written, so a free-text rule field
+  cannot inject a fake login line that fail2ban would act on.
+
 * Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-21
 - Fix mistranslated status labels in the advanced security settings
   language files: Spanish "Discapacitado" for Disabled, Bulgarian and
