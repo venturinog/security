@@ -124,9 +124,11 @@ function showRulesPage($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     // grilla GeoIP va primero, como en la interfaz histórica.
     return $alert
         . renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted)
-        . '<h4 class="fw-grid-title">'._tr('GeoIP').'</h4>'
+        . '<h4 class="fw-grid-title">'._tr('GeoIP')
+        . ' <span class="fw-drag-hint">'._tr('Drag to reorder').'</span></h4>'
         . '<div class="fw-grid" id="geoip_grid">'.renderRulesGrid($smarty, $module_name, $pDB, true).'</div>'
-        . '<h4 class="fw-grid-title">'._tr('Rules').'</h4>'
+        . '<h4 class="fw-grid-title">'._tr('Rules')
+        . ' <span class="fw-drag-hint">'._tr('Drag to reorder').'</span></h4>'
         . '<div class="fw-grid" id="rules_grid">'.renderRulesGrid($smarty, $module_name, $pDB, false).'</div>';
 }
 
@@ -226,10 +228,10 @@ function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo)
         }
     }
 
-    $trafficFiles = array(
-        'INPUT'   => 'fw_input.gif',
-        'OUTPUT'  => 'fw_output.gif',
-        'FORWARD' => 'fw_forward.gif',
+    $trafficIcons = array(
+        'INPUT'   => array('icon' => 'ti-chevrons-down-left', 'class' => 'fw-traffic--input'),
+        'OUTPUT'  => array('icon' => 'ti-chevrons-up-right',  'class' => 'fw-traffic--output'),
+        'FORWARD' => array('icon' => 'ti-arrows-exchange',    'class' => 'fw-traffic--forward'),
     );
 
     $result = $isGeo ? $pRules->ObtainRulesGEOIP(100000, 0) : $pRules->ObtainRules(100000, 0);
@@ -244,10 +246,12 @@ function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo)
             $arrTmp[1] = $order;
 
             $traffic = (string)$row['traffic'];
-            if (isset($trafficFiles[$traffic])) {
+            if (isset($trafficIcons[$traffic])) {
                 $label = htmlspecialchars(_tr($traffic), ENT_COMPAT, 'UTF-8');
-                $arrTmp[2] = '<img class="fw-icon" src="modules/'.$module_name.'/images/'.$trafficFiles[$traffic]
-                           . '" alt="'.$label.'" title="'.$label.'">';
+                $arrTmp[2] = '<span class="fw-traffic '.$trafficIcons[$traffic]['class'].'"'
+                           . ' role="img" aria-label="'.$label.'" title="'.$label.'">'
+                           . '<i class="ti '.$trafficIcons[$traffic]['icon'].'" aria-hidden="true"></i>'
+                           . '</span>';
             } else {
                 $arrTmp[2] = htmlspecialchars($traffic, ENT_COMPAT, 'UTF-8');
             }

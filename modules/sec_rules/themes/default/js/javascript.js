@@ -62,6 +62,22 @@ jQuery(function ($) {
         $form.trigger('submit');
     }
 
+    /*
+     * Fuerza una navegación GET. Después de Aplicar (o cualquier acción que
+     * use POST) el iframe queda en un documento POST y location.reload()
+     * puede no refrescar o pedir reenvío de formulario. Un parámetro único
+     * evita reutilizar esa misma navegación.
+     */
+    function fwReloadPage() {
+        try {
+            var url = new URL(window.location.href);
+            url.searchParams.set('_fw', Date.now());
+            window.location.replace(url.toString());
+        } catch (err) {
+            window.location.replace(window.location.href);
+        }
+    }
+
     function fwApplyStart($button) {
         if ($button.data('applying')) return false;
 
@@ -147,7 +163,7 @@ jQuery(function ($) {
                 fwAlert('error', res && res.message ? res.message : '');
             } else {
                 // Refresca el aviso de cambios pendientes y el botón Descartar.
-                window.location.reload();
+                fwReloadPage();
             }
         }).fail(function () {
             $toggle.prop('checked', !enabled);
@@ -176,14 +192,14 @@ jQuery(function ($) {
             dataType: 'json'
         }).done(function (res) {
             if (res && res.status === 'success') {
-                window.location.reload();
+                fwReloadPage();
             } else {
                 fwAlert('error', res && res.message ? res.message : '');
-                setTimeout(function () { window.location.reload(); }, 1500);
+                setTimeout(fwReloadPage, 1500);
             }
         }).fail(function () {
             fwAlert('error', '');
-            setTimeout(function () { window.location.reload(); }, 1500);
+            setTimeout(fwReloadPage, 1500);
         }).always(function () {
             $grid.removeClass('fw-saving');
         });
@@ -191,22 +207,150 @@ jQuery(function ($) {
 
     var dragRow = null;
     var dragGrid = null;
+    var dragOrigin = null;
+    var dragScrollEl = null;
+    var dragScrollPrevBehavior = '';
+    var dragPointerY = null;
+    var dragScrollTimer = null;
+    var DRAG_SCROLL_EDGE = 72;
+    var DRAG_SCROLL_MAX = 18;
 
-    $(document).on('dragstart', '.fw-drag', function (e) {
-        dragRow = $(this).closest('tr');
+    function fwInitDragRows() {
+        $('.fw-grid tbody tr').each(function () {
+            var $row = $(this);
+            if ($row.find('.fw-drag').length) {
+                $row.attr('draggable', 'true');
+            }
+        });
+    }
+
+    function fwFindScrollParent($el) {
+        var el = $el[0];
+        while (el && el !== document.body && el !== document.documentElement) {
+            var overflowY = window.getComputedStyle(el).overflowY;
+            if ((overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight) {
+                return el;
+            }
+            el = el.parentElement;
+        }
+        return document.scrollingElement || document.documentElement;
+    }
+
+    function fwDragScrollStop() {
+        if (dragScrollTimer !== null) {
+            window.clearInterval(dragScrollTimer);
+            dragScrollTimer = null;
+        }
+        dragPointerY = null;
+    }
+
+    function fwDragScrollStep() {
+        if (!dragRow || dragPointerY === null) return;
+
+        var el = dragScrollEl || document.scrollingElement || document.documentElement;
+        var isWindow = (el === document.scrollingElement || el === document.documentElement || el === document.body);
+        var top = 0;
+        var bottom = window.innerHeight;
+
+        if (!isWindow) {
+            var rect = el.getBoundingClientRect();
+            top = rect.top;
+            bottom = rect.bottom;
+        }
+
+        var delta = 0;
+        if (dragPointerY < top + DRAG_SCROLL_EDGE) {
+            delta = -Math.ceil(Math.min(1, (top + DRAG_SCROLL_EDGE - dragPointerY) / DRAG_SCROLL_EDGE) * DRAG_SCROLL_MAX);
+        } else if (dragPointerY > bottom - DRAG_SCROLL_EDGE) {
+            delta = Math.ceil(Math.min(1, (dragPointerY - (bottom - DRAG_SCROLL_EDGE)) / DRAG_SCROLL_EDGE) * DRAG_SCROLL_MAX);
+        }
+
+        if (delta !== 0) {
+            if (isWindow) {
+                window.scrollBy(0, delta);
+            } else {
+                el.scrollTop += delta;
+            }
+        }
+    }
+
+    function fwDragScrollStart() {
+        if (dragScrollTimer !== null) return;
+        dragScrollTimer = window.setInterval(fwDragScrollStep, 16);
+    }
+
+    function fwDragReset() {
+        if (dragRow) dragRow.removeClass('fw-dragging');
+        $('.fw-drop-above, .fw-drop-below').removeClass('fw-drop-above fw-drop-below');
+        fwDragScrollStop();
+        if (dragScrollEl) {
+            dragScrollEl.style.scrollBehavior = dragScrollPrevBehavior;
+        }
+        dragRow = null;
+        dragGrid = null;
+        dragScrollEl = null;
+        dragScrollPrevBehavior = '';
+        dragOrigin = null;
+    }
+
+    fwInitDragRows();
+
+    $(document).on('mousedown', '.fw-grid tbody tr', function (e) {
+        dragOrigin = e.target;
+    });
+
+    $(document).on('mouseup', function () {
+        dragOrigin = null;
+    });
+
+    $(document).on('dragstart', '.fw-grid tbody tr', function (e) {
+        if ($(dragOrigin).closest('input, a, button, select, textarea, label, .fw-switch, .fw-edit').length) {
+            e.preventDefault();
+            return;
+        }
+
+        var $handle = $(this).find('.fw-drag');
+        if (!$handle.length) {
+            e.preventDefault();
+            return;
+        }
+
+        dragRow = $(this);
         dragGrid = $(this).closest('.fw-grid');
+        dragScrollEl = fwFindScrollParent(dragRow);
+        dragScrollPrevBehavior = dragScrollEl.style.scrollBehavior || '';
+        dragScrollEl.style.scrollBehavior = 'auto';
         dragRow.addClass('fw-dragging');
+
         if (e.originalEvent.dataTransfer) {
             e.originalEvent.dataTransfer.effectAllowed = 'move';
-            e.originalEvent.dataTransfer.setData('text/plain', String($(this).data('id')));
+            e.originalEvent.dataTransfer.setData('text/plain', String($handle.data('id')));
+            if (e.originalEvent.dataTransfer.setDragImage) {
+                try {
+                    e.originalEvent.dataTransfer.setDragImage(this, 16, 16);
+                } catch (err) {}
+            }
         }
     });
 
-    $(document).on('dragend', '.fw-drag', function () {
-        if (dragRow) dragRow.removeClass('fw-dragging');
-        $('.fw-drop-above, .fw-drop-below').removeClass('fw-drop-above fw-drop-below');
-        dragRow = null;
-        dragGrid = null;
+    $(document).on('dragend', '.fw-grid tbody tr', function () {
+        fwDragReset();
+    });
+
+    $(document).on('dragend', function () {
+        if (dragRow) fwDragReset();
+    });
+
+    $(document).on('dragover', function (e) {
+        if (!dragRow) return;
+        dragPointerY = e.originalEvent.clientY;
+        fwDragScrollStart();
+    });
+
+    $(document).on('dragleave', function (e) {
+        if (dragRow && e.originalEvent.relatedTarget === null) {
+            fwDragScrollStop();
+        }
     });
 
     $(document).on('dragover', '.fw-grid tbody tr', function (e) {
@@ -238,10 +382,12 @@ jQuery(function ($) {
         else dragRow.insertBefore($target);
 
         var $grid = dragGrid;
-        dragRow.removeClass('fw-dragging');
-        dragRow = null;
-        dragGrid = null;
+        fwDragReset();
         fwSaveOrder($grid);
+    });
+
+    $(document).on('drop', function () {
+        if (dragRow) fwDragReset();
     });
 
     $(document).on('keydown', '.fw-drag', function (e) {

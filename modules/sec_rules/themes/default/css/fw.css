@@ -29,10 +29,40 @@
     color: var(--iss-text);
 }
 
+.fw-drag-hint {
+    margin-left: 8px;
+    color: var(--iss-text-muted);
+    font-size: .8rem;
+    font-weight: 400;
+}
+
 .fw-icon {
     height: 16px;
     width: auto;
     vertical-align: middle;
+}
+
+.fw-traffic {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.fw-traffic .ti {
+    font-size: 1.15rem;
+}
+
+.fw-traffic--input .ti {
+    color: var(--iss-primary);
+}
+
+.fw-traffic--output .ti {
+    color: var(--iss-sev-warning);
+}
+
+.fw-traffic--forward .ti {
+    color: var(--iss-text-muted);
 }
 
 .fw-protocol {
@@ -68,6 +98,23 @@
 .fw-drag:focus-visible {
     outline: 2px solid var(--iss-primary);
     outline-offset: 1px;
+}
+
+.fw-grid tbody tr[draggable="true"] {
+    cursor: grab;
+    user-select: none;
+}
+
+.fw-grid tbody tr[draggable="true"]:active,
+.fw-grid tbody tr.fw-dragging {
+    cursor: grabbing;
+}
+
+.fw-grid tbody tr[draggable="true"] input,
+.fw-grid tbody tr[draggable="true"] a,
+.fw-grid tbody tr[draggable="true"] button,
+.fw-grid tbody tr[draggable="true"] .fw-switch {
+    cursor: pointer;
 }
 
 .fw-edit {

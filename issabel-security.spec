@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 17
+Release: 20
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -243,6 +243,18 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-20
+- Reload the firewall rules page with a GET request after AJAX actions,
+  so toggles and reordering still refresh after the POST used by Apply.
+
+* Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-19
+- Replace the firewall traffic GIFs with Tabler direction icons and color
+  input/output/forward consistently with the theme palette.
+
+* Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-18
+- Allow reordering firewall rules by dragging any row, not only the grip,
+  and auto-scroll the page while dragging near the viewport edges.
+
 * Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-17
 - Hide the firewall apply button when there is nothing pending, show an
   "All changes applied" chip instead, and block the page with a progress
