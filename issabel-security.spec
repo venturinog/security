@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 20
+Release: 21
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -243,6 +243,12 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-21
+- Fix mistranslated status labels in the advanced security settings
+  language files: Spanish "Discapacitado" for Disabled, Bulgarian and
+  Persian Disabled/Enabled, and "Dismiss" translated as firing an
+  employee in German, Russian, Ukrainian and Chinese.
+
 * Fri Oct 23 2026 Issabel Foundation <info@issabel.org> - 6.0.0-20
 - Reload the firewall rules page with a GET request after AJAX actions,
   so toggles and reordering still refresh after the POST used by Apply.
