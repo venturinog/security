@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 23
+Release: 24
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -243,6 +243,14 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Sat Oct 24 2026 Issabel Foundation <info@issabel.org> - 6.0.0-24
+- Include PJSIP extensions in the Weak Keys report. PJSIP extension secrets
+  are stored in the sip table keyed by extension, so the listing, the total
+  count and the Change Secret action now cover tech='pjsip' along with SIP
+  and IAX2, and paginate over the whole set. The update now compares the id
+  as text, so MariaDB strict mode no longer fails on non-numeric ids such as
+  the trunk rows stored in the same table.
+
 * Sat Oct 24 2026 Issabel Foundation <info@issabel.org> - 6.0.0-23
 - Log firewall changes in /var/log/issabel/audit.log: rule create, update,
   delete, enable/disable, reorder, move, discard and apply, firewall

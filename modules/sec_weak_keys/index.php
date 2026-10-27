@@ -98,16 +98,17 @@ function reportWeakKeys($smarty, $module_name, $local_templates_dir, &$pDB)
     );
     $oGrid -> setURL($url);
     $arrResult =$pWeakKeys->getWeakKeys($limit,$offset,$filter_field,$filter_value);
-    if (!is_array($arrResult) && $pWeakKeys->errMsg != "") {
+    if (!is_array($arrResult)) {
+        $arrResult = array();
+    }
+    if (count($arrResult) == 0 && $pWeakKeys->errMsg != "") {
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pWeakKeys->errMsg));
     }
     $arrData = null;
-    //$arrResult =$pWeakKeys->getWeakKeysChecker();
     $arrColumns = array(_tr("Extension"),_tr("Description"),_tr("Status"));
     $oGrid->setColumns($arrColumns);
-    if(is_array($arrResult) && $total>0){
-        foreach($arrResult as $tech){
-            foreach($tech as $key => $value){
+    if($total>0){
+        foreach($arrResult as $value){
             $arrTmp[0] = $value['id'];
             $arrTmp[1] = $value['description'];
             $mensaje = getMensaje($value['id'],$value['data']);
@@ -115,7 +116,6 @@ function reportWeakKeys($smarty, $module_name, $local_templates_dir, &$pDB)
                 $mensaje = _tr("Weak Key").": $mensaje &nbsp;<a href='?menu=$module_name&action=change&id=$value[id]'>"._tr("Change Secret")."</a>";
             $arrTmp[2] = $mensaje;
             $arrData[] = $arrTmp;
-            }
         }
     }
     $oGrid->setData($arrData);

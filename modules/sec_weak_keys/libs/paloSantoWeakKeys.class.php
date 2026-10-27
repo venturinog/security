@@ -59,43 +59,27 @@ class paloSantoWeakKeys {
      * @param string    $filter_field       string that indicates the filter applying 
      * @param string    $filter_value       string that has the value of the filter
      *
-     * @return integer  0 in case of an error or the number of devices sip or iax in the database
+     * @return integer  0 in case of an error or the number of devices sip, iax or pjsip in the database
      */
     function getNumWeakKeys($filter_field,$filter_value)
     {
-        $arrParam = "";
-        $where = "true";
+        $where = "";
+        $arrParam = array();
         if(isset($filter_field) && $filter_field !="" && $filter_value != ""){
-           $arrParam = array("$filter_value%"); 
-           $where = "id like ?";
+           $arrParam = array("$filter_value%", "$filter_value%");
+           $where = " AND d.id LIKE ?";
         }
 
- /*       $query   = "select count(*),".
-                            "if(id=ext or id=ext1,'igual',if(id/1000<10,'menor','')) as mensaje ".
-                    "from (".
-                            "select id,".
-                                "tech,".
-                                "description ".
-                            "from devices ".
-                            "where (tech = 'sip' ".
-                                "or tech = 'iax2' ".
-                                "or id/1000<10) and $where ) dev ".
-                    "left join (".
-                            "select data as ext ".
-                            "from sip ".
-                            "where keyword = 'secret' ".
-                            "group by data) s ".
-                    "on (dev.id=s.ext ".
-                            "and tech ='sip') ".
-                    "left join (".
-                            "select data as ext1 ".
-                            "from iax ".
-                            "where keyword = 'secret' ".
-                            "group by data) iax ".
-                    "on (dev.id=iax.ext1 ".
-                            "and tech ='iax2' )";*/
-        
-        $query = "select count(*) from devices where (tech = 'sip' or tech = 'iax2') and $where";
+        // Solo se cuentan los dispositivos de una tecnologia soportada que
+        // tienen fila de secreto, para que el total coincida con lo que
+        // devuelve getWeakKeys() (SIP, IAX2 y PJSIP).
+        $query = "SELECT COUNT(*) FROM (".
+                    "SELECT d.id FROM devices d INNER JOIN sip s ON s.id=d.id AND s.keyword='secret' ".
+                        "WHERE d.tech IN ('sip','pjsip')$where".
+                    " UNION ALL ".
+                    "SELECT d.id FROM devices d INNER JOIN iax i ON i.id=d.id AND i.keyword='secret' ".
+                        "WHERE d.tech='iax2'$where".
+                 ") t";
 
         $result=$this->_DB->getFirstRowQuery($query,false,$arrParam);
         if($result==FALSE){
@@ -106,7 +90,7 @@ class paloSantoWeakKeys {
     }
 
     /**
-     * Function that returns an array with all the devices sip or iax in the database with their respective key 
+     * Function that returns an array with all the devices sip, iax or pjsip in the database with their respective key 
      *
      * @param integer    $limit             Value to limit the result of the query
      * @param integer    $offset            Value for the offset of the query
@@ -117,82 +101,31 @@ class paloSantoWeakKeys {
      */
     function getWeakKeys($limit,$offset,$filter_field,$filter_value)
     {
-        $same = _tr('Same Key');
-        $short = _tr('Short Key');
-        $where = "true";
-        $arrParam = "";
+        $where = "";
+        $arrParam = array($limit,$offset);
         if(isset($filter_field) && $filter_field !="" && $filter_value != ""){
-            $where = "devices.id like ?";
-            $arrParam = array("$filter_value%",$limit,$offset);
-        }else
-             $arrParam = array($limit,$offset);
-    /*    $query   = "select dev.*,".
-                            "if(id=ext or id=ext1,if(id/1000<10,'$same, $short','$same'),if(id/1000<10,'$short','')) as mensaje ".
-                    "from (".
-                            "select id,".
-                                "tech,".
-                                "description ".
-                            "from devices ".
-                            "where (tech = 'sip' ".
-                                "or tech = 'iax2') and $where) dev ".
-                    "left join (".
-                            "select data as ext ".
-                            "from sip ".
-                            "where keyword = 'secret' ".
-                            "group by data) s ".
-                    "on (dev.id=s.ext ".
-                            "and tech ='sip') ".
-                    "left join (".
-                            "select data as ext1 ".
-                            "from iax ".
-                            "where keyword = 'secret' ".
-                            "group by data) iax ".
-                    "on (dev.id=iax.ext1 ".
-                            "and tech ='iax2' ) ".
-                    "group by id order by id limit $limit offset $offset;";
-*/
-        //For SIP
-        $query = "select devices.id,description,data from devices,sip where devices.id=sip.id and tech = 'sip' and keyword = 'secret' and $where LIMIT ? OFFSET ?";
+            $where = " AND d.id LIKE ?";
+            $arrParam = array("$filter_value%","$filter_value%",$limit,$offset);
+        }
+
+        // SIP y PJSIP comparten la tabla sip (en PJSIP el id sigue siendo la
+        // extension); IAX2 usa la tabla iax. La union se pagina como un solo
+        // conjunto para no perder filas entre tecnologias.
+        $query = "SELECT d.id AS id,d.description AS description,s.data AS data,d.tech AS tech ".
+                    "FROM devices d INNER JOIN sip s ON s.id=d.id AND s.keyword='secret' ".
+                    "WHERE d.tech IN ('sip','pjsip')$where".
+                 " UNION ALL ".
+                 "SELECT d.id AS id,d.description AS description,i.data AS data,d.tech AS tech ".
+                    "FROM devices d INNER JOIN iax i ON i.id=d.id AND i.keyword='secret' ".
+                    "WHERE d.tech='iax2'$where".
+                 " ORDER BY id LIMIT ? OFFSET ?";
+
         $result=$this->_DB->fetchTable($query, true, $arrParam);
         if($result==FALSE){
             $this->errMsg = $this->_DB->errMsg;
+            return array();
         }
-        $result2 = array();
-        if(count($result) < $limit){
-            $arrParam = "";
-            $where = "true";
-            if(isset($filter_field) && $filter_field !="" && $filter_value != ""){
-                $where = "devices.id like ?";
-                $arrParam = array("$filter_value%");
-            }
-            $query = "select count(*) from devices where tech = 'sip' and $where";
-
-            $total=$this->_DB->getFirstRowQuery($query,false,$arrParam);
-            if($total==FALSE){
-                $this->errMsg = $this->_DB->errMsg;
-                return 0;
-            }
-            $totalSIP = $total[0];
-            if($offset <= $totalSIP)
-                $offset = 0;
-            else
-                $offset = $offset-$totalSIP;
-            $limit = $limit - count($result);
-            if(isset($filter_field) && $filter_field !="" && $filter_value != ""){
-                $where = "devices.id like ?";
-                $arrParam = array("$filter_value%",$limit,$offset);
-            }else
-                $arrParam = array($limit,$offset);
-            //For IAX
-            $query = "select devices.id,description,data from devices,iax where devices.id=iax.id and tech = 'iax2' and keyword = 'secret' and $where LIMIT ? OFFSET ?";
-            $result2= $this->_DB->fetchTable($query, true, $arrParam);
-            if($result2==FALSE){
-                $this->errMsg = $this->_DB->errMsg;
-            }
-        }
-        $final[] = $result;
-        $final[] = $result2;
-        return $final;
+        return $result;
     }
 
     /**
@@ -214,7 +147,7 @@ class paloSantoWeakKeys {
             return null;
         }
         $device = $result;
-        if($device['tech'] == "sip"){
+        if($device['tech'] == "sip" || $device['tech'] == "pjsip"){
             $arrParam = array($id);
             $query = "select devices.id,description,tech,data from devices,sip where devices.id=sip.id and keyword = 'secret' and devices.id = ?";
             $result=$this->_DB->fetchTable($query, true, $arrParam);
@@ -241,15 +174,19 @@ class paloSantoWeakKeys {
      * Function that updates the key of an existing device in the database 
      *
      * @param array     $arrValues        array that contains the new key and the id of the device
-     * @param string    $tech             string that contains the technology of the device (sip or iax2)
+     * @param string    $tech             string that contains the technology of the device (sip, pjsip or iax2)
      *
      * @return bool     false if an error occurs or true if the key is correctly updated
      */
     function saveNewKey($arrValues, $tech)
     {
         $arrParam = array($arrValues['new_key'],$arrValues['id']);
-        if($tech == "sip"){
-            $query = "update sip set data = ? where id = ? and keyword = 'secret'";
+        // paloDB enlaza las cadenas numericas como enteros, y una comparacion
+        // entera sobre el id (varchar) obliga a MariaDB a convertir filas como
+        // 'pjsip-1' o 'tr-peer-1', lo que falla en modo estricto. El cast deja
+        // la comparacion en texto.
+        if($tech == "sip" || $tech == "pjsip"){
+            $query = "update sip set data = ? where id = cast(? as char) and keyword = 'secret'";
             $result = $this->_DB->genQuery($query,$arrParam);
             if( $result == false ){
                 $this->errMsg = $this->_DB->errMsg;
@@ -258,7 +195,7 @@ class paloSantoWeakKeys {
             return true;
         }
         if($tech == "iax2"){
-            $query = "update iax set data = ? where id = ? and keyword = 'secret'";
+            $query = "update iax set data = ? where id = cast(? as char) and keyword = 'secret'";
             $result = $this->_DB->genQuery($query,$arrParam);
             if( $result == false ){
                 $this->errMsg = $this->_DB->errMsg;
@@ -266,6 +203,8 @@ class paloSantoWeakKeys {
             }    
             return true;
         }
+        // Tecnologia no soportada: no hay nada que actualizar.
+        return false;
     }
 }
 ?>
