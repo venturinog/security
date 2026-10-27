@@ -241,7 +241,7 @@ function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo)
         foreach ($result as $row) {
             $id = (int)$row['id'];
             $activated = ($row['activated'] == '1');
-            $order = $isGeo ? ((int)$row['rule_order'] - 100000) : (int)$row['rule_order'];
+            $order = fwRuleOrder($row);
 
             $arrTmp[0] = "<input type='checkbox' name='del_x[]' value='".$id."'>";
             $arrTmp[1] = $order;
@@ -721,38 +721,75 @@ function validateRuleInput(&$values)
 }
 
 /**
+ * Posición de una regla tal como se muestra en la grilla.
+ *
+ * Las reglas GeoIP se guardan a partir de rule_order 100000 para que iptables
+ * las evalúe antes que el resto (ver fixGEOIPOrder) y la grilla les resta esa
+ * base. La auditoría usa esta misma función: si registrara el rule_order
+ * crudo, el número no coincidiría con el que ve el operador.
+ */
+function fwRuleOrder($row)
+{
+    $order = (int)$row['rule_order'];
+    if ((string)$row['protocol'] === 'GEOIP') {
+        // Si el valor quedó por debajo de la base (BD de una instalación
+        // antigua, que fixGEOIPOrder() repara en la siguiente lectura) se
+        // registra tal cual, no un negativo sin sentido.
+        return ($order > 100000) ? $order - 100000 : $order;
+    }
+    return $order;
+}
+
+/**
  * Datos de una regla para audit.log, leídos de la BD (ya normalizados).
  * Si la regla no existe sólo se devuelve el id y, si hay, el error.
+ *
+ * Es la ficha mínima que permite reconocer la regla sin consultar la BD:
+ * qué cadena toca (traffic), qué hace (target), si estaba activa, sobre qué
+ * direcciones e interfaces, y qué protocolo y puertos. Imprescindible en
+ * `rule.delete`, donde la fila desaparece y el log es la única constancia.
+ *
+ * La línea lleva dos identificadores a propósito: `id` es la clave de la
+ * tabla `filter` y `order` es la posición que muestra la grilla. No son
+ * intercambiables: los version_sql insertan reglas en medio de la lista y
+ * corren el rule_order sin renumerar el id, y además reordenar o borrar
+ * renumera el rule_order. Sin el `order` la línea de auditoría no se puede
+ * cruzar con lo que el usuario tiene delante.
  */
 function fwAuditRuleDetails(&$pDB, $ruleId, $errMsg = '')
 {
-    $details = array('id' => (int)$ruleId);
+    $row = NULL;
     if ($ruleId > 0) {
         $pRules = new paloSantoRules($pDB);
-        $row = $pRules->getRule($ruleId);
-        if (is_array($row) && count($row) > 0) {
-            $details['traffic']  = $row['traffic'];
-            $details['protocol'] = $row['protocol'];
-            $details['target']   = $row['target'];
-            if ((string)$row['eth_in'] !== '')  $details['iface_in']  = $row['eth_in'];
-            if ((string)$row['eth_out'] !== '') $details['iface_out'] = $row['eth_out'];
-            $details['src'] = ((string)$row['ip_source'] !== '') ? $row['ip_source'] : 'ANY';
-            $details['dst'] = ((string)$row['ip_destiny'] !== '') ? $row['ip_destiny'] : 'ANY';
+        $candidate = $pRules->getRule($ruleId);
+        if (is_array($candidate) && count($candidate) > 0) $row = $candidate;
+    }
 
-            $protocol = (string)$row['protocol'];
-            if ($protocol === 'TCP' || $protocol === 'UDP') {
-                $details['sport'] = fwAuditPortName($pDB, $row['sport']);
-                $details['dport'] = fwAuditPortName($pDB, $row['dport']);
-            } elseif ($protocol === 'ICMP') {
-                $details['icmp_type'] = $row['icmp_type'];
-            } elseif ($protocol === 'IP') {
-                $details['ip_proto'] = $row['number_ip'];
-            } elseif ($protocol === 'STATE') {
-                $details['state'] = $row['state'];
-            } elseif ($protocol === 'GEOIP') {
-                $details['countries']  = fwAuditList($row['countries']);
-                $details['continents'] = fwAuditList($row['continents']);
-            }
+    $details = array('id' => (int)$ruleId);
+    if ($row !== NULL) {
+        $details['order']     = fwRuleOrder($row);
+        $details['traffic']   = $row['traffic'];
+        $details['protocol']  = $row['protocol'];
+        $details['target']    = $row['target'];
+        $details['activated'] = ((string)$row['activated'] === '1') ? 'on' : 'off';
+        if ((string)$row['eth_in'] !== '')  $details['iface_in']  = $row['eth_in'];
+        if ((string)$row['eth_out'] !== '') $details['iface_out'] = $row['eth_out'];
+        $details['src'] = ((string)$row['ip_source'] !== '') ? $row['ip_source'] : 'ANY';
+        $details['dst'] = ((string)$row['ip_destiny'] !== '') ? $row['ip_destiny'] : 'ANY';
+
+        $protocol = (string)$row['protocol'];
+        if ($protocol === 'TCP' || $protocol === 'UDP') {
+            $details['sport'] = fwAuditPortName($pDB, $row['sport']);
+            $details['dport'] = fwAuditPortName($pDB, $row['dport']);
+        } elseif ($protocol === 'ICMP') {
+            $details['icmp_type'] = $row['icmp_type'];
+        } elseif ($protocol === 'IP') {
+            $details['ip_proto'] = $row['number_ip'];
+        } elseif ($protocol === 'STATE') {
+            $details['state'] = $row['state'];
+        } elseif ($protocol === 'GEOIP') {
+            $details['countries']  = fwAuditList($row['countries']);
+            $details['continents'] = fwAuditList($row['continents']);
         }
     }
     if ($errMsg !== '') $details['msg'] = $errMsg;
@@ -912,13 +949,14 @@ function toggleRule($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf
     $id = (int)getParameter($action);
     $pRules = new paloSantoRules($pDB);
     $ok = ($action == 'activate') ? $pRules->setActivated($id) : $pRules->setDesactivated($id);
+    $event = ($action == 'activate') ? 'rule.enable' : 'rule.disable';
 
     // Se audita antes de responder por AJAX: el switch del grid pasa por aquí.
-    issabelFwAudit::log(($action == 'activate') ? 'rule.enable' : 'rule.disable',
-        $ok ? 'ok' : 'error', array(
-            'id'  => $id,
-            'msg' => $ok ? '' : $pRules->errMsg,
-        ));
+    // La línea lleva los datos de la regla, incluida su posición en la grilla
+    // (`order`), que no coincide con el `id` de `filter`.
+    $audit = fwAuditRuleDetails($pDB, $id);
+    if (!$ok) $audit['msg'] = $pRules->errMsg;
+    issabelFwAudit::log($event, $ok ? 'ok' : 'error', $audit);
 
     if (getParameter('ajax')) {
         header('Content-Type: application/json; charset=utf-8');
@@ -1024,11 +1062,11 @@ function moveRule($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, 
             $moved = ($okFirst && $okSecond);
         }
     }
-    issabelFwAudit::log('rule.move', $moved ? 'ok' : 'error', array(
-        'id'  => $id,
-        'dir' => ($action == 'move_up') ? 'up' : 'down',
-        'msg' => $moved ? '' : 'the rule could not be moved',
-    ));
+    // La posición cambia con el movimiento: se audita la nueva, no la previa.
+    $audit = fwAuditRuleDetails($pDB, $id);
+    $audit['dir'] = ($action == 'move_up') ? 'up' : 'down';
+    if (!$moved) $audit['msg'] = 'the rule could not be moved';
+    issabelFwAudit::log('rule.move', $moved ? 'ok' : 'error', $audit);
     return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
 }
 
@@ -1080,25 +1118,35 @@ function deleteRules($smarty, $module_name, $local_templates_dir, &$pDB, $arrCon
         return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
     }
     $count = 0;
-    $deleted = array();
     $failed = array();
-    $failedRaw = array();
+
+    // La ficha de cada regla se lee antes de borrar: deleteRule() reordena el
+    // resto y la fila deja de existir. El log es la única constancia de lo
+    // que se borró, así que se escribe una línea por regla.
+    $audit = array();
+    foreach ($ids as $id) $audit[(int)$id] = fwAuditRuleDetails($pDB, (int)$id);
+
     foreach ($ids as $id) {
-        if ($pRules->deleteRule((int)$id)) {
+        $id = (int)$id;
+        $details = $audit[$id];
+        $details['count'] = count($ids);
+        // Un id que ya no existe no es un borrado correcto: deleteRule()
+        // devolvería true (sólo renumera) y la línea diría que se borró.
+        if (!isset($details['order'])) {
+            $details['msg'] = 'the rule does not exist';
+            issabelFwAudit::log('rule.delete', 'error', $details);
+            $failed[] = htmlspecialchars(_tr('The rule could not be loaded').' (id '.$id.')', ENT_COMPAT, 'UTF-8');
+            continue;
+        }
+        if ($pRules->deleteRule($id)) {
             $count++;
-            $deleted[] = (int)$id;
+            issabelFwAudit::log('rule.delete', 'ok', $details);
         } else {
-            $failedRaw[] = (string)$pRules->errMsg;
             $failed[] = htmlspecialchars((string)$pRules->errMsg, ENT_COMPAT, 'UTF-8');
+            $details['msg'] = $pRules->errMsg;
+            issabelFwAudit::log('rule.delete', 'error', $details);
         }
     }
-    $auditIds = array_slice($deleted, 0, 20);
-    if (count($deleted) > 20) $auditIds[] = '+'.(count($deleted) - 20);
-    issabelFwAudit::log('rule.delete', count($failedRaw) === 0 ? 'ok' : 'error', array(
-        'ids'   => implode(',', $auditIds),
-        'count' => $count,
-        'msg'   => implode(' ', $failedRaw),
-    ));
     if (count($failed) === 0) {
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"),
             sprintf(_tr("%d rules were deleted"), $count)));

@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 24
+Release: 25
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -243,6 +243,17 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Tue Oct 27 2026 Issabel Foundation <info@issabel.org> - 6.0.0-25
+- Enrich the firewall rule audit entries so a line identifies the rule it
+  refers to. Each event now carries the rule's identity card (traffic,
+  protocol and its detail, target, activated, interfaces, source and
+  destination) in addition to the filter id, and the position shown in the
+  grid as order=, because the two numbers differ after an upgrade or a
+  reorder. rule.enable/rule.disable and rule.move no longer log a bare id, and
+  rule.delete writes one line per deleted rule with a count= of the rules
+  requested, since the row is gone from the database afterwards and the log is
+  the only record of what was removed.
+
 * Sat Oct 24 2026 Issabel Foundation <info@issabel.org> - 6.0.0-24
 - Include PJSIP extensions in the Weak Keys report. PJSIP extension secrets
   are stored in the sip table keyed by extension, so the listing, the total

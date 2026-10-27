@@ -26,9 +26,10 @@ Firewall change auditing
 ----
 
 Changes that affect the firewall are recorded in `/var/log/issabel/audit.log`
-and can be reviewed in **Security → Audit**. There is one line per user action,
-not per database row: dragging a rule leaves a single entry, not one per rule
-touched.
+and can be reviewed in **Security → Audit**. Normally there is one line per
+user action, not per database row: dragging a rule leaves a single entry, not
+one per rule touched. `rule.delete` is the exception and writes one line per
+deleted rule, because the row no longer exists afterwards (see below).
 
 Format:
 
@@ -45,9 +46,76 @@ FIREWALL <user>: <event> <key=value ...> result=<ok|error> from <ip>.
 Examples:
 
 ```
-FIREWALL admin: rule.create id=42 traffic=INPUT protocol=TCP target=DROP src=192.0.2.0/24 dst=0.0.0.0/0 sport=ANY dport=ssh result=ok from 192.0.2.10.
+FIREWALL admin: rule.create id=42 order=20 traffic=INPUT protocol=TCP target=DROP activated=on src=192.0.2.0/24 dst=0.0.0.0/0 sport=ANY dport=ssh result=ok from 192.0.2.10.
+FIREWALL admin: rule.enable id=19 order=20 traffic=INPUT protocol=TCP target=ACCEPT activated=on src=0.0.0.0/0 dst=0.0.0.0/0 sport=ANY dport=SSH result=ok from 192.168.11.138.
+FIREWALL admin: rule.move id=19 order=21 traffic=INPUT protocol=TCP target=ACCEPT activated=on src=0.0.0.0/0 dst=0.0.0.0/0 sport=ANY dport=SSH dir=down result=ok from 192.0.2.10.
+FIREWALL admin: rule.delete id=19 order=20 traffic=INPUT protocol=TCP target=ACCEPT activated=on src=0.0.0.0/0 dst=0.0.0.0/0 sport=ANY dport=SSH count=1 result=ok from 192.0.2.10.
 FIREWALL admin: rules.apply mode=first result=ok from 192.0.2.10.
 FIREWALL admin: firewall.disable result=ok from 192.0.2.10.
+```
+
+### What a rule entry carries
+
+Every per-rule event carries the same "identity card", read from the database
+at the time of the action:
+
+| Field | Meaning |
+|---|---|
+| `id` | primary key of the `filter` table |
+| `order` | position shown in the grid (`rule_order`) |
+| `traffic` | `INPUT`, `OUTPUT` or `FORWARD` |
+| `protocol` | `ALL`, `TCP`, `UDP`, `ICMP`, `IP`, `STATE` or `GEOIP` |
+| `target` | `ACCEPT`, `DROP` or `REJECT` |
+| `activated` | `on` or `off` — whether the rule was effective |
+| `iface_in` / `iface_out` | omitted when empty |
+| `src` / `dst` | source and destination as stored (`ANY` if empty) |
+| protocol detail | `sport`/`dport` (port names), `icmp_type`, `ip_proto`, `state`, or `countries`/`continents` |
+
+Ports are logged by name, not by their `port` table id, so `dport=SSH` is what
+the grid shows. Long lists (GeoIP countries) are capped at 10 entries plus
+`+N`. The whole line is capped at 400 characters by the writer.
+
+### One line per action, except `rule.delete`
+
+Every action leaves a single entry: dragging a rule is one `rule.reorder` line
+with `geoip` and `count`, not one per rule moved, because in a reorder the
+order is a property of the whole list.
+
+`rule.delete` is the exception: it writes **one line per deleted rule**, each
+with its own identity card and a `count=` with the number of rules requested
+in the action. A deleted rule is gone from the database, so the log is the only
+record of what was removed; a summary line listing bare ids would not say which
+rule it was. Failed deletions are logged the same way, with `result=error` and
+the helper's message in `msg`.
+
+### `id` and `order` are not the same number
+
+Every per-rule event carries two identifiers:
+
+- `id` — the primary key of the `filter` table. Stable for the life of the
+  rule; this is what the edit page and the checkboxes use.
+- `order` — the position the rule has in the grid, i.e. `rule_order`. Rules
+  with `protocol=GEOIP` are stored from 100000 and logged minus that offset,
+  so the value matches what the grid shows.
+
+They differ in normal operation, so an audit line saying `id=19` can well be
+the rule displayed in position 20:
+
+- `security`'s `version_sql` upgrades insert rules in the middle of the list
+  (the WEBRTC/XMPP ones, for instance) and shift `rule_order` for everything
+  below, without renumbering `id`.
+- Reordering, moving or deleting a rule renumbers `rule_order`; `id` stays.
+
+`rule.reorder` is the only event that does not identify individual rules: it
+records `geoip` and `count`, and leaves a single entry for the whole drag.
+
+Note that lines written before this distinction was logged cannot be
+reinterpreted: they only carry `id`, so cross-checking one against the grid
+needs the database:
+
+```sh
+sqlite3 /var/www/db/iptables.db \
+  "SELECT rule_order, id, protocol, dport, target FROM filter ORDER BY rule_order;"
 ```
 
 The lines are written by `modules/sec_rules/libs/issabelFwAudit.class.php`.
