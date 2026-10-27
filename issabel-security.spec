@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 25
+Release: 26
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -243,6 +243,15 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Tue Oct 27 2026 Issabel Foundation <info@issabel.org> - 6.0.0-26
+- Keep GeoIP rules in their own rule_order range. paloSantoRules::reorder(),
+  which runs after every delete, renumbered them from 1, mixing them with the
+  normal rules until fixGEOIPOrder() repaired them on the next read, and
+  saveRule() stored the first GeoIP rule at order 1 because MAX() is NULL on
+  an empty family. Both now use the new paloSantoRules::GEOIP_ORDER_BASE
+  (100000), the value the grid and drag-and-drop reordering already used.
+  Existing databases are still repaired by fixGEOIPOrder().
+
 * Tue Oct 27 2026 Issabel Foundation <info@issabel.org> - 6.0.0-25
 - Enrich the firewall rule audit entries so a line identifies the rule it
   refers to. Each event now carries the rule's identity card (traffic,

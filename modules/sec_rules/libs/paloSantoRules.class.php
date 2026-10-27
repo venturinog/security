@@ -30,6 +30,14 @@ class paloSantoRules {
     var $errMsg;    // Variable where the errors are stored
     var $lastInsertId = 0; // id de la última regla creada por saveRule()
 
+    /**
+     * Base de rule_order para las reglas GeoIP. Ocupan su propio rango
+     * (100001, 100002, ...) para no mezclarse con las normales (1, 2, ...):
+     * iptables las evalúa antes y las grillas muestran la posición restando
+     * esta base.
+     */
+    const GEOIP_ORDER_BASE = 100000;
+
      /**
      * Constructor of the class, receives as a parameter the database, which is stored in the class variable $_DB
      *  .
@@ -196,11 +204,12 @@ class paloSantoRules {
      * GEOIP and normal RULES table, as iptables evaluation order for GeoIP always takes precedences 
      */
     function fixGEOIPOrder() {
-        $query = "SELECT * FROM  filter WHERE protocol='GEOIP' AND rule_order > 0 AND rule_order<100000 ORDER BY rule_order";
+        $query = "SELECT * FROM  filter WHERE protocol='GEOIP' AND rule_order > 0 AND rule_order<"
+               . self::GEOIP_ORDER_BASE . " ORDER BY rule_order";
         $result = $this->_DB->fetchTable($query, true);
         if(is_array($result)) {
             if(count($result)>0) {
-                $i=100000;
+                $i=self::GEOIP_ORDER_BASE;
                 foreach($result as $key => $value) {
                     $i++;
                     $arrParam = array($i, $value['id']);
@@ -208,7 +217,8 @@ class paloSantoRules {
                     $result = $this->_DB->genQuery($query,$arrParam);
                 }
                 $i=0;
-                $query = "SELECT * FROM  filter WHERE protocol<>'GEOIP' AND rule_order > 0 AND rule_order<100000 ORDER BY rule_order";
+                $query = "SELECT * FROM  filter WHERE protocol<>'GEOIP' AND rule_order > 0 AND rule_order<"
+                       . self::GEOIP_ORDER_BASE . " ORDER BY rule_order";
                 $result = $this->_DB->fetchTable($query, true);
                 foreach($result as $key => $value) {
                     $i++;
@@ -272,12 +282,17 @@ class paloSantoRules {
 
         if($protocol == 'GEOIP') {
             $max = $this->getMaxOrderGEOIP();
-            //$max['lastRule'] = $max['lastRule'] + 100000;
         } else {
             $max = $this->getMaxOrder();
         }
 
-        $order = 1 + $max['lastRule'];
+        // getMaxOrder*() devuelve array() si falla la consulta y MAX() es NULL
+        // cuando la familia todavía no tiene reglas.
+        $maxOrder = isset($max['lastRule']) ? (int)$max['lastRule'] : 0;
+        // La primera regla GeoIP debe nacer dentro de su rango, no en 1.
+        $order = ($protocol == 'GEOIP')
+            ? max(self::GEOIP_ORDER_BASE, $maxOrder) + 1
+            : 1 + $maxOrder;
 
         $query = "INSERT INTO filter(traffic, eth_in, eth_out, ip_source, ip_destiny, protocol, ".
                                     "sport, dport, icmp_type, number_ip, target, rule_order, activated, state, countries, continents) ".
@@ -435,11 +450,16 @@ class paloSantoRules {
                     return false;
         }
 
+        // Las GeoIP viven en su propio rango: renumerarlas desde 1 las
+        // mezclaba con las normales hasta que fixGEOIPOrder() las reparaba
+        // en la siguiente lectura.
         $total = $this->ObtainNumRulesGEOIP();
         $result = $this->ObtainRulesGEOIP($total,0);
+        $i = self::GEOIP_ORDER_BASE;
         foreach($result as $key => $value){
-            if($value['rule_order'] != $key + 1)
-                if(!$this->updateOrder($value['id'],$key+1))
+            $i++;
+            if($value['rule_order'] != $i)
+                if(!$this->updateOrder($value['id'],$i))
                     return false;
         }
  

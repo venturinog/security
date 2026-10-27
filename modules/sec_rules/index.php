@@ -235,6 +235,7 @@ function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo)
         'FORWARD' => array('icon' => 'ti-arrows-exchange',    'class' => 'fw-traffic--forward'),
     );
 
+    // El primer argumento es el límite de paginación, no la base de order.
     $result = $isGeo ? $pRules->ObtainRulesGEOIP(100000, 0) : $pRules->ObtainRules(100000, 0);
     $data = array();
     if (is_array($result)) {
@@ -723,19 +724,21 @@ function validateRuleInput(&$values)
 /**
  * Posición de una regla tal como se muestra en la grilla.
  *
- * Las reglas GeoIP se guardan a partir de rule_order 100000 para que iptables
- * las evalúe antes que el resto (ver fixGEOIPOrder) y la grilla les resta esa
- * base. La auditoría usa esta misma función: si registrara el rule_order
- * crudo, el número no coincidiría con el que ve el operador.
+ * Las reglas GeoIP se guardan a partir de paloSantoRules::GEOIP_ORDER_BASE
+ * (100000) para que iptables las evalúe antes que el resto (ver
+ * fixGEOIPOrder) y la grilla les resta esa base. La auditoría usa esta misma
+ * función: si registrara el rule_order crudo, el número no coincidiría con el
+ * que ve el operador.
  */
 function fwRuleOrder($row)
 {
     $order = (int)$row['rule_order'];
     if ((string)$row['protocol'] === 'GEOIP') {
+        $base = paloSantoRules::GEOIP_ORDER_BASE;
         // Si el valor quedó por debajo de la base (BD de una instalación
         // antigua, que fixGEOIPOrder() repara en la siguiente lectura) se
         // registra tal cual, no un negativo sin sentido.
-        return ($order > 100000) ? $order - 100000 : $order;
+        return ($order > $base) ? $order - $base : $order;
     }
     return $order;
 }
@@ -1009,7 +1012,7 @@ function reorderRules(&$pDB)
         $seen[$id] = true;
     }
 
-    $order = ($isGeo ? 100000 : 0) + 1;
+    $order = ($isGeo ? paloSantoRules::GEOIP_ORDER_BASE : 0) + 1;
     foreach ($ids as $id) {
         if (!$pRules->updateOrder((int)$id, $order++)) {
             issabelFwAudit::log('rule.reorder', 'error', $audit + array('msg' => $pRules->errMsg));
@@ -1050,6 +1053,7 @@ function moveRule($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, 
     $moved = false;
     if (is_array($rule)) {
         $isGeo = ($rule['protocol'] == 'GEOIP');
+        // Límite de paginación, no la base de order.
         $list = $isGeo ? $pRules->ObtainRulesGEOIP(100000, 0) : $pRules->ObtainRules(100000, 0);
         $index = -1;
         foreach ($list as $i => $row) if ((int)$row['id'] === $id) { $index = $i; break; }
