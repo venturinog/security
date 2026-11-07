@@ -7,16 +7,41 @@ function setDisplay(id, visible) {
     if (el) el.style.display = visible ? '' : 'none';
 }
 
+/*
+ * Ancho de las interfaces en las dos retículas del formulario: la de 6
+ * columnas (ventanas estrechas, 3 filas) y la de 12 (escritorio ancho, 2
+ * filas). Se aplican las dos clases y el CSS elige según el ancho de la
+ * ventana. Con FORWARD las dos interfaces ocupan la mitad que la única
+ * visible en INPUT u OUTPUT, de modo que la fila siga completa.
+ */
+function setSpan(id, narrow, wide) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('fw-col-2', 'fw-col-4', 'fw-g-3', 'fw-g-6');
+    el.classList.add('fw-col-' + narrow, 'fw-g-' + wide);
+}
+
 function showElementByTraffic() {
     var traffic = document.querySelector('[name="id_traffic"]');
     var value = traffic ? traffic.value : 'INPUT';
-    setDisplay('id_interface_in', value === 'INPUT' || value === 'FORWARD');
-    setDisplay('id_interface_out', value === 'OUTPUT' || value === 'FORWARD');
+
+    var both = (value === 'FORWARD');
+    setDisplay('id_interface_in', value === 'INPUT' || both);
+    setDisplay('id_interface_out', value === 'OUTPUT' || both);
+    setSpan('id_interface_in', both ? 2 : 4, both ? 3 : 6);
+    setSpan('id_interface_out', both ? 2 : 4, both ? 3 : 6);
 }
 
 function showElementByProtocol() {
     var protocol = document.querySelector('[name="id_protocol"]');
     var value = protocol ? protocol.value : 'ALL';
+
+    // Los campos que dependen del protocolo van en su propia tarjeta: se
+    // oculta entera cuando el protocolo no tiene detalles, así los campos
+    // fijos de la tarjeta principal no cambian de sitio.
+    var hasDetails = value === 'TCP' || value === 'UDP' || value === 'ICMP'
+                  || value === 'IP' || value === 'STATE' || value === 'GEOIP';
+    setDisplay('fw_protocol_details', hasDetails);
 
     setDisplay('id_port_in', value === 'TCP' || value === 'UDP');
     setDisplay('id_port_out', value === 'TCP' || value === 'UDP');
@@ -169,6 +194,73 @@ jQuery(function ($) {
             $toggle.prop('checked', !enabled);
             fwAlert('error', '');
         });
+    });
+
+    /*
+     * Filtro del selector de países de GeoIP. La primera vez se guardan los
+     * nodos originales (option y optgroup); en cada tecla se reconstruye la
+     * lista con los que coinciden con el texto o están seleccionados. Así la
+     * selección no se pierde y no se depende de que el navegador aplique
+     * display:none a una <option>, que no es fiable.
+     */
+    function fwFilterOptions($input) {
+        var $select = $input.closest('.iss-field').find('select');
+        if (!$select.length) return;
+
+        var records = $select.data('fw-options');
+        if (!records) {
+            records = [];
+            $select.children().each(function () {
+                var $child = $(this);
+                if (this.nodeName === 'OPTGROUP') {
+                    $child.children('option').each(function () {
+                        records.push({ group: $child.attr('label') || '', option: this });
+                    });
+                } else if (this.nodeName === 'OPTION') {
+                    records.push({ group: null, option: this });
+                }
+            });
+            $select.data('fw-options', records);
+        }
+
+        var term = String($input.val() || '').replace(/^\s+|\s+$/g, '').toLowerCase();
+        var selected = {};
+        $select.find('option:selected').each(function () {
+            selected[this.value] = true;
+        });
+
+        var frag = document.createDocumentFragment();
+        var groupLabel;
+        var groupEl = null;
+        records.forEach(function (record) {
+            var option = record.option;
+            var keep = selected[option.value] || term === ''
+                || (option.text + ' ' + option.value).toLowerCase().indexOf(term) !== -1;
+            if (!keep) return;
+
+            if (record.group !== groupLabel) {
+                groupLabel = record.group;
+                groupEl = null;
+                if (record.group !== null) {
+                    groupEl = document.createElement('optgroup');
+                    groupEl.label = record.group;
+                    frag.appendChild(groupEl);
+                }
+            }
+            if (groupEl) groupEl.appendChild(option);
+            else frag.appendChild(option);
+        });
+
+        $select.empty()[0].appendChild(frag);
+    }
+
+    $(document).on('input', '.fw-filter', function () {
+        fwFilterOptions($(this));
+    });
+
+    // El filtro se escribe, no se envía: Enter no debe guardar la regla.
+    $(document).on('keydown', '.fw-filter', function (e) {
+        if (e.key === 'Enter') e.preventDefault();
     });
 
     function fwSaveOrder($grid) {

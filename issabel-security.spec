@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 26
+Release: 27
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -243,6 +243,13 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Fri Nov 06 2026 Issabel Foundation <info@issabel.org> - 6.0.0-27
+- Rebuild the new firewall rule form as a compact six-column grid: the four
+  stacked cards become two, and the protocol-dependent fields move to their
+  own card that appears as a block, so changing the protocol no longer
+  reflows the fields above it. The GeoIP multiselects get a fixed size and
+  the country list a filter box. The form now fits without scrolling.
+
 * Tue Oct 27 2026 Issabel Foundation <info@issabel.org> - 6.0.0-26
 - Keep GeoIP rules in their own rule_order range. paloSantoRules::reorder(),
   which runs after every delete, renumbered them from 1, mixing them with the

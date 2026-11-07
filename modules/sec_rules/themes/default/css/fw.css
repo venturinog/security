@@ -268,3 +268,101 @@ body.fw-applying {
     background-color: var(--iss-sev-ok);
     border-color: var(--iss-sev-ok);
 }
+
+/* --------------------- Formulario de regla --------------------- */
+/* Retícula de 6 columnas: cada fila del formulario suma exactamente 6, así
+ * una dirección con su máscara (2+1) entra junto a la otra pareja (2+1) y no
+ * queda el campo huérfano que dejaba la grilla de 3 columnas. Los campos que
+ * dependen del protocolo viven en su propia tarjeta y se ocultan como bloque,
+ * de modo que cambiar de protocolo no recoloca los campos fijos.
+ * La primera tarjeta usa además la retícula ancha de 12 columnas (dos filas)
+ * en pantallas grandes; ver más abajo. */
+.fw-formgrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.fw-formgrid > .iss-field.fw-col-1 {
+    grid-column: span 1;
+}
+
+.fw-formgrid > .iss-field.fw-col-2 {
+    grid-column: span 2;
+}
+
+.fw-formgrid > .iss-field.fw-col-3 {
+    grid-column: span 3;
+}
+
+/* Una interfaz sola (INPUT u OUTPUT) ocupa cuatro columnas para que la fila
+ * siga completa junto al campo Order; con FORWARD las dos vuelven a dos. */
+.fw-formgrid > .iss-field.fw-col-4 {
+    grid-column: span 4;
+}
+
+/* Los controles llenan su celda. El tope de 430px del tema deja huecos en
+ * las celdas de tres columnas (detalles de protocolo y GeoIP), que son las
+ * que llevan los controles más anchos. */
+.fw-formgrid .iss-field__control > .form-control,
+.fw-formgrid .iss-field__control > .form-select {
+    max-width: none;
+}
+
+/* Filtro del selector de países de GeoIP: va encima del select y ocupa su
+ * mismo ancho. */
+.fw-filter {
+    margin-bottom: 6px;
+}
+
+/* La columna de países lleva el buscador encima del selector, así que su
+ * control es más alto que el de continentes. La columna de continentes se
+ * estira para que su selector empiece a la altura del buscador y termine a la
+ * misma altura que el selector de países. */
+#id_geoipcontinents .iss-field__control {
+    display: flex;
+    flex: 1 1 auto;
+}
+
+#id_geoipcontinents .iss-field__control > .form-select {
+    flex: 1 1 auto;
+    height: auto;
+}
+
+/* Primera tarjeta en escritorio ancho: 12 columnas y dos filas. Las clases
+ * fw-col-* siguen gobernando la retícula de 6 columnas (3 filas) por debajo
+ * del punto de ruptura; fw-g-* sólo existe dentro de esta consulta. */
+@media (min-width: 1200px) {
+    .fw-formgrid--main {
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .fw-formgrid--main > .iss-field.fw-g-2 {
+        grid-column: span 2;
+    }
+
+    .fw-formgrid--main > .iss-field.fw-g-3 {
+        grid-column: span 3;
+    }
+
+    .fw-formgrid--main > .iss-field.fw-g-6 {
+        grid-column: span 6;
+    }
+
+    /* Order cierra la segunda fila sin cambiar el orden del documento, que es
+     * el que necesita la retícula estrecha. */
+    #id_orden {
+        order: 1;
+    }
+}
+
+@media (max-width: 767px) {
+    .fw-formgrid {
+        grid-template-columns: 1fr;
+    }
+
+    .fw-formgrid > .iss-field.fw-col-1,
+    .fw-formgrid > .iss-field.fw-col-2,
+    .fw-formgrid > .iss-field.fw-col-3,
+    .fw-formgrid > .iss-field.fw-col-4 {
+        grid-column: 1 / -1;
+    }
+}

@@ -412,6 +412,9 @@ function constructForm($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     $smarty->assign("SAVE", _tr("Save"));
     $smarty->assign("CANCEL", _tr("Cancel"));
     $smarty->assign("REQUIRED_FIELD", _tr("Required field"));
+    // Texto del filtro del selector de países de GeoIP. "Search" ya existe en
+    // el lang global de framework, así que no hace falta clave nueva.
+    $smarty->assign("SEARCH", _tr("Search"));
     $smarty->assign("icon", "modules/$module_name/images/security_firewall_rules.png");
     $smarty->assign("ERRORS", $errors);
 
@@ -435,9 +438,8 @@ function constructForm($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     $smarty->assign("protocol_html", $protocol_html);
     $smarty->assign("traffic_label", _tr("Traffic"));
     $smarty->assign("protocol_label", _tr("Protocol"));
-    $smarty->assign("ip_detail", _tr("IP DETAILS"));
+    // Cabecera de la tarjeta que agrupa los campos propios del protocolo.
     $smarty->assign("protocol_detail", _tr("PROTOCOL DETAILS"));
-    $smarty->assign("action_detail", _tr("ACTION DETAIL"));
     $smarty->assign("MODE", $action === 'edit' ? 'edit' : 'new');
     $smarty->assign("VALUES", $arrValues);
 
@@ -617,7 +619,10 @@ function createFieldForm($pDB,$arrValues = array())
             "VALIDATION_TYPE"        => "text",
             "VALIDATION_EXTRA_PARAM" => "",
             "EDITABLE"               => "yes",
-            "MULTIPLE"               => TRUE
+            "MULTIPLE"               => TRUE,
+            // Alto fijo de 10 filas: sin SIZE el navegador decide y la fila
+            // de GeoIP cambiaba de alto según el motor.
+            "SIZE"                   => "10"
             ),
         "geoipcontinents"  => array( "LABEL"                  => _tr("Continents"),
             "REQUIRED"               => "no",
@@ -626,7 +631,8 @@ function createFieldForm($pDB,$arrValues = array())
             "VALIDATION_TYPE"        => "text",
             "VALIDATION_EXTRA_PARAM" => "",
             "EDITABLE"               => "yes",
-            "MULTIPLE"               => TRUE
+            "MULTIPLE"               => TRUE,
+            "SIZE"                   => "10"
             ),
         "target"          => array( "LABEL"                  => _tr("Target"),
             "REQUIRED"               => "yes",
