@@ -39,7 +39,7 @@ FIREWALL <user>: <event> <key=value ...> result=<ok|error> from <ip>.
 
 | Module | Events |
 |---|---|
-| `sec_rules` | `rule.create`, `rule.update`, `rule.delete`, `rule.enable`, `rule.disable`, `rule.reorder`, `rule.move`, `rules.discard`, `rules.apply`, `rules.snapshot`, `firewall.disable` |
+| `sec_rules` | `rule.create`, `rule.update`, `rule.delete`, `rule.enable`, `rule.disable`, `rule.reorder`, `rule.move`, `rules.discard`, `rules.apply`, `rules.snapshot`, `firewall.enable`, `firewall.disable` |
 | `sec_geoip_map` | `country.block`, `country.unblock`, `country.none` |
 | `sec_whitelist` | `whitelist.add`, `whitelist.update`, `whitelist.delete` |
 
@@ -50,9 +50,15 @@ FIREWALL admin: rule.create id=42 order=20 traffic=INPUT protocol=TCP target=DRO
 FIREWALL admin: rule.enable id=19 order=20 traffic=INPUT protocol=TCP target=ACCEPT activated=on src=0.0.0.0/0 dst=0.0.0.0/0 sport=ANY dport=SSH result=ok from 192.168.11.138.
 FIREWALL admin: rule.move id=19 order=21 traffic=INPUT protocol=TCP target=ACCEPT activated=on src=0.0.0.0/0 dst=0.0.0.0/0 sport=ANY dport=SSH dir=down result=ok from 192.0.2.10.
 FIREWALL admin: rule.delete id=19 order=20 traffic=INPUT protocol=TCP target=ACCEPT activated=on src=0.0.0.0/0 dst=0.0.0.0/0 sport=ANY dport=SSH count=1 result=ok from 192.0.2.10.
-FIREWALL admin: rules.apply mode=first result=ok from 192.0.2.10.
+FIREWALL admin: firewall.enable result=ok from 192.0.2.10.
+FIREWALL admin: rules.apply result=ok from 192.0.2.10.
 FIREWALL admin: firewall.disable result=ok from 192.0.2.10.
 ```
+
+`firewall.enable` is written only when the firewall goes from stopped to
+running (first activation, reactivation after it was disabled, or a restart
+that left no firewall chain). Applying changes while the firewall is already
+running is `rules.apply`.
 
 ### What a rule entry carries
 
@@ -130,6 +136,7 @@ Useful queries:
 ```sh
 grep 'FIREWALL ' /var/log/issabel/audit.log
 grep 'result=error' /var/log/issabel/audit.log
+grep 'FIREWALL admin: firewall.enable' /var/log/issabel/audit.log | tail
 grep 'FIREWALL admin: rules.apply' /var/log/issabel/audit.log | tail
 ```
 

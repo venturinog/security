@@ -34,7 +34,8 @@
  *
  *   FIREWALL admin: rule.create id=42 traffic=INPUT protocol=TCP target=DROP
  *     src=192.0.2.0/24 dst=0.0.0.0/0 sport=ANY dport=ssh result=ok from 192.0.2.10.
- *   FIREWALL admin: rules.apply mode=first result=error msg="..." from 192.0.2.10.
+ *   FIREWALL admin: firewall.enable result=ok from 192.0.2.10.
+ *   FIREWALL admin: rules.apply result=error msg="..." from 192.0.2.10.
  *
  * Todos los valores se sanean antes de escribirse: se eliminan los caracteres
  * de control (incluidos CR y LF) y los no imprimibles, y se recortan. Esto no

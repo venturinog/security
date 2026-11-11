@@ -1090,14 +1090,16 @@ function activateFirewall($smarty, $module_name, $local_templates_dir, &$pDB, $a
 {
     $pRules = new paloSantoRules($pDB);
     $bFirstTime = $pRules->isFirstTime();
-    $mode = $bFirstTime ? 'first' : 'apply';
+    // Encender el firewall (primera vez, tras desactivarlo o tras un reinicio
+    // sin la cadena) es un evento distinto de reaplicar reglas ya activas.
+    $event = $bFirstTime ? 'firewall.enable' : 'rules.apply';
     $pRules->noMoreFirstTime();
     if (!$pRules->activateRules()) {
-        issabelFwAudit::log('rules.apply', 'error', array('mode' => $mode, 'msg' => $pRules->errMsg));
+        issabelFwAudit::log($event, 'error', array('msg' => $pRules->errMsg));
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pRules->errMsg));
         return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
     }
-    issabelFwAudit::log('rules.apply', 'ok', array('mode' => $mode));
+    issabelFwAudit::log($event, 'ok');
     $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"),
         $bFirstTime ? _tr("The firewall has been activated") : _tr("The rules have been executed in the system")));
     $pRules->updateExecutedInSystem();

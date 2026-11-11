@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 28
+Release: 29
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -243,6 +243,11 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Wed Nov 11 2026 Issabel Foundation <info@issabel.org> - 6.0.0-29
+- Log firewall activation as its own audit event. Turning the firewall on now
+  writes firewall.enable, mirroring firewall.disable, while applying changes
+  over an already running firewall stays as rules.apply.
+
 * Wed Nov 11 2026 Issabel Foundation <info@issabel.org> - 6.0.0-28
 - Hide the "Deactivate firewall" button while the firewall is not running and
   ignore deactivation requests in that state, so the rules page no longer
