@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 32
+Release: 33
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -166,6 +166,21 @@ elif [ $1 -eq 2 ]; then #update
     $pathModule/setup/reloadIssabelconf upgrade
 fi
 
+# 6.0.0-28..32 declared `deactivated` both in the install schema and in the
+# 27->28 version_sql, so the ALTER always failed on a clean install and left
+# /var/spool/issabel-mysqldbscripts/iptables_install.sql behind: firstboot
+# warned about it on every boot even though the database was complete. Drop
+# the stale script only when every table and the column are actually there.
+if [ -f /var/spool/issabel-mysqldbscripts/iptables_install.sql ] && \
+   [ -f /var/www/db/iptables.db ]; then
+    tables=`/usr/bin/sqlite3 /var/www/db/iptables.db "SELECT count(*) FROM sqlite_master WHERE type='table' AND name IN ('tmp_execute','whitelist','portknock_eth','portknock_user_auth','portknock_user_current_rule');" 2>/dev/null`
+    hascol=`/usr/bin/sqlite3 /var/www/db/iptables.db "PRAGMA table_info(tmp_execute);" 2>/dev/null | grep -c '|deactivated|'`
+    if [ "$tables" = "5" ] && [ "$hascol" = "1" ]; then
+        echo "Removing stale iptables script from the firstboot spool"
+        rm -f /var/spool/issabel-mysqldbscripts/iptables_install.sql
+    fi
+fi
+
 
 # Create line in jail.local
 if [ -f /etc/fail2ban/jail.local ]; then
@@ -273,6 +288,17 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Wed Nov 11 2026 Issabel Foundation <info@issabel.org> - 6.0.0-33
+- Keep `deactivated` out of the iptables install schema. A clean install runs
+  the schema and then every version_sql on top of it, so declaring the column
+  in both places made the 6.0.0-28 ALTER fail with "duplicate column name":
+  the whole iptables script was deferred to /var/spool/issabel-mysqldbscripts
+  and firstboot warned about it on every boot. Upgrades from 6.0.0-27 still get
+  the column from the version_sql.
+- Drop that stale spool script from %post when the iptables database already
+  has every table and the column, so boxes installed with 28..32 stop warning
+  after upgrading instead of waiting for a manual rm.
+
 * Wed Nov 11 2026 Issabel Foundation <info@issabel.org> - 6.0.0-32
 - Add custom DNS-01 hooks to the HTTPS Certificate module for providers without
   a certbot plugin or for internal DNS servers. The hook is selected by id from

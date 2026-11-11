@@ -22,11 +22,15 @@ CREATE TABLE port(
     details             varchar(50)   not null,
     comment             varchar(100)
 );
+/* No declarar `deactivated` aca: lo agrega el version_sql
+ * 6_6.0.0-27_6.0.0-28.sql. En una instalacion limpia issabel-dbprocess aplica
+ * este esquema y despues TODOS los version_sql, asi que declararla en los dos
+ * lados hacia fallar el ALTER con "duplicate column name" y el script entero
+ * quedaba diferido al spool de firstboot en cada arranque. */
 CREATE TABLE tmp_execute(
     id                  integer       primary key,
     exec_in_sys         integer       not null,
-    first_time          integer       not null,
-    deactivated         integer       not null default 0
+    first_time          integer       not null
 );
 
 CREATE TABLE whitelist(
