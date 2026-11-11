@@ -6,7 +6,15 @@
 <body>
 <h1>{$node_name}</h1>
 
-<p>You can obtanin a free SSL security certificate for your server using Letsencrypt</p>
+<p>Obtain a free SSL certificate from Let's Encrypt. The certificate is installed in Apache and copied to Asterisk.</p>
+
+<p><strong>HTTP-01 (webroot)</strong> requires TCP port 80 reachable from the Internet and a public DNS name pointing to this server.</p>
+
+<p><strong>DNS-01 (Cloudflare, DigitalOcean, Linode, OVH, RFC 2136)</strong> validates the domain through a TXT record in your DNS provider, so no inbound port is needed and wildcard names such as *.example.com are supported. The API credentials are stored root-only in /etc/letsencrypt/credentials.</p>
+
+<p>Use <em>Test Validation</em> to check the configuration with certbot --dry-run before issuing the certificate.</p>
+
+<p>If your DNS provider has no certbot plugin, an administrator can add a custom hook in /etc/letsencrypt/hooks and declare it in hooks.json; the method then appears in the list above. See /etc/letsencrypt/hooks/README for the script contract.</p>
 
 </body>
 </html>

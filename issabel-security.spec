@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 29
+Release: 32
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -32,6 +32,16 @@ Requires: ipset-service
 Requires: sqlite
 Requires: certbot
 Requires: python3-certbot-apache
+# DNS-01 authenticators offered by sec_letsencrypt. Keeping them as hard
+# Requires lets the page assume the plugin is present instead of guessing from
+# the filesystem. Cloudflare, DigitalOcean and RFC 2136 are small; OVH and
+# Linode are lexicon-based and pull python3-dns-lexicon, which is available in
+# EL10 as its own package.
+Requires: python3-certbot-dns-cloudflare
+Requires: python3-certbot-dns-digitalocean
+Requires: python3-certbot-dns-linode
+Requires: python3-certbot-dns-ovh
+Requires: python3-certbot-dns-rfc2136
 
 # sec_weak_keys pulls extensions_batch/libs/paloSantoExtensionsBatch.class.php
 # to perform asterisk reload
@@ -68,6 +78,11 @@ mv modules/ $RPM_BUILD_ROOT%{_localstatedir}/www/html/
 mv setup/usr/share/issabel/privileged/*  $RPM_BUILD_ROOT%{_datadir}/issabel/privileged
 rmdir setup/usr/share/issabel/privileged
 
+# Validation method registry, read by the module and by ssl_certbot
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/issabel/letsencrypt
+cp setup/usr/share/issabel/letsencrypt/providers.php $RPM_BUILD_ROOT%{_datadir}/issabel/letsencrypt/providers.php
+rmdir setup/usr/share/issabel/letsencrypt
+
 chmod +x setup/updateDatabase
 chmod +x setup/reloadIssabelconf
 
@@ -92,6 +107,16 @@ chmod 644 $RPM_BUILD_ROOT%{_sysconfdir}/fail2ban/filter.d/issabel-gui.conf
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/fail2ban/action.d/
 cp setup/etc/fail2ban/action.d/iptables-multiport-issabel.conf $RPM_BUILD_ROOT%{_sysconfdir}/fail2ban/action.d
 chmod 644 $RPM_BUILD_ROOT%{_sysconfdir}/fail2ban/action.d/iptables-multiport-issabel.conf
+
+# Custom DNS hooks for sec_letsencrypt (root-owned allowlist)
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/letsencrypt/hooks
+cp setup/etc/letsencrypt/hooks/hooks.json $RPM_BUILD_ROOT%{_sysconfdir}/letsencrypt/hooks/hooks.json
+cp setup/etc/letsencrypt/hooks/README $RPM_BUILD_ROOT%{_sysconfdir}/letsencrypt/hooks/README
+cp setup/etc/letsencrypt/hooks/example.sh $RPM_BUILD_ROOT%{_sysconfdir}/letsencrypt/hooks/example.sh
+chmod 755 $RPM_BUILD_ROOT%{_sysconfdir}/letsencrypt/hooks
+chmod 644 $RPM_BUILD_ROOT%{_sysconfdir}/letsencrypt/hooks/hooks.json
+chmod 644 $RPM_BUILD_ROOT%{_sysconfdir}/letsencrypt/hooks/README
+chmod 644 $RPM_BUILD_ROOT%{_sysconfdir}/letsencrypt/hooks/example.sh
 
 # Startup service for portknock
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d/
@@ -230,6 +255,11 @@ fi
 %{_sysconfdir}/fail2ban/filter.d/asterisk-ami.conf
 %{_sysconfdir}/fail2ban/filter.d/issabel-gui.conf
 %{_sysconfdir}/fail2ban/action.d/iptables-multiport-issabel.conf
+%{_datadir}/issabel/letsencrypt/providers.php
+%dir %attr(0755, root, root) %{_sysconfdir}/letsencrypt/hooks
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/letsencrypt/hooks/hooks.json
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/letsencrypt/hooks/example.sh
+%attr(0644, root, root) %{_sysconfdir}/letsencrypt/hooks/README
 /usr/src/portknock-client-sample/portknock-client.go
 %defattr(0755, root, root)
 %{_datadir}/issabel/privileged/*
@@ -243,6 +273,33 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Wed Nov 11 2026 Issabel Foundation <info@issabel.org> - 6.0.0-32
+- Add custom DNS-01 hooks to the HTTPS Certificate module for providers without
+  a certbot plugin or for internal DNS servers. The hook is selected by id from
+  a root-owned manifest in /etc/letsencrypt/hooks; the privileged helper
+  validates ownership, permissions, symlinks and path before handing the script
+  to certbot's manual plugin, so the web user can never choose a command.
+
+* Wed Nov 11 2026 Issabel Foundation <info@issabel.org> - 6.0.0-31
+- Add DigitalOcean, OVH and Linode DNS-01 authenticators to the HTTPS
+  Certificate module. Like Cloudflare, they need no inbound port and allow
+  wildcard names, and their credentials are validated field by field and stored
+  root-only in /etc/letsencrypt/credentials.
+
+* Wed Nov 11 2026 Issabel Foundation <info@issabel.org> - 6.0.0-30
+- Add DNS-01 validation to the HTTPS Certificate module, with Cloudflare and
+  RFC 2136 authenticators. DNS-01 needs no inbound port and allows wildcard
+  names, so it works behind NAT and with port 80 closed.
+- Move the method definition to a root-owned registry shared by the GUI and
+  the privileged helper, send credentials to the helper over stdin (never in
+  argv), validate every field before writing the certbot INI, and run certbot
+  with an argv array instead of a shell string.
+- Add a Test Validation button that runs certbot with --dry-run, and install
+  DNS-01 certificates ourselves (certonly plus ssl.conf rewrite, configtest
+  and rollback), which removes the Apache installer from that path.
+- Renewal now reloads httpd and rebuilds the Asterisk PEM through a certbot
+  deploy hook instead of only doing it after a manual run.
+
 * Wed Nov 11 2026 Issabel Foundation <info@issabel.org> - 6.0.0-29
 - Log firewall activation as its own audit event. Turning the firewall on now
   writes firewall.enable, mirroring firewall.disable, while applying changes

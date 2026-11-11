@@ -15,6 +15,68 @@ Security
 
 Security modules for Issabel. Firewall configuration and setup. Port knocking. Audit Logs.
 
+HTTPS certificate (Let's Encrypt)
+----
+
+`Security -> HTTPS Certificate` requests and renews a Let's Encrypt certificate
+with [certbot](https://certbot.eff.org/) and points Apache and Asterisk at it.
+Six domain-validation methods are available:
+
+| Method | How the domain is validated | Port 80 | Wildcards |
+|---|---|---|---|
+| HTTP-01 (webroot) | The CA fetches a file from `/var/www/html` on port 80 | Required | No |
+| DNS-01 (Cloudflare) | The CA reads a TXT record created through the Cloudflare API | Not needed | Yes |
+| DNS-01 (DigitalOcean) | The CA reads a TXT record created through the DigitalOcean API | Not needed | Yes |
+| DNS-01 (Linode) | The CA reads a TXT record created through the Linode API | Not needed | Yes |
+| DNS-01 (OVH) | The CA reads a TXT record created through the OVH API | Not needed | Yes |
+| DNS-01 (RFC 2136) | The CA reads a TXT record created with a TSIG-signed dynamic update | Not needed | Yes |
+
+DNS-01 is the right choice when the PBX is behind NAT, the provider blocks
+inbound port 80, or the certificate has to cover `*.example.com`. Each DNS
+provider asks only for the credentials its API needs; OVH additionally asks for
+the API endpoint that matches the account (Europe, Canada or the United States,
+plus the Kimsufi and So you Start endpoints).
+
+**Credentials.** DNS provider credentials are written by the privileged helper
+to `/etc/letsencrypt/credentials/<provider>.ini` with mode `0600 root:root`.
+They are sent from the web form to the helper over stdin, never on the command
+line, and they are never shown back to the browser. Leaving the credential
+fields empty reuses the stored file. The method registry lives in
+`/usr/share/issabel/letsencrypt/providers.php` (root-owned), and every value
+is validated against it before certbot runs.
+
+**Test first.** *Test Validation* runs `certbot certonly --dry-run`: it creates
+and removes a real DNS record (or serves the HTTP file) against the staging
+environment, without issuing a certificate and without consuming a production
+rate-limit slot.
+
+**Issuing and renewing.** For DNS-01 the helper runs `certbot certonly` and
+installs the result itself: it rewrites `SSLCertificateFile` and
+`SSLCertificateKeyFile` in `/etc/httpd/conf.d/ssl.conf`, comments out
+`SSLCertificateChainFile`, runs `apachectl configtest` and reloads httpd,
+restoring the previous file if the test fails. A first copy of the original
+configuration is kept as `/etc/httpd/conf.d/ssl.conf.issabel.bak`. Automatic
+renewal is handled by `/etc/cron.daily/renewssl`; a certbot deploy hook reloads
+httpd and rebuilds `/etc/asterisk/keys/asterisk.pem` after a successful
+renewal.
+
+The module keeps non-secret state in `/etc/letsencrypt/values` (domains, email,
+method, provider and propagation time) so the page can show how the current
+certificate was issued. The full certbot log is in
+`/var/log/letsencrypt/letsencrypt.log`.
+
+**Custom DNS hooks.** A provider without a certbot plugin, or a local DNS
+server, can be added by installing a hook in `/etc/letsencrypt/hooks` and
+declaring it in `/etc/letsencrypt/hooks/hooks.json`. The module offers it by id;
+the helper validates that the directory, the manifest and the script are
+root-owned, not writable by group or others, and that the script resolves inside
+that directory, before running it through certbot's manual plugin. The script
+receives `CERTBOT_DOMAIN` and `CERTBOT_VALIDATION`, publishes
+`_acme-challenge.<domain>`, and removes exactly that value on cleanup. Secrets
+belong in a `0600 root:root` file sourced by the script, never in the manifest.
+The full contract and an `nsupdate` example are in
+`/etc/letsencrypt/hooks/README` and `/etc/letsencrypt/hooks/example.sh`.
+
 Notas de diseño
 ----
 

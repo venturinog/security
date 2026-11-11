@@ -4,118 +4,828 @@
   vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
   Codificación: UTF-8
   +----------------------------------------------------------------------+
-  | Copyright (c) 2017 - Issabel Foundation                              |
+  | Issabel version 6                                                    |
+  | http://www.issabel.org                                               |
   +----------------------------------------------------------------------+
+  | Copyright (c) 2026 Issabel Foundation                                |
   +----------------------------------------------------------------------+
-  | Autor: Nicolas Gudino  <asternic@gmail.com>                          |
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+  | The Initial Developer of the Original Code is Issabel Foundation     |
+  +----------------------------------------------------------------------+
+  | Autor original: Nicolas Gudino <asternic@gmail.com>                   |
   +----------------------------------------------------------------------+
 */
 
-if(!isset($argv[1]))
-    exit(1);
+/*
+ * Privileged helper for the HTTPS Certificate (Let's Encrypt) module.
+ *
+ * Every operation that needs root goes through here: writing the DNS
+ * credentials INI, running certbot, installing the certificate in Apache and
+ * writing /etc/letsencrypt/values. All arguments are validated against the
+ * registry in /usr/share/issabel/letsencrypt/providers.php, which is owned by
+ * root, and certbot is executed with an argv array (no shell), so no value
+ * coming from the web is ever interpreted as a command.
+ *
+ * Credentials are read from STDIN as JSON, never from the command line, so
+ * they do not show up in `ps` output.
+ */
 
-switch($argv[1]){
-    case "insertservername":
-        if(isset($argv[2])) {
+define('LE_REGISTRY',        '/usr/share/issabel/letsencrypt/providers.php');
+define('LE_VALUES',          '/etc/letsencrypt/values');
+define('LE_CREDENTIALS_DIR', '/etc/letsencrypt/credentials');
+define('LE_HOOKS_DIR',       '/etc/letsencrypt/hooks');
+define('LE_HOOKS_MANIFEST',  LE_HOOKS_DIR.'/hooks.json');
+define('LE_LOCK_FILE',       '/var/lib/letsencrypt/issabel-ctrl.lock');
+define('LE_SSL_CONF',        '/etc/httpd/conf.d/ssl.conf');
+define('LE_SSL_BACKUP',      '/etc/httpd/conf.d/ssl.conf.issabel.bak');
+define('LE_CERTBOT',         '/usr/bin/certbot');
+define('LE_SELF',            '/usr/share/issabel/privileged/ssl_certbot');
+
+if (!isset($argv[1])) {
+    fwrite(STDERR, "ERR: missing command\n");
+    exit(1);
+}
+
+switch ($argv[1]) {
+    case 'insertservername':
+        if (isset($argv[2])) {
             insertServerName($argv[2]);
         }
         break;
-    case "editservername":
-        if(isset($argv[2])) {
+
+    case 'editservername':
+        if (isset($argv[2])) {
             editServerName($argv[2]);
         }
         break;
-    case "newcertificate":
 
-        // newcertificate test@email.com my.dominio.com staging
+    case 'newcertificate':
+        $registry = le_registry();
+        $params = le_normalize_params($registry);
+        le_lock();
 
-        if(isset($argv[2]) && isset($argv[3])) {
-            $params = array();
-            $params[]="-n";
-            $params[]="-i apache";
-            $params[]="-a webroot";
-            $params[]="-w /var/www/html";
-            $params[]="--agree-tos";
+        $credentials = le_read_stdin_json();
+        $credentialsPath = le_prepare_credentials($params['method_data'], $credentials);
 
-            if(isset($argv[4])) {
-                $params[]="--test-cert";
-            }
-
-            $params[]="--email ".$argv[2];
-            $params[]="-d ".$argv[3];
-
-            $lcomandos = implode(" ",$params);
-            $comando = "/usr/bin/certbot $lcomandos";
-
-            //$fp=fopen("/tmp/certbot.log","a");
-            //fputs($fp,"$comando\n");
-            //fclose($fp);
-
-            $output = $ret = NULL;
-
-            if(!is_executable('/usr/bin/certbot')) {
-                echo "ERR: Could not find /usr/bin/certbot. Be sure to install the certbot package";
-                exit(1);
-            }
-        
-            exec($comando, $output, $ret);
-
-            if ($ret != 0) {
-                echo "ERR: failed to run /usr/bin/certbot ($comando). Output follows:\n".implode('', $output);
-                exit(1);
-            } else {
-                //exec("/sbin/service httpd restart 2>&1", $output, $ret);
-
-                writeAsteriskPEMfile(1);
-
-                echo implode("\n",$output);
-                exit(0);
-            }
-        }
-        break;
-    case "renewcertificate":
-        $comando = "/usr/bin/certbot renew";
-        $output = $ret = NULL;
-
-        exec($comando, $output, $ret);
-
-        if ($ret != 0) {
-            fputs(STDERR, "ERR: failed to run /usr/bin/certbot. Output follows:\n");
-            fputs(STDERR, implode('', $output));
+        $args = le_issue_argv($params, $credentialsPath, false);
+        list($code, $output) = le_run($args);
+        if ($code !== 0) {
+            fwrite(STDERR, "ERR: failed to run /usr/bin/certbot. Output follows:\n".$output."\n");
             exit(1);
-        } else {
-
-            writeAsteriskPEMfile(1);
-
-            echo implode("\n",$output);
-            exit(0);
         }
-        break;
-    case "writevars":
-        if(isset($argv[2]) && isset($argv[3])) {
-            $email  = $argv[2];
-            $domain = $argv[3];
-            $valuesc="/etc/letsencrypt/values";
-            file_put_contents($valuesc, "");
-            //create the new vars File
-            $fp = fopen($valuesc, "w");
-            fputs($fp,"domain=${domain}\n");
-            fputs($fp,"email=${email}\n");
-            fclose($fp);
+        echo $output."\n";
+
+        if ($params['method_data']['group'] !== 'http') {
+            $installError = le_install_certificate($params['cert_name']);
+            if ($installError !== '') {
+                fwrite(STDERR, "ERR: the certificate was issued but could not be installed: ".$installError."\n");
+                exit(1);
+            }
+            echo "Certificate installed in ".LE_SSL_CONF."\n";
         }
+
+        le_write_values($params);
+        writeAsteriskPEMfile(1);
+        exit(0);
         break;
-    case "writeasteriskcert":
+
+    case 'dryrun':
+        $registry = le_registry();
+        $params = le_normalize_params($registry);
+        le_lock();
+
+        // The dry-run writes the credentials to <provider>.ini.dryrun and the
+        // shutdown handler removes them, so a failed test never replaces the
+        // credentials of a working setup.
+        if (!empty($params['method_data']['credentials_file'])) {
+            $dryRunFile = LE_CREDENTIALS_DIR.'/'.$params['method_data']['credentials_file'].'.dryrun';
+            register_shutdown_function(function () use ($dryRunFile) {
+                @unlink($dryRunFile);
+            });
+        }
+
+        $credentials = le_read_stdin_json();
+        $credentialsPath = le_prepare_credentials($params['method_data'], $credentials, false);
+
+        $args = le_issue_argv($params, $credentialsPath, true);
+        list($code, $output) = le_run($args);
+        echo $output."\n";
+        exit($code === 0 ? 0 : 1);
+        break;
+
+    case 'savecredentials':
+        $registry = le_registry();
+        $params = le_normalize_params($registry, true);
+        le_lock();
+
+        $credentials = le_read_stdin_json();
+        $credentialsPath = le_prepare_credentials($params['method_data'], $credentials);
+        if ($credentialsPath === null) {
+            fwrite(STDERR, "ERR: this validation method does not use credentials\n");
+            exit(1);
+        }
+        echo "Credentials saved\n";
+        exit(0);
+        break;
+
+    case 'renewcertificate':
+        le_lock();
+        $args = array(LE_CERTBOT, 'renew', '--deploy-hook', LE_SELF.' afterdeploy');
+        list($code, $output) = le_run($args);
+        echo $output."\n";
+        if ($code !== 0) {
+            fwrite(STDERR, "ERR: failed to run /usr/bin/certbot renew\n");
+            exit(1);
+        }
+        exit(0);
+        break;
+
+    case 'afterdeploy':
+        // Runs as a certbot deploy hook after a certificate has been renewed.
+        le_reload_httpd();
+        writeAsteriskPEMfile(1);
+        echo "Certificate deployed\n";
+        exit(0);
+        break;
+
+    case 'writevars':
+        $registry = le_registry();
+        $params = le_normalize_params($registry, true);
+        le_write_values($params);
+        exit(0);
+        break;
+
+    case 'printcmd':
+        // Debug helper: prints the certbot argv without running it.
+        $registry = le_registry();
+        $params = le_normalize_params($registry);
+        echo le_shell_preview(le_issue_argv($params, '/etc/letsencrypt/credentials/x.ini', false))."\n";
+        exit(0);
+        break;
+
+    case 'writeasteriskcert':
         generateAsteriskCert();
         break;
+
     default:
+        fwrite(STDERR, "ERR: unknown command\n");
         exit(1);
         break;
 }
 
+/* ------------------------------------------------------------------------ */
+/*  Registry and parameter validation                                        */
+/* ------------------------------------------------------------------------ */
 
-function insertServerName($sHostname) {
+function le_registry()
+{
+    if (!is_readable(LE_REGISTRY)) {
+        le_error('Could not read '.LE_REGISTRY);
+    }
+    $registry = include LE_REGISTRY;
+    if (!is_array($registry)) {
+        le_error('Invalid validation method registry');
+    }
+    return $registry;
+}
+
+function le_error($message, $code = 1)
+{
+    fwrite(STDERR, 'ERR: '.$message."\n");
+    exit($code);
+}
+
+function le_read_stdin_json()
+{
+    $raw = stream_get_contents(STDIN);
+    if ($raw === false || trim($raw) === '') {
+        return array();
+    }
+    $data = json_decode($raw, true);
+    if (!is_array($data)) {
+        le_error('Invalid credentials payload');
+    }
+    return $data;
+}
+
+/*
+ * Normalizes and validates the JSON parameter blob received as argv[2].
+ * With $credentialsOnly the domains/email are not required (savecredentials,
+ * writevars and printcmd do not issue a certificate).
+ */
+function le_normalize_params($registry, $credentialsOnly = false)
+{
+    if (!isset($GLOBALS['argv'][2])) {
+        le_error('Missing parameters');
+    }
+    $raw = json_decode($GLOBALS['argv'][2], true);
+    if (!is_array($raw)) {
+        le_error('Invalid parameters payload');
+    }
+
+    if (!isset($raw['method']) || !is_string($raw['method'])) {
+        le_error('Unknown validation method');
+    }
+    $methodKey = $raw['method'];
+    $hookPath = '';
+
+    if (strpos($methodKey, 'dns-hook:') === 0) {
+        // Custom hook: the method id is "dns-hook:<id>". The registry entry is
+        // only a template; the script comes from a root-owned allowlist that
+        // the web server cannot modify.
+        if (!isset($registry['dns-hook'])) {
+            le_error('Custom DNS hooks are not supported');
+        }
+        $method = $registry['dns-hook'];
+        $hook = le_resolve_hook(substr($methodKey, strlen('dns-hook:')));
+        $hookPath = $hook['path'];
+        $method['propagation_default'] = $hook['propagation_default'];
+    } else {
+        if (!isset($registry[$methodKey])) {
+            le_error('Unknown validation method');
+        }
+        $method = $registry[$methodKey];
+    }
+
+    $domains = array();
+    if (isset($raw['domains'])) {
+        $domains = is_array($raw['domains']) ? $raw['domains'] : explode(',', (string)$raw['domains']);
+    }
+    $allowWildcard = ($method['group'] === 'dns');
+    list($domains, $domainError) = le_validate_domains($domains, $allowWildcard);
+    if ($domainError !== '' && !$credentialsOnly) {
+        le_error('Invalid domain list ('.$domainError.')');
+    }
+    if ($credentialsOnly && $domainError !== '') {
+        $domains = array();
+    }
+
+    $email = isset($raw['email']) ? trim((string)$raw['email']) : '';
+    if (!$credentialsOnly && ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL))) {
+        le_error('Invalid or missing email address');
+    }
+
+    $propagation = isset($raw['propagation']) ? (int)$raw['propagation'] : (int)$method['propagation_default'];
+    if ($method['group'] === 'dns') {
+        if ($propagation < 5 || $propagation > 300) {
+            le_error('Propagation time must be between 5 and 300 seconds');
+        }
+    } else {
+        $propagation = 0;
+    }
+
+    $webroot = isset($raw['webroot']) ? trim((string)$raw['webroot']) : '';
+    if ($method['authenticator'] === 'webroot') {
+        if ($webroot === '') {
+            $webroot = $method['webroot'];
+        }
+        if (strpos($webroot, '/var/www/') !== 0 || !is_dir($webroot)) {
+            le_error('Invalid webroot directory');
+        }
+    }
+
+    $certName = le_cert_name($domains);
+    if (!$credentialsOnly && $certName === '') {
+        le_error('Could not derive a certificate name from the domains');
+    }
+
+    return array(
+        'method'        => $methodKey,
+        'method_data'   => $method,
+        'domains'       => $domains,
+        'email'         => $email,
+        'propagation'   => $propagation,
+        'webroot'       => $webroot,
+        'hook_path'     => $hookPath,
+        'staging'       => !empty($raw['staging']),
+        'reissue'       => !empty($raw['reissue']),
+        'cert_name'     => $certName,
+    );
+}
+
+function le_validate_domains($domains, $allowWildcard)
+{
+    if (!is_array($domains)) {
+        return array(array(), 'invalid');
+    }
+    $clean = array();
+    foreach ($domains as $rawDomain) {
+        $domain = strtolower(trim((string)$rawDomain));
+        if ($domain === '') {
+            continue;
+        }
+        $wildcard = false;
+        if (strpos($domain, '*.') === 0) {
+            $wildcard = true;
+            $domain = substr($domain, 2);
+        }
+        if ($wildcard && !$allowWildcard) {
+            return array(array(), 'wildcard');
+        }
+        if (strlen($domain) > 253 || strpos($domain, '..') !== false) {
+            return array(array(), 'invalid');
+        }
+        if (!preg_match('/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/', $domain)) {
+            return array(array(), 'invalid');
+        }
+        $clean[] = ($wildcard ? '*.' : '').$domain;
+    }
+    if (count($clean) === 0) {
+        return array(array(), 'required');
+    }
+    return array($clean, '');
+}
+
+function le_cert_name($domains)
+{
+    foreach ($domains as $domain) {
+        $base = strpos($domain, '*.') === 0 ? substr($domain, 2) : $domain;
+        if (preg_match('/^[a-z0-9][a-z0-9.-]*$/', $base)) {
+            return $base;
+        }
+    }
+    return '';
+}
+
+/* ------------------------------------------------------------------------ */
+/*  Custom DNS hooks                                                         */
+/* ------------------------------------------------------------------------ */
+
+/*
+ * Resolves a custom DNS hook from the root-owned allowlist.
+ *
+ * The web server user cannot write to /etc/letsencrypt/hooks, and the hook is
+ * selected by id (never by path), so the GUI can only run scripts that the
+ * administrator installed. The checks below are the ones that make that true:
+ * the directory and the manifest are root-owned and not writable by group or
+ * others, the script is a regular file (no symlinks) with the same ownership,
+ * and its canonical path still resolves inside the hooks directory.
+ */
+function le_resolve_hook($hookId)
+{
+    if (!preg_match('/^[a-z0-9][a-z0-9._-]{0,63}$/', $hookId)) {
+        le_error('Invalid DNS hook identifier');
+    }
+    if (is_link(LE_HOOKS_DIR) || !is_dir(LE_HOOKS_DIR)) {
+        le_error('The hooks directory '.LE_HOOKS_DIR.' is missing');
+    }
+    $dirStat = @lstat(LE_HOOKS_DIR);
+    if ($dirStat === false || $dirStat['uid'] !== 0 || ($dirStat['mode'] & 0022) !== 0) {
+        le_error('The hooks directory must be owned by root and not writable by group or others');
+    }
+
+    if (is_link(LE_HOOKS_MANIFEST) || !is_file(LE_HOOKS_MANIFEST) || !is_readable(LE_HOOKS_MANIFEST)) {
+        le_error('The hooks manifest '.LE_HOOKS_MANIFEST.' is missing');
+    }
+    $manifestStat = @lstat(LE_HOOKS_MANIFEST);
+    if ($manifestStat === false || $manifestStat['uid'] !== 0 || ($manifestStat['mode'] & 0022) !== 0) {
+        le_error('The hooks manifest must be owned by root and not writable by group or others');
+    }
+
+    $data = json_decode((string)file_get_contents(LE_HOOKS_MANIFEST), true);
+    if (!is_array($data) || !isset($data[$hookId]) || !is_array($data[$hookId])) {
+        le_error('Unknown DNS hook');
+    }
+
+    $script = isset($data[$hookId]['script']) ? (string)$data[$hookId]['script'] : '';
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $script)) {
+        le_error('Invalid DNS hook script name');
+    }
+
+    $path = LE_HOOKS_DIR.'/'.$script;
+    if (is_link($path) || !is_file($path) || !is_executable($path)) {
+        le_error('The DNS hook script is missing or not executable');
+    }
+    $scriptStat = @lstat($path);
+    if ($scriptStat === false || $scriptStat['uid'] !== 0 || ($scriptStat['mode'] & 0022) !== 0) {
+        le_error('The DNS hook script must be owned by root and not writable by group or others');
+    }
+
+    $realPath = realpath($path);
+    $realDir = realpath(LE_HOOKS_DIR);
+    if ($realPath === false || $realDir === false || strpos($realPath, $realDir.'/') !== 0) {
+        le_error('The DNS hook script resolves outside '.LE_HOOKS_DIR);
+    }
+
+    $propagation = isset($data[$hookId]['propagation_default']) ? (int)$data[$hookId]['propagation_default'] : 30;
+    if ($propagation < 5 || $propagation > 300) {
+        $propagation = 30;
+    }
+
+    return array(
+        'id'                  => $hookId,
+        'path'                => $realPath,
+        'propagation_default' => $propagation,
+    );
+}
+
+/* ------------------------------------------------------------------------ */
+/*  Credentials                                                              */
+/* ------------------------------------------------------------------------ */
+
+/*
+ * Writes the provider credentials INI. With $persist = false (used by the
+ * dry-run) the file is written next to the real one and the caller removes it,
+ * so a failed test can never overwrite the credentials of a working setup.
+ */
+function le_prepare_credentials($method, $fields, $persist = true)
+{
+    if (empty($method['credentials_file'])) {
+        return null;
+    }
+    $path = LE_CREDENTIALS_DIR.'/'.$method['credentials_file'];
+    if (!$persist) {
+        $path .= '.dryrun';
+    }
+
+    $hasAny = false;
+    foreach ($method['fields'] as $field) {
+        $name = $field['name'];
+        if (isset($fields[$name]) && trim((string)$fields[$name]) !== '') {
+            $hasAny = true;
+            break;
+        }
+    }
+    if (!$hasAny) {
+        $storedPath = LE_CREDENTIALS_DIR.'/'.$method['credentials_file'];
+        if (is_readable($storedPath)) {
+            return $storedPath;
+        }
+        le_error('DNS credentials are required');
+    }
+
+    $lines = array();
+    foreach ($method['fields'] as $field) {
+        $name = $field['name'];
+        $value = isset($fields[$name]) ? le_field_value($field, $fields[$name]) : '';
+        if ($value === '') {
+            if (!empty($field['required'])) {
+                le_error('Missing required credential: '.$field['label']);
+            }
+            continue;
+        }
+        $lines[] = $name.' = '.$value;
+    }
+    if (count($lines) === 0) {
+        le_error('DNS credentials are required');
+    }
+
+    if (!is_dir(LE_CREDENTIALS_DIR)) {
+        if (!@mkdir(LE_CREDENTIALS_DIR, 0700, true) && !is_dir(LE_CREDENTIALS_DIR)) {
+            le_error('Could not create '.LE_CREDENTIALS_DIR);
+        }
+    }
+    @chmod(LE_CREDENTIALS_DIR, 0700);
+
+    $content = implode("\n", $lines)."\n";
+    $tmp = $path.'.tmp';
+    if (@file_put_contents($tmp, $content) === false) {
+        le_error('Could not write the credentials file');
+    }
+    @chmod($tmp, 0600);
+    @chown($tmp, 'root');
+    @chgrp($tmp, 'root');
+    if (!@rename($tmp, $path)) {
+        @unlink($tmp);
+        le_error('Could not install the credentials file');
+    }
+    @chmod($path, 0600);
+    @chown($path, 'root');
+    @chgrp($path, 'root');
+
+    return $path;
+}
+
+/*
+ * Validates one credential field against its registry definition. Returns the
+ * value to write to the INI file, or '' when the field is an empty optional
+ * one. Newlines and control characters are rejected: the INI file has no
+ * escaping, so a newline would let a value inject extra keys.
+ */
+function le_field_value($field, $rawValue)
+{
+    $value = trim((string)$rawValue);
+    if ($value === '') {
+        return '';
+    }
+    if (preg_match('/[\x00-\x1f\x7f]/', $value)) {
+        le_error('Invalid characters in '.$field['label']);
+    }
+    // The certbot credentials file is parsed with configobj, where "#" starts
+    // an inline comment. Reject it instead of silently truncating the value.
+    if (strpos($value, '#') !== false) {
+        le_error('Invalid characters in '.$field['label']);
+    }
+
+    switch ($field['type']) {
+        case 'number':
+            if (!preg_match('/^\d+$/', $value)) {
+                le_error($field['label'].' must be a number');
+            }
+            $number = (int)$value;
+            if (isset($field['min']) && $number < $field['min']) {
+                le_error($field['label'].' is out of range');
+            }
+            if (isset($field['max']) && $number > $field['max']) {
+                le_error($field['label'].' is out of range');
+            }
+            return (string)$number;
+
+        case 'checkbox':
+            $truthy = in_array(strtolower($value), array('1', 'true', 'on', 'yes'), true);
+            return $truthy ? 'TRUE' : 'FALSE';
+
+        case 'select':
+            foreach ($field['options'] as $option) {
+                if ($option['value'] === $value) {
+                    return $value;
+                }
+            }
+            le_error('Invalid value for '.$field['label']);
+            break;
+
+        case 'password':
+        case 'text':
+        default:
+            if (isset($field['maxlength']) && strlen($value) > $field['maxlength']) {
+                le_error($field['label'].' is too long');
+            }
+            return $value;
+    }
+    return '';
+}
+
+/* ------------------------------------------------------------------------ */
+/*  certbot invocation                                                       */
+/* ------------------------------------------------------------------------ */
+
+function le_auth_argv($method, $credentialsPath, $propagation, $webroot, $hookPath = '')
+{
+    $args = array('-a', $method['authenticator']);
+    if ($method['authenticator'] === 'webroot') {
+        $args[] = '-w';
+        $args[] = $webroot !== '' ? $webroot : $method['webroot'];
+        return $args;
+    }
+    if ($method['authenticator'] === 'manual') {
+        // Custom hook. The path was validated by le_resolve_hook(): root-owned,
+        // not writable by group or others, inside /etc/letsencrypt/hooks.
+        if ($hookPath === '') {
+            le_error('Missing DNS hook');
+        }
+        $args[] = '--preferred-challenges';
+        $args[] = 'dns';
+        $args[] = '--manual-auth-hook';
+        $args[] = $hookPath.' auth';
+        $args[] = '--manual-cleanup-hook';
+        $args[] = $hookPath.' cleanup';
+        return $args;
+    }
+    $plugin = $method['authenticator'];
+    $args[] = '--'.$plugin.'-credentials';
+    $args[] = $credentialsPath;
+    $args[] = '--'.$plugin.'-propagation-seconds';
+    $args[] = (string)$propagation;
+    return $args;
+}
+
+function le_issue_argv($params, $credentialsPath, $dryRun)
+{
+    $method = $params['method_data'];
+
+    if ($method['group'] === 'http') {
+        $args = array(LE_CERTBOT, '-i', 'apache');
+    } else {
+        $args = array(LE_CERTBOT, 'certonly');
+    }
+    if ($dryRun) {
+        $args = array(LE_CERTBOT, 'certonly');
+    }
+
+    $args[] = '-n';
+    $args[] = '--agree-tos';
+    $args[] = '--email';
+    $args[] = $params['email'];
+    $args[] = '--cert-name';
+    $args[] = $params['cert_name'];
+
+    foreach ($params['domains'] as $domain) {
+        $args[] = '-d';
+        $args[] = $domain;
+    }
+
+    foreach (le_auth_argv($method, $credentialsPath, $params['propagation'], $params['webroot'], $params['hook_path']) as $arg) {
+        $args[] = $arg;
+    }
+
+    if ($dryRun) {
+        $args[] = '--dry-run';
+    } elseif ($params['staging']) {
+        $args[] = '--test-cert';
+    } elseif ($params['reissue']) {
+        $args[] = '--force-renewal';
+    }
+
+    return $args;
+}
+
+/*
+ * Runs a command with an argv array (no shell) and returns the exit code and
+ * the combined output. stderr is redirected to stdout to avoid deadlocks.
+ */
+function le_run($args)
+{
+    if (!is_executable($args[0])) {
+        return array(1, 'Could not execute '.$args[0].' (is the package installed?)');
+    }
+    $descriptors = array(
+        0 => array('pipe', 'r'),
+        1 => array('pipe', 'w'),
+        2 => array('redirect', 1),
+    );
+    $process = @proc_open($args, $descriptors, $pipes);
+    if (!is_resource($process)) {
+        return array(1, 'Could not execute '.$args[0]);
+    }
+    fclose($pipes[0]);
+    $output = stream_get_contents($pipes[1]);
+    fclose($pipes[1]);
+    $code = proc_close($process);
+    return array($code, trim((string)$output));
+}
+
+function le_shell_preview($args)
+{
+    $escaped = array();
+    foreach ($args as $arg) {
+        $escaped[] = escapeshellarg($arg);
+    }
+    return implode(' ', $escaped);
+}
+
+/* ------------------------------------------------------------------------ */
+/*  Installation                                                             */
+/* ------------------------------------------------------------------------ */
+
+/*
+ * Points Apache at the new certificate. The first SSLCertificateFile and
+ * SSLCertificateKeyFile of ssl.conf are rewritten, SSLCertificateChainFile is
+ * commented out (fullchain.pem already contains the chain) and the new
+ * configuration is validated with apachectl before reloading httpd. On a
+ * configtest failure the original file is restored.
+ */
+function le_install_certificate($certName)
+{
+    $live = '/etc/letsencrypt/live/'.$certName;
+    $fullchain = $live.'/fullchain.pem';
+    $privkey = $live.'/privkey.pem';
+    if (!is_readable($fullchain) || !is_readable($privkey)) {
+        return 'the certificate files for '.$certName.' were not found';
+    }
+    if (!is_readable(LE_SSL_CONF)) {
+        return LE_SSL_CONF.' was not found';
+    }
+    $original = file_get_contents(LE_SSL_CONF);
+    if ($original === false) {
+        return 'could not read '.LE_SSL_CONF;
+    }
+
+    $lines = preg_split('/\n/', $original);
+    $seenFile = false;
+    $seenKey = false;
+    foreach ($lines as $index => $line) {
+        if (preg_match('/^\s*SSLCertificateFile\s+/', $line)) {
+            $lines[$index] = 'SSLCertificateFile '.$fullchain;
+            $seenFile = true;
+        } elseif (preg_match('/^\s*SSLCertificateKeyFile\s+/', $line)) {
+            $lines[$index] = 'SSLCertificateKeyFile '.$privkey;
+            $seenKey = true;
+        } elseif (preg_match('/^\s*SSLCertificateChainFile\s+/', $line)) {
+            $lines[$index] = '#'.ltrim($line);
+        }
+    }
+    if (!$seenFile || !$seenKey) {
+        foreach ($lines as $index => $line) {
+            if (preg_match('/^<VirtualHost\s+_default_:443/', $line)) {
+                $insert = array();
+                if (!$seenFile) {
+                    $insert[] = 'SSLCertificateFile '.$fullchain;
+                }
+                if (!$seenKey) {
+                    $insert[] = 'SSLCertificateKeyFile '.$privkey;
+                }
+                array_splice($lines, $index + 1, 0, $insert);
+                $seenFile = true;
+                $seenKey = true;
+                break;
+            }
+        }
+    }
+    if (!$seenFile || !$seenKey) {
+        return 'the SSL virtual host was not found in '.LE_SSL_CONF;
+    }
+
+    if (!file_exists(LE_SSL_BACKUP)) {
+        @copy(LE_SSL_CONF, LE_SSL_BACKUP);
+    }
+    if (@file_put_contents(LE_SSL_CONF, implode("\n", $lines)) === false) {
+        return 'could not write '.LE_SSL_CONF;
+    }
+
+    list($code, $output) = le_run(array('/usr/sbin/apachectl', 'configtest'));
+    if ($code !== 0) {
+        @file_put_contents(LE_SSL_CONF, $original);
+        return "Apache rejected the new configuration:\n".$output;
+    }
+
+    list($code, $output) = le_run(array('/usr/bin/systemctl', 'reload', 'httpd'));
+    if ($code !== 0) {
+        return "could not reload httpd:\n".$output;
+    }
+
+    return '';
+}
+
+function le_reload_httpd()
+{
+    list($code, $output) = le_run(array('/usr/sbin/apachectl', 'configtest'));
+    if ($code !== 0) {
+        fwrite(STDERR, "ERR: Apache rejected the configuration:\n".$output."\n");
+        return false;
+    }
+    list($code, $output) = le_run(array('/usr/bin/systemctl', 'reload', 'httpd'));
+    if ($code !== 0) {
+        fwrite(STDERR, "ERR: could not reload httpd:\n".$output."\n");
+        return false;
+    }
+    return true;
+}
+
+/* ------------------------------------------------------------------------ */
+/*  State                                                                    */
+/* ------------------------------------------------------------------------ */
+
+function le_write_values($params)
+{
+    $values = array(
+        'domain'      => implode(',', $params['domains']),
+        'email'       => $params['email'],
+        'method'      => $params['method'],
+        'credentials' => $params['method_data']['credentials_provider'],
+        'propagation' => (string)$params['propagation'],
+        'cert_name'   => $params['cert_name'],
+    );
+
+    $content = '';
+    foreach ($values as $key => $value) {
+        $content .= $key.'='.$value."\n";
+    }
+    if (@file_put_contents(LE_VALUES, $content) === false) {
+        le_error('Could not write '.LE_VALUES);
+    }
+    @chmod(LE_VALUES, 0644);
+}
+
+/* ------------------------------------------------------------------------ */
+/*  Lock                                                                     */
+/* ------------------------------------------------------------------------ */
+
+function le_lock()
+{
+    static $handle = null;
+    if ($handle !== null) {
+        return;
+    }
+    $dir = dirname(LE_LOCK_FILE);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0700, true);
+    }
+    $handle = @fopen(LE_LOCK_FILE, 'c');
+    if ($handle === false) {
+        return;
+    }
+    if (!flock($handle, LOCK_EX | LOCK_NB)) {
+        le_error('Another certificate operation is already running. Try again when it finishes.');
+    }
+}
+
+/* ------------------------------------------------------------------------ */
+/*  Apache ServerName                                                        */
+/* ------------------------------------------------------------------------ */
+
+function insertServerName($sHostname)
+{
     // Insert new line, we must do it after <VirtualHost _default_:443>
-    $sslfile = "/etc/httpd/conf.d/ssl.conf";
+    $sslfile = LE_SSL_CONF;
     $contenidoNuevo = array();
     foreach (file($sslfile) as $sLinea) {
         if (preg_match('/^<VirtualHost _default_:443/', $sLinea)) {
@@ -128,8 +838,9 @@ function insertServerName($sHostname) {
     file_put_contents($sslfile, $contenidoNuevo);
 }
 
-function editServerName($sHostname) {
-    $sslfile = "/etc/httpd/conf.d/ssl.conf";
+function editServerName($sHostname)
+{
+    $sslfile = LE_SSL_CONF;
     $contenidoNuevo = array();
     foreach (file($sslfile) as $sLinea) {
         if (preg_match('/^[\s]*?ServerName\s*/', $sLinea)) {
@@ -141,22 +852,51 @@ function editServerName($sHostname) {
     file_put_contents($sslfile, $contenidoNuevo);
 }
 
-function generateAsteriskCert() {
+/* ------------------------------------------------------------------------ */
+/*  Asterisk                                                                 */
+/* ------------------------------------------------------------------------ */
+
+function generateAsteriskCert()
+{
     if (!file_exists('/etc/asterisk/keys/asterisk.pem')) {
         writeAsteriskPEMfile(0);
     }
 }
 
-function writeAsteriskPEMfile($reload=1) {
-
+/*
+ * Builds /etc/asterisk/keys/asterisk.pem from the certificate files Apache is
+ * configured to use: fullchain (certificate + chain) followed by the private
+ * key, which is the order Asterisk expects.
+ */
+function writeAsteriskPEMfile($reload = 1)
+{
     if (!file_exists('/etc/asterisk/keys')) {
-        mkdir('/etc/asterisk/keys', 0751, true);
+        @mkdir('/etc/asterisk/keys', 0751, true);
     }
 
-    exec(">/etc/asterisk/keys/asterisk.pem", $output, $ret);
-    exec("for A in `grep '^SSLCert' /etc/httpd/conf.d/ssl.conf | awk '{print $2}' | sed 's/cert.pem/fullchain.pem/g'`; do cat \$A >>/etc/asterisk/keys/asterisk.pem; done", $output, $ret);
-    if($reload==1) {
-       system('/usr/sbin/amportal a r');
+    $pem = '';
+    if (is_readable(LE_SSL_CONF)) {
+        foreach (file(LE_SSL_CONF) as $line) {
+            if (preg_match('/^\s*SSLCertificate(?:File|KeyFile)\s+(\S+)/', $line, $matches)) {
+                $path = $matches[1];
+                // A lineage installed with cert.pem also has fullchain.pem;
+                // prefer the bundle so the chain is included.
+                if (basename($path) === 'cert.pem') {
+                    $fullchain = dirname($path).'/fullchain.pem';
+                    if (is_readable($fullchain)) {
+                        $path = $fullchain;
+                    }
+                }
+                if (is_readable($path)) {
+                    $pem .= file_get_contents($path);
+                }
+            }
+        }
     }
-
+    // Write the file even when it is empty: Asterisk and the %post chown
+    // expect the path to exist, and the next certificate issuance rewrites it.
+    @file_put_contents('/etc/asterisk/keys/asterisk.pem', $pem);
+    if ($reload == 1) {
+        system('/usr/sbin/amportal a r');
+    }
 }

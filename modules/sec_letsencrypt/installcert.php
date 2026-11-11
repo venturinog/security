@@ -62,6 +62,9 @@ $arrLang = array_merge($arrLang, $arrLangModule);
 
 header('Content-Type: application/json; charset=utf-8');
 
+define('LE_REGISTRY', '/usr/share/issabel/letsencrypt/providers.php');
+define('LE_VALUES', '/etc/letsencrypt/values');
+
 /**
  * Devuelve el log de certbot listo para insertar en el DOM, escapado.
  */
@@ -78,6 +81,103 @@ function cert_json($data)
     die();
 }
 
+function cert_registry()
+{
+    if (!is_readable(LE_REGISTRY)) {
+        return array();
+    }
+    $registry = include LE_REGISTRY;
+    return is_array($registry) ? $registry : array();
+}
+
+function cert_values()
+{
+    $values = array('domain' => '', 'email' => '', 'method' => '', 'credentials' => '', 'propagation' => '', 'cert_name' => '');
+    if (!is_readable(LE_VALUES)) {
+        return $values;
+    }
+    foreach (file(LE_VALUES) as $line) {
+        if (preg_match('/^([a-z_]+)=(.*)$/', trim($line), $m)) {
+            $values[$m[1]] = $m[2];
+        }
+    }
+    return $values;
+}
+
+/**
+ * Ejecuta /usr/bin/issabel-helper con un argv sin shell y devuelve
+ * array(exit_code, output). El helper corre como root vía sudo. El segundo
+ * parámetro es el payload ya codificado que se envía por STDIN.
+ */
+function cert_helper_exec($cmd, $stdinPayload = null)
+{
+    $descriptors = array(
+        0 => array('pipe', 'r'),
+        1 => array('pipe', 'w'),
+        2 => array('redirect', 1),
+    );
+    $process = @proc_open($cmd, $descriptors, $pipes);
+    if (!is_resource($process)) {
+        return array(1, 'Could not execute the privileged helper');
+    }
+    if ($stdinPayload !== null) {
+        fwrite($pipes[0], $stdinPayload);
+    }
+    fclose($pipes[0]);
+    $output = stream_get_contents($pipes[1]);
+    fclose($pipes[1]);
+    $code = proc_close($process);
+    return array($code, trim((string)$output));
+}
+
+function cert_helper($command, $params, $stdin = null)
+{
+    $paramsJson = json_encode($params);
+    if ($paramsJson === false) {
+        return array(1, 'Could not encode the request parameters');
+    }
+    $stdinJson = null;
+    if ($stdin !== null) {
+        $stdinJson = json_encode($stdin);
+        if ($stdinJson === false) {
+            return array(1, 'Could not encode the credentials');
+        }
+    }
+    $cmd = array('/usr/bin/issabel-helper', 'ssl_certbot', $command, $paramsJson);
+    return cert_helper_exec($cmd, $stdinJson);
+}
+
+/**
+ * Valida y normaliza un dominio. Devuelve '' si no es válido.
+ */
+function cert_check_domain($domain, $allowWildcard)
+{
+    $domain = strtolower(trim((string)$domain));
+    if ($domain === '') {
+        return '';
+    }
+    $wildcard = false;
+    if (strpos($domain, '*.') === 0) {
+        $wildcard = true;
+        $domain = substr($domain, 2);
+    }
+    if ($wildcard && !$allowWildcard) {
+        return '';
+    }
+    if (strlen($domain) > 253 || strpos($domain, '..') !== false) {
+        return '';
+    }
+    if (!preg_match('/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/', $domain)) {
+        return '';
+    }
+    return ($wildcard ? '*.' : '').$domain;
+}
+
+$arrRegistry = cert_registry();
+if (count($arrRegistry) === 0) {
+    cert_json(array('status' => 'error', 'result' => cert_output_html('The validation method registry is missing')));
+}
+
 $pNet = new paloNetwork();
 $arrNetwork = $pNet->obtener_configuracion_red();
 $arrNetworkData = array('dns_ip_1' => '', 'dns_ip2' => '', 'host' => '', 'gateway_ip' => '');
@@ -90,31 +190,61 @@ if(is_array($arrNetwork)) {
 
 // Renovación: no requiere dominio ni email, usa la configuración guardada.
 if(isset($_POST['renew'])) {
-    exec("/usr/bin/issabel-helper ssl_certbot renewcertificate", $result, $retorno);
+    list($retorno, $result) = cert_helper('renewcertificate', array());
     cert_json(array(
         'status' => $retorno == 0 ? 'success' : 'error',
-        'result' => cert_output_html(implode("\n", $result)),
+        'result' => cert_output_html($result),
     ));
 }
 
-// Instalación de un certificado nuevo.
-$staging = (isset($_POST['staging']) && $_POST['staging'] === '--test-cert') ? '--test-cert' : '';
-$domain  = isset($_POST['domain']) ? trim((string)$_POST['domain']) : '';
-$email   = isset($_POST['email'])  ? trim((string)$_POST['email'])  : '';
+// Instalación de un certificado nuevo o prueba de validación.
+$action = isset($_POST['test']) ? 'test' : 'install';
+
+$methodKey = isset($_POST['method']) ? (string)$_POST['method'] : 'webroot';
+if (strpos($methodKey, 'dns-hook:') === 0) {
+    // Custom DNS hook: the helper resolves and validates the script against the
+    // root-owned allowlist. Here only the template entry is needed.
+    if (!isset($arrRegistry['dns-hook'])) {
+        cert_json(array('status' => 'error', 'result' => cert_output_html('Custom DNS hooks are not supported')));
+    }
+    $method = $arrRegistry['dns-hook'];
+} else {
+    if (!isset($arrRegistry[$methodKey])) {
+        cert_json(array('status' => 'error', 'result' => cert_output_html('Unknown validation method')));
+    }
+    $method = $arrRegistry[$methodKey];
+}
+$isDns = ($method['group'] === 'dns');
+
+$domainRaw = isset($_POST['domain']) ? trim((string)$_POST['domain']) : '';
+$email     = isset($_POST['email'])  ? trim((string)$_POST['email'])  : '';
+$staging   = (isset($_POST['staging']) && $_POST['staging'] === '--test-cert');
+$reissue   = (isset($_POST['reissue']) && $_POST['reissue'] === '1');
 
 $errors = array();
 $domainList = array();
-foreach (explode(',', $domain) as $d) {
-    $d = trim($d);
-    if ($d === '') continue;
-    if (!preg_match('/^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?$/', $d) || strpos($d, '..') !== false) {
+$primaryDomain = '';
+foreach (explode(',', $domainRaw) as $d) {
+    if (trim((string)$d) === '') {
+        continue;
+    }
+    $checked = cert_check_domain($d, $isDns);
+    if ($checked === '') {
         $errors['domain'] = _tr('The domain is invalid');
         break;
     }
-    $domainList[] = $d;
+    $domainList[] = $checked;
+    if ($primaryDomain === '' && strpos($checked, '*.') !== 0) {
+        $primaryDomain = $checked;
+    }
 }
-if (count($domainList) === 0) {
+if (count($domainList) === 0 && !isset($errors['domain'])) {
     $errors['domain'] = sprintf(_tr('%s is required'), _tr('Domain'));
+}
+if ($primaryDomain === '' && count($domainList) > 0) {
+    // Wildcard-only certificate: use the base domain for ServerName and the
+    // certificate lineage name, without the wildcard label.
+    $primaryDomain = str_replace('*.', '', $domainList[0]);
 }
 if ($email === '') {
     $errors['email'] = sprintf(_tr('%s is required'), _tr('Email'));
@@ -122,13 +252,78 @@ if ($email === '') {
     $errors['email'] = sprintf(_tr('%s is invalid'), _tr('Email'));
 }
 
+$propagation = isset($_POST['propagation']) ? (int)$_POST['propagation'] : (int)$method['propagation_default'];
+if ($isDns && ($propagation < 5 || $propagation > 300)) {
+    $errors['propagation'] = sprintf(_tr('%s is invalid'), _tr('Propagation Time (seconds)'));
+}
+if (!$isDns) {
+    $propagation = 0;
+}
+
+// Credenciales del método. Se envían al helper por STDIN; aquí sólo se
+// validan para dar un mensaje por campo antes de invocarlo.
+$credentials = array();
+$credentialsProvided = false;
+foreach ($method['fields'] as $field) {
+    $name = $field['name'];
+    $value = isset($_POST[$name]) ? trim((string)$_POST[$name]) : '';
+    if ($value !== '') {
+        $credentialsProvided = true;
+        $credentials[$name] = $value;
+    }
+    if (isset($field['maxlength']) && strlen($value) > $field['maxlength']) {
+        $errors[$name] = sprintf(_tr('%s is invalid'), _tr($field['label']));
+    }
+    if ($field['type'] === 'number' && $value !== '' && !preg_match('/^\d+$/', $value)) {
+        $errors[$name] = sprintf(_tr('%s is invalid'), _tr($field['label']));
+    }
+}
+
+$storedValues = cert_values();
+if ($isDns && !$credentialsProvided) {
+    if ($storedValues['credentials'] !== $method['credentials_provider']) {
+        foreach ($method['fields'] as $field) {
+            if (!empty($field['required'])) {
+                $errors[$field['name']] = sprintf(_tr('%s is required'), _tr($field['label']));
+            }
+        }
+    }
+} elseif ($isDns && $credentialsProvided) {
+    // If any credential was typed, require the complete set so a partial form
+    // is not written over the stored file.
+    foreach ($method['fields'] as $field) {
+        $name = $field['name'];
+        if (!empty($field['required']) && (!isset($credentials[$name]) || $credentials[$name] === '')) {
+            $errors[$name] = sprintf(_tr('%s is required'), _tr($field['label']));
+        }
+    }
+}
+
 if (count($errors) > 0) {
     cert_json(array('status' => 'error', 'errors' => $errors));
 }
 
-$arrNetworkData['host'] = $domain;
+$params = array(
+    'method'      => $methodKey,
+    'domains'     => $domainList,
+    'email'       => $email,
+    'staging'     => $staging,
+    'reissue'     => $reissue,
+    'propagation' => $propagation,
+    'webroot'     => isset($method['webroot']) ? $method['webroot'] : '',
+);
 
-// Check to see if we have ServerName defined in ssl.conf, if not, add it
+// Prueba de validación: certbot obtiene un certificado de staging con
+// --dry-run, sin guardar nada y sin tocar Apache.
+if ($action === 'test') {
+    list($retorno, $result) = cert_helper('dryrun', $params, $credentials);
+    cert_json(array(
+        'status' => $retorno == 0 ? 'success' : 'error',
+        'result' => cert_output_html($result),
+    ));
+}
+
+// Ensure a ServerName exists in ssl.conf before certbot looks at Apache.
 $modify=0;
 $sslfile = "/etc/httpd/conf.d/ssl.conf";
 if (is_readable($sslfile)) {
@@ -140,29 +335,29 @@ if (is_readable($sslfile)) {
 }
 
 if($modify==0) {
-    exec("/usr/bin/issabel-helper ssl_certbot insertservername ".escapeshellarg($domain), $respuesta, $retorno);
+    cert_helper_exec(array('/usr/bin/issabel-helper', 'ssl_certbot', 'insertservername', $primaryDomain));
 } else {
-    exec("/usr/bin/issabel-helper ssl_certbot editservername ".escapeshellarg($domain), $respuesta, $retorno);
+    cert_helper_exec(array('/usr/bin/issabel-helper', 'ssl_certbot', 'editservername', $primaryDomain));
 }
 
-exec("/usr/bin/issabel-helper ssl_certbot newcertificate ".escapeshellarg($email)." ".escapeshellarg($domain)." $staging", $result, $retorno);
-$resultText = implode("\n", $result);
+list($retorno, $result) = cert_helper('newcertificate', $params, $credentials);
 
 if($retorno != 0) {
     cert_json(array(
         'status' => 'error',
         'domain' => '',
         'email'  => '',
-        'result' => cert_output_html($resultText),
+        'result' => cert_output_html($result),
     ));
 }
 
-exec("/usr/bin/issabel-helper ssl_certbot writevars ".escapeshellarg($email)." ".escapeshellarg($domain), $out, $rtn);
+$arrNetworkData['host'] = $primaryDomain;
 $pNet->escribir_configuracion_red_sistema($arrNetworkData);
 
 cert_json(array(
     'status' => 'success',
-    'domain' => $domain,
+    'domain' => implode(',', $domainList),
     'email'  => $email,
-    'result' => cert_output_html($resultText),
+    'method' => $methodKey,
+    'result' => cert_output_html($result),
 ));

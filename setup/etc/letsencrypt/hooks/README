@@ -1,0 +1,88 @@
+Custom DNS hooks for the HTTPS Certificate module
+=================================================
+
+This directory plugs a DNS provider that has no certbot plugin, or a local DNS
+server, into the DNS-01 validation of the HTTPS Certificate module.
+
+How it works
+------------
+
+Every hook is a script installed here and declared in hooks.json. The GUI offers
+the hook by its id; it never sends a path, a command or an environment variable.
+The privileged helper (ssl_certbot) re-reads hooks.json and validates the script
+before certbot runs it.
+
+The helper requires, and refuses to run otherwise:
+
+  * this directory owned by root (uid 0) and not writable by group or others
+    (mode 0755 or stricter);
+  * hooks.json owned by root and not writable by group or others;
+  * the script owned by root, not writable by group or others, executable and
+    a regular file (symlinks are rejected);
+  * a script name without slashes, resolving inside this directory.
+
+The web server user (asterisk) must not be able to create or modify any of
+these files, so keep this directory at 0755 root:root.
+
+Declaring a hook
+----------------
+
+Add an entry to hooks.json:
+
+  {
+    "my-dns": {
+      "label": "My DNS",
+      "description": "Publishes the TXT record through the My DNS API.",
+      "script": "my-dns.sh",
+      "propagation_default": 30
+    }
+  }
+
+  id                    lowercase letters, digits, dot, dash or underscore
+  label                 text shown in the method selector
+  description           help text shown when the method is selected
+  script                file name inside this directory (no slashes)
+  propagation_default   seconds to wait for the record to become visible,
+                        between 5 and 300 (optional, default 30)
+
+Reload the HTTPS Certificate page after editing hooks.json.
+
+The script contract
+-------------------
+
+certbot runs the script twice, with the environment it uses for any manual hook:
+
+  <script> auth      publish the challenge
+  <script> cleanup   remove it
+
+Variables available:
+
+  CERTBOT_DOMAIN      domain being validated (for *.example.com it is
+                      example.com)
+  CERTBOT_VALIDATION  value that must be published as a TXT record
+  CERTBOT_AUTH_OUTPUT output (stdout) of the auth run, only in cleanup
+
+The record must be published at:
+
+  _acme-challenge.<CERTBOT_DOMAIN>
+
+Add a TXT record with the value of CERTBOT_VALIDATION, and in cleanup delete
+only that value: example.com and *.example.com share the same record name and
+can be validated at the same time. Exit non-zero on failure; certbot then aborts
+the validation.
+
+Credentials
+-----------
+
+Keep API secrets in a separate file, for example my-dns.env, with mode
+0600 root:root, and source it from the script. Do not put secrets in
+hooks.json: it is readable by the web server user to render the GUI.
+
+Renewal
+-------
+
+certbot stores the hook command in the renewal configuration of the certificate
+(/etc/letsencrypt/renewal/<name>.conf). If you rename the script, reissue the
+certificate from the GUI so the renewal configuration points to the new file.
+
+See example.sh for a working skeleton.
