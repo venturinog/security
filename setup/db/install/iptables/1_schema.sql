@@ -25,7 +25,8 @@ CREATE TABLE port(
 CREATE TABLE tmp_execute(
     id                  integer       primary key,
     exec_in_sys         integer       not null,
-    first_time          integer       not null
+    first_time          integer       not null,
+    deactivated         integer       not null default 0
 );
 
 CREATE TABLE whitelist(

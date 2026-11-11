@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 27
+Release: 28
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -243,6 +243,14 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Wed Nov 11 2026 Issabel Foundation <info@issabel.org> - 6.0.0-28
+- Hide the "Deactivate firewall" button while the firewall is not running and
+  ignore deactivation requests in that state, so the rules page no longer
+  offers an action that does nothing.
+- Distinguish a firewall that was explicitly deactivated from one that was
+  never activated, using the new tmp_execute.deactivated flag, so the rules
+  page notice matches what the administrator did.
+
 * Fri Nov 06 2026 Issabel Foundation <info@issabel.org> - 6.0.0-27
 - Rebuild the new firewall rule form as a compact six-column grid: the four
   stacked cards become two, and the protocol-dependent fields move to their

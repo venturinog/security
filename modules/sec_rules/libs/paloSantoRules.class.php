@@ -750,6 +750,44 @@ class paloSantoRules {
         return TRUE;
     }
 
+    /**
+     * Indica si el firewall fue desactivado explícitamente por el usuario.
+     * `first_time` también vale 1 cuando nunca se activó, así que este flag
+     * separa ambos casos para el aviso de la página.
+     *
+     * @return bool     true si el usuario desactivó el firewall
+     */
+    function isFirewallDeactivated()
+    {
+        $query = "SELECT deactivated from tmp_execute";
+        $result = $this->_DB->fetchTable($query, true);
+        if($result == FALSE)
+        {
+            $this->errMsg = $this->_DB->errMsg;
+            return FALSE;
+        }
+        $data = $result[0];
+        return (isset($data['deactivated']) && $data['deactivated'] == 1);
+    }
+
+    /**
+     * Marca o limpia la desactivación explícita del firewall.
+     *
+     * @param bool      $deactivated    true al desactivar, false al activar
+     * @return bool     false si falla la actualización
+     */
+    function setFirewallDeactivated($deactivated = true)
+    {
+        $query = "UPDATE tmp_execute SET deactivated = ?";
+        $result = $this->_DB->genQuery($query, array($deactivated ? 1 : 0));
+        if($result == FALSE)
+        {
+            $this->errMsg = $this->_DB->errMsg;
+            return false;
+        }
+        return true;
+    }
+
     function isFirstTime()
     {
         $query = "SELECT first_time from tmp_execute";

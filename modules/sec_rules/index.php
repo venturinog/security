@@ -108,8 +108,12 @@ function showRulesPage($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
 
     $alert = (string)$smarty->getTemplateVars('SECURITY_ALERT');
     if ($isFirst) {
+        // `first_time` también queda a 1 al desactivar, así que se consulta el
+        // flag explícito para no decir "nunca activado" a quien lo apagó.
         $alert .= issabel_alert_html('warning', _tr("Firewall"),
-            _tr("The firewall has not been activated yet"));
+            $pRules->isFirewallDeactivated()
+                ? _tr("The firewall is totally desactivated. It is recommended to activate the firewall rules")
+                : _tr("The firewall has not been activated yet"));
     } elseif (!$isExecuted) {
         $alert .= issabel_alert_html('warning', _tr("Firewall"),
             _tr("There are changes pending to apply to the firewall"));
@@ -150,9 +154,11 @@ function renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted)
            . htmlspecialchars(_tr('No rules were selected'), ENT_COMPAT, 'UTF-8') . '" data-confirm="'
            . htmlspecialchars(_tr('Are you sure you wish to delete the selected rules?'), ENT_COMPAT, 'UTF-8') . '">'
            . '<i class="ti ti-trash"></i> '._tr('Delete').'</button>';
-    $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_deactivate" data-confirm="'
-           . htmlspecialchars(_tr('Are you sure you wish to deactivate the firewall?'), ENT_COMPAT, 'UTF-8') . '">'
-           . '<i class="ti ti-power"></i> '._tr('Deactivate firewall').'</button>';
+    if (!$isFirst) {
+        $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_deactivate" data-confirm="'
+               . htmlspecialchars(_tr('Are you sure you wish to deactivate the firewall?'), ENT_COMPAT, 'UTF-8') . '">'
+               . '<i class="ti ti-power"></i> '._tr('Deactivate firewall').'</button>';
+    }
     if ($needsApply) {
         $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_apply">'
                . '<i class="ti ti-check" aria-hidden="true"></i> '.$applyLabel.'</button>';
@@ -1095,6 +1101,8 @@ function activateFirewall($smarty, $module_name, $local_templates_dir, &$pDB, $a
     $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"),
         $bFirstTime ? _tr("The firewall has been activated") : _tr("The rules have been executed in the system")));
     $pRules->updateExecutedInSystem();
+    // Si el firewall se había desactivado a propósito, deja de estarlo.
+    $pRules->setFirewallDeactivated(false);
     // Snapshot del estado que acaba de quedar aplicado; es la base de
     // "Descartar cambios".
     if (!$pRules->snapshotApplied()) {
@@ -1108,7 +1116,12 @@ function activateFirewall($smarty, $module_name, $local_templates_dir, &$pDB, $a
 function desactivateFirewall($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
     $pRules = new paloSantoRules($pDB);
-    if ($pRules->flushRules() && $pRules->setFirstTime()) {
+    // Sin firewall en ejecución no hay nada que descargar ni que reportar como
+    // desactivación nueva (por ejemplo, si se reenvía un POST antiguo).
+    if ($pRules->isFirstTime()) {
+        return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+    }
+    if ($pRules->flushRules() && $pRules->setFirewallDeactivated(true) && $pRules->setFirstTime()) {
         issabelFwAudit::log('firewall.disable', 'ok');
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("The firewall has been desactivated")));
     } else {
