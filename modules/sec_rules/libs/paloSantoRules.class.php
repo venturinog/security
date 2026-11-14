@@ -88,7 +88,29 @@ class paloSantoRules {
              $query = "ALTER TABLE filter ADD continents TEXT";
              $result = $this->_DB->genQuery($query,array());
          }
+         // Mismo esquema que el version_sql 6.0.0-33->34. Va con guarda para
+         // que la pagina siga funcionando si el script quedo diferido en el
+         // spool de firstboot; el ALTER del version_sql sigue siendo la unica
+         // via en una instalacion normal.
+         if($this->hasField('filter','family')==0) {
+             $query = "ALTER TABLE filter ADD COLUMN family TEXT NOT NULL DEFAULT 'inet'";
+             $result = $this->_DB->genQuery($query,array());
+         }
+         if($this->hasField('tmp_execute','ipv6_enabled')==0) {
+             $query = "ALTER TABLE tmp_execute ADD COLUMN ipv6_enabled INTEGER NOT NULL DEFAULT 0";
+             $result = $this->_DB->genQuery($query,array());
+         }
      }
+
+    /**
+     * Familia de una regla. Solo se aceptan los dos valores que el motor sabe
+     * emitir: `both` no se expone todavia (una regla con origen de una familia
+     * no se puede traducir a la otra sin volverla "cualquiera").
+     */
+    private function normalizeFamily($family)
+    {
+        return ((string)$family === 'inet6') ? 'inet6' : 'inet';
+    }
      /**
      * Function that returns the number of rules (data) in the database
      *  .
@@ -107,11 +129,16 @@ class paloSantoRules {
         return $result[0];
     }
 
-    function ObtainNumRulesGEOIP()
+    function ObtainNumRulesGEOIP($family = NULL)
     {
         $query = "SELECT COUNT(*) FROM filter WHERE protocol='GEOIP'";
+        $arrParam = array();
+        if ($family === 'inet' || $family === 'inet6') {
+            $query .= " AND family=?";
+            $arrParam[] = $family;
+        }
         
-        $result = $this->_DB->getFirstRowQuery($query);
+        $result = $this->_DB->getFirstRowQuery($query, false, $arrParam);
         if($result == FALSE)
         {
             $this->errMsg = $this->_DB->errMsg;
@@ -167,10 +194,17 @@ class paloSantoRules {
      *
      * @return array     empty if an error occurs or an array with all the rules
      */
-    function ObtainRules($limit,$offset)
+    function ObtainRules($limit,$offset,$family=NULL)
     {
-        $query   = "SELECT * FROM  filter WHERE protocol<>'GEOIP' ORDER BY rule_order LIMIT ? OFFSET ?";
-        $arrParam = array($limit,$offset);
+        $query   = "SELECT * FROM  filter WHERE protocol<>'GEOIP'";
+        $arrParam = array();
+        if ($family === 'inet' || $family === 'inet6') {
+            $query .= " AND family=?";
+            $arrParam[] = $family;
+        }
+        $query .= " ORDER BY rule_order LIMIT ? OFFSET ?";
+        $arrParam[] = $limit;
+        $arrParam[] = $offset;
         $result = $this->_DB->fetchTable($query, true, $arrParam);
         if($result == FALSE)
         {
@@ -183,12 +217,19 @@ class paloSantoRules {
     /**
      * Same as above, but listing only GEOIP rules
      */
-    function ObtainRulesGEOIP($limit,$offset)
+    function ObtainRulesGEOIP($limit,$offset,$family=NULL)
     {
         $this->fixGEOIPOrder();
 
-        $query   = "SELECT * FROM  filter WHERE protocol='GEOIP' ORDER BY rule_order LIMIT ? OFFSET ?";
-        $arrParam = array($limit,$offset);
+        $query   = "SELECT * FROM  filter WHERE protocol='GEOIP'";
+        $arrParam = array();
+        if ($family === 'inet' || $family === 'inet6') {
+            $query .= " AND family=?";
+            $arrParam[] = $family;
+        }
+        $query .= " ORDER BY rule_order LIMIT ? OFFSET ?";
+        $arrParam[] = $limit;
+        $arrParam[] = $offset;
         $result = $this->_DB->fetchTable($query, true, $arrParam);
         if($result == FALSE)
         {
@@ -280,24 +321,31 @@ class paloSantoRules {
         $geoipcountries  = (is_array($arrValues['geoipcountries'])) ? implode(",",$arrValues['geoipcountries']) : "";
         $geoipcontinents  = (is_array($arrValues['geoipcontinents'])) ? implode(",",$arrValues['geoipcontinents']) : "";
 
+        // GeoIP tambien es por familia: la base xt_geoip trae rangos v4 (.iv4)
+        // y v6 (.iv6) por separado.
+        $family = $this->normalizeFamily(isset($arrValues['family']) ? $arrValues['family'] : 'inet');
+
         if($protocol == 'GEOIP') {
             $max = $this->getMaxOrderGEOIP();
+            // getMaxOrder*() devuelve array() si falla la consulta y MAX() es
+            // NULL cuando todavia no hay reglas en el rango.
+            $maxOrder = isset($max['lastRule']) ? (int)$max['lastRule'] : 0;
+            // La primera regla GeoIP debe nacer dentro de su rango, no en 1.
+            $order = max(self::GEOIP_ORDER_BASE, $maxOrder) + 1;
         } else {
             $max = $this->getMaxOrder();
+            $maxOrder = isset($max['lastRule']) ? (int)$max['lastRule'] : 0;
+            $order = $this->orderBeforeCatchAll($family, $traffic, $maxOrder);
+            if ($order === NULL) {
+                // errMsg ya quedo seteado por orderBeforeCatchAll()
+                return false;
+            }
         }
 
-        // getMaxOrder*() devuelve array() si falla la consulta y MAX() es NULL
-        // cuando la familia todavía no tiene reglas.
-        $maxOrder = isset($max['lastRule']) ? (int)$max['lastRule'] : 0;
-        // La primera regla GeoIP debe nacer dentro de su rango, no en 1.
-        $order = ($protocol == 'GEOIP')
-            ? max(self::GEOIP_ORDER_BASE, $maxOrder) + 1
-            : 1 + $maxOrder;
-
         $query = "INSERT INTO filter(traffic, eth_in, eth_out, ip_source, ip_destiny, protocol, ".
-                                    "sport, dport, icmp_type, number_ip, target, rule_order, activated, state, countries, continents) ".
-                 "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,1,?,?,?)";
-        $arrParam = array($traffic,$eth_in,$eth_out,$source,$destino,$protocol,$port_in,$port_out,$type_icmp,$id_ip,$target,$order,$state,$geoipcountries,$geoipcontinents);
+                                    "sport, dport, icmp_type, number_ip, target, rule_order, activated, state, countries, continents, family) ".
+                 "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?)";
+        $arrParam = array($traffic,$eth_in,$eth_out,$source,$destino,$protocol,$port_in,$port_out,$type_icmp,$id_ip,$target,$order,$state,$geoipcountries,$geoipcontinents,$family);
         $result = $this->_DB->genQuery($query,$arrParam);
 
         if( $result == FALSE )
@@ -368,8 +416,10 @@ class paloSantoRules {
         $geoipcountries  = ($arrValues['geoipcountries'] == null)   ? "" : implode(",",$arrValues['geoipcountries']);
         $geoipcontinents = ($arrValues['geoipcontinents'] == null)  ? "" : implode(",",$arrValues['geoipcontinents']);
 
-        $query = "UPDATE filter SET traffic = ?, eth_in = ?, eth_out = ?, ip_source = ?, ip_destiny = ?, protocol = ?, sport = ?, dport = ?, icmp_type = ?, number_ip = ?, target = ?, rule_order = ?, state = ?, countries = ?, continents = ?  WHERE id = ?";
-        $arrParam = array($traffic,$eth_in,$eth_out,$source,$destino,$protocol,$port_in,$port_out,$type_icmp,$id_ip,$target,$orden,$state,$geoipcountries,$geoipcontinents,$id);
+        $family = $this->normalizeFamily(isset($arrValues['family']) ? $arrValues['family'] : 'inet');
+
+        $query = "UPDATE filter SET traffic = ?, eth_in = ?, eth_out = ?, ip_source = ?, ip_destiny = ?, protocol = ?, sport = ?, dport = ?, icmp_type = ?, number_ip = ?, target = ?, rule_order = ?, state = ?, countries = ?, continents = ?, family = ?  WHERE id = ?";
+        $arrParam = array($traffic,$eth_in,$eth_out,$source,$destino,$protocol,$port_in,$port_out,$type_icmp,$id_ip,$target,$orden,$state,$geoipcountries,$geoipcontinents,$family,$id);
         $result = $this->_DB->genQuery($query,$arrParam);
 
         if( $result == FALSE )
@@ -413,6 +463,44 @@ class paloSantoRules {
             return array();
         }
         return $result[0];
+    }
+
+    /**
+     * Posicion de una regla nueva dentro de su familia y su trafico.
+     *
+     * Historicamente se usaba 1 + MAX(rule_order), que dejaba la regla nueva
+     * por debajo del REJECT por defecto del seed: no se evaluaba nunca hasta
+     * que el operador la movia a mano. Ahora la regla se inserta antes del
+     * catch-all (protocol ALL, target REJECT, mismo trafico y familia) y el
+     * resto de la lista corre una posicion, con lo que el orden sigue siendo
+     * una secuencia unica sin numeros repetidos entre familias.
+     *
+     * @return integer  posicion donde insertar, o NULL si fallo la consulta
+     */
+    private function orderBeforeCatchAll($family, $traffic, $maxOrder)
+    {
+        $query = "SELECT MAX(rule_order) AS lastRule FROM filter " .
+                 "WHERE protocol='ALL' AND target='REJECT' AND traffic=? AND family=?";
+        $result = $this->_DB->fetchTable($query, true, array($traffic, $family));
+        if($result == FALSE)
+        {
+            $this->errMsg = $this->_DB->errMsg;
+            return NULL;
+        }
+
+        $catchAll = isset($result[0]['lastRule']) ? $result[0]['lastRule'] : NULL;
+        if ($catchAll === NULL || $catchAll === '' || (int)$catchAll > $maxOrder)
+            return 1 + $maxOrder;
+
+        $catchAll = (int)$catchAll;
+        $query = "UPDATE filter SET rule_order = rule_order + 1 " .
+                 "WHERE protocol<>'GEOIP' AND rule_order >= ?";
+        if ($this->_DB->genQuery($query, array($catchAll)) == FALSE)
+        {
+            $this->errMsg = $this->_DB->errMsg;
+            return NULL;
+        }
+        return $catchAll;
     }
 
 
@@ -740,8 +828,57 @@ class paloSantoRules {
         return $this->updateExecutedInSystem();
     }
 
-    function hasGeoip() {
-        $sComando = '/usr/bin/issabel-helper fwconfig --isactivegeoip 2>&1';
+    function hasGeoip($family = 'inet') {
+        $option = ($family === 'inet6') ? '--isactivegeoip6' : '--isactivegeoip';
+        $sComando = '/usr/bin/issabel-helper fwconfig '.$option.' 2>&1';
+        $output = $ret = NULL;
+        exec($sComando, $output, $ret);
+        if ($ret != 0) {
+            return FALSE;
+        }
+        return TRUE;
+    }
+
+    /**
+     * Indica si el filtrado IPv6 esta habilitado en la base. Es el opt-in:
+     * mientras valga 0, fwconfig no toca ip6tables.
+     */
+    function isIpv6Enabled()
+    {
+        $query = "SELECT ipv6_enabled from tmp_execute";
+        $result = $this->_DB->fetchTable($query, true);
+        if($result == FALSE)
+        {
+            $this->errMsg = $this->_DB->errMsg;
+            return FALSE;
+        }
+        $data = $result[0];
+        return (isset($data['ipv6_enabled']) && $data['ipv6_enabled'] == 1);
+    }
+
+    /**
+     * Habilita o deshabilita el filtrado IPv6. El cambio queda pendiente de
+     * aplicar, igual que cualquier otra modificacion de reglas.
+     */
+    function setIpv6Enabled($enabled)
+    {
+        $query = "UPDATE tmp_execute SET ipv6_enabled = ?";
+        $result = $this->_DB->genQuery($query, array($enabled ? 1 : 0));
+        if($result == FALSE)
+        {
+            $this->errMsg = $this->_DB->errMsg;
+            return false;
+        }
+        return $this->updateNotExecutedInSystem();
+    }
+
+    /**
+     * Indica si las cadenas de Issabel estan cargadas en ip6tables.
+     */
+    function isActive6()
+    {
+        $this->errMsg = '';
+        $sComando = '/usr/bin/issabel-helper fwconfig --isactive6 2>&1';
         $output = $ret = NULL;
         exec($sComando, $output, $ret);
         if ($ret != 0) {

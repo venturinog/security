@@ -22,6 +22,10 @@
     font-size: 1rem;
 }
 
+.fw-applied-chip--pending .ti {
+    color: var(--iss-sev-warning);
+}
+
 .fw-grid-title {
     margin: 18px 0 8px;
     font-size: 1.05rem;
@@ -34,6 +38,79 @@
     color: var(--iss-text-muted);
     font-size: .8rem;
     font-weight: 400;
+}
+
+/* Chip de familia en la grilla. Las dos familias comparten la misma tabla:
+   esto es lo que dice a cuál pertenece cada fila. */
+.fw-family {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: .75rem;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.fw-family--inet {
+    color: var(--iss-primary);
+    background: color-mix(in srgb, var(--iss-primary) 12%, transparent);
+}
+
+.fw-family--inet6 {
+    color: var(--iss-sev-ok);
+    background: color-mix(in srgb, var(--iss-sev-ok) 14%, transparent);
+}
+
+/* Filtro Todas / IPv4 / IPv6: un control segmentado, no una segunda grilla. */
+.fw-segmented {
+    display: inline-flex;
+    margin-bottom: 4px;
+    border: 1px solid var(--iss-border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.fw-segmented__item {
+    padding: 2px 12px;
+    font-size: .85rem;
+    color: var(--iss-text-muted);
+    text-decoration: none;
+    background: transparent;
+}
+
+.fw-segmented__item + .fw-segmented__item {
+    border-left: 1px solid var(--iss-border);
+}
+
+.fw-segmented__item:hover,
+.fw-segmented__item:focus {
+    color: var(--iss-text);
+    text-decoration: none;
+}
+
+.fw-segmented__item--active {
+    color: var(--iss-primary);
+    font-weight: 600;
+    background: color-mix(in srgb, var(--iss-primary) 10%, transparent);
+}
+
+/* Switch de IPv6 en la barra de acciones. */
+.fw-ipv6 {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 0 4px;
+    font-size: .875rem;
+    color: var(--iss-text);
+    cursor: pointer;
+    user-select: none;
+}
+
+.fw-ipv6 .form-check-input {
+    margin: 0;
+    cursor: pointer;
 }
 
 .fw-icon {

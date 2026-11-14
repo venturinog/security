@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 33
+Release: 34
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -80,7 +80,7 @@ rmdir setup/usr/share/issabel/privileged
 
 # Validation method registry, read by the module and by ssl_certbot
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/issabel/letsencrypt
-cp setup/usr/share/issabel/letsencrypt/providers.php $RPM_BUILD_ROOT%{_datadir}/issabel/letsencrypt/providers.php
+mv setup/usr/share/issabel/letsencrypt/providers.php $RPM_BUILD_ROOT%{_datadir}/issabel/letsencrypt/providers.php
 rmdir setup/usr/share/issabel/letsencrypt
 
 chmod +x setup/updateDatabase
@@ -222,8 +222,9 @@ chown asterisk.asterisk /etc/fail2ban/jail.d/issabel.conf
 systemctl enable fail2ban
 systemctl enable ipset
 
-mkdir /etc/sysconfig/ipset.d
-echo "create issabel_whitelist hash:ip family inet hashsize 1024 maxelem 65536" >/etc/sysconfig/ipset.d/issabel_whitelist.set
+mkdir -p /etc/sysconfig/ipset.d
+echo "create issabel_whitelist hash:net family inet hashsize 1024 maxelem 65536" >/etc/sysconfig/ipset.d/issabel_whitelist.set
+echo "create issabel_whitelist6 hash:net family inet6 hashsize 1024 maxelem 65536" >/etc/sysconfig/ipset.d/issabel_whitelist6.set
 touch /etc/sysconfig/ipset.d/.saved
 
 /usr/share/issabel/privileged/fwconfig --save_wl
@@ -288,6 +289,65 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Fri Nov 13 2026 Issabel Foundation <info@issabel.org> - 6.0.0-34
+- Add IPv6 filtering to the firewall engine. `filter` gets a `family` column
+  (`inet` by default, so every existing rule and the whole IPv4 behaviour stay
+  untouched) and fwconfig loads the `inet6` rules into ip6tables, persisting
+  them in /etc/sysconfig/ip6tables.
+- IPv6 is opt-in: `tmp_execute.ipv6_enabled` defaults to 0 and only then does
+  fwconfig touch ip6tables. It is switched on from the firewall rules page and
+  applied with the usual Apply button, so no upgrade starts filtering IPv6 on
+  its own.
+- Seed loopback, ICMPv6 and established/related for IPv6, and always emit the
+  IPv6 REJECT at the end of the chain. NDP/SLAAC survive the first load and
+  IPv6 can never be left fail-open by deleting that rule.
+- One rules grid, mixed families: a Family column plus an All/IPv4/IPv6 filter,
+  and a family selector in the rule form. `both` is not exposed yet, so a rule
+  is always evaluated by exactly one family and no matcher is silently dropped.
+- A new rule is now created before the catch-all REJECT of its family and
+  traffic instead of at the end of the list. Before this, a new IPv4 rule was
+  appended below the default REJECT and never matched until it was reordered.
+- Give the whitelist an IPv6 set (`issabel_whitelist6`) and hook both sets at
+  the top of INPUT. Entries are routed to the set of their family.
+- Move both whitelist sets from `hash:ip` to `hash:net`: the module has always
+  accepted networks in the form, but `hash:ip` rejects anything with a prefix,
+  so adding `192.168.1.0/24` failed after the row was already stored. The sets
+  are recreated on the next load and repopulated from the database.
+- Validate whitelist entries with IPv4/IPv6 (prefix up to 128) instead of the
+  IPv4-only regex, reject the `0.0.0.0` and `::` wildcards, and roll back the
+  database row when the firewall refuses the entry.
+- Finish IPv6 banning in fail2ban. The custom banaction already runs once per
+  family on fail2ban 1.1 (the included iptables.conf brings the
+  `[Init?family=inet6]` section), so ip6tables gets its own `F2B_INPUT` and
+  `f2b-*` chains and an IPv6 offender is rejected with
+  `icmp6-port-unreachable`; verified against fail2ban 1.1.0-6.el10_0. The
+  action now documents the mechanism, because writing the IPv6 commands by
+  hand makes them run in the IPv4 pass too and duplicates every rule.
+- Read the banned addresses with `preg_split("/:/", ..., 2)`: splitting on
+  every colon truncated IPv6 addresses in the GUI list (`2001:db8::1` showed as
+  `2001`) and made them impossible to unban.
+- Look up the country with `geoiplookup6` for IPv6 bans, and default it to `ZZ`
+  when the lookup fails, so the attacks table no longer stores an empty source.
+- Report by family: the rules page shows whether IPv6 is active or still
+  pending and offers Apply when IPv6 is enabled but its chains are not loaded
+  (failed apply, manual flush, boot without ip6tables.service); the rejected-IP
+  list classifies IPv6 addresses by range instead of a generic "IPv6 address";
+  and the fail2ban blocked-by-country report walks both tables, stripping the
+  /32 and /128 suffix that iptables prints (which also fixes the IPv4 report,
+  that always fell back to `ZZ`).
+- GeoIP for IPv6: the GEOIP rules are emitted to ip6tables in their own
+  `ISSABEL_*_GEOIP` chains, and the match is checked per family (the `.iv4` and
+  `.iv6` files of /usr/share/xt_geoip are different artefacts, so having one
+  does not enable the other). The rule form accepts IPv6 for a GeoIP rule and
+  the page warns when such rules exist without .iv6 data.
+- Blocking or whitelisting a country from the GeoIP map now covers both
+  families when IPv6 filtering is enabled, and fails with a clear message when
+  the .iv6 data is missing instead of leaving an IPv4-only rule that would be a
+  silent fail-open for IPv6. The blocked and whitelisted lists merge both
+  tables.
+- The `issabel-geoip` updater now fails when the .iv6 files are missing too, not
+  only the .iv4 ones (separate package).
+
 * Wed Nov 11 2026 Issabel Foundation <info@issabel.org> - 6.0.0-33
 - Keep `deactivated` out of the iptables install schema. A clean install runs
   the schema and then every version_sql on top of it, so declaring the column

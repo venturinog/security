@@ -58,7 +58,9 @@ function _moduleContent(&$smarty, $module_name)
 
     switch($accion){
         case "new":
-            $content = constructForm($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, array());
+            $newValues = array();
+            if (fwFamilyFilter() !== '') $newValues['family'] = fwFamilyFilter();
+            $content = constructForm($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $newValues);
             break;
         case "edit":
             $content = editRulePage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
@@ -68,6 +70,10 @@ function _moduleContent(&$smarty, $module_name)
             break;
         case "activatefirewall":
             $content = activateFirewall($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+            break;
+        case "enableipv6":
+        case "disableipv6":
+            $content = toggleIpv6($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $accion == "enableipv6");
             break;
         case "save":
             $content = saveRulePage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
@@ -105,6 +111,11 @@ function showRulesPage($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     $pRules = new paloSantoRules($pDB);
     $isFirst = $pRules->isFirstTime();
     $isExecuted = $pRules->isExecutedInSystem();
+    $family = fwFamilyFilter();
+    // Estado por familia, calculado una sola vez por carga (cada consulta es
+    // una llamada al helper privilegiado).
+    $fwState = fwFamilyState($pRules);
+    $needsApply = fwNeedsApply($isFirst, $isExecuted, $fwState);
 
     $alert = (string)$smarty->getTemplateVars('SECURITY_ALERT');
     if ($isFirst) {
@@ -114,42 +125,150 @@ function showRulesPage($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
             $pRules->isFirewallDeactivated()
                 ? _tr("The firewall is totally desactivated. It is recommended to activate the firewall rules")
                 : _tr("The firewall has not been activated yet"));
-    } elseif (!$isExecuted) {
+    } elseif ($needsApply) {
         $alert .= issabel_alert_html('warning', _tr("Firewall"),
             _tr("There are changes pending to apply to the firewall"));
     }
 
-    if ($pRules->ObtainNumRulesGEOIP() > 0 && !$pRules->hasGeoip()) {
+    if ($pRules->ObtainNumRulesGEOIP('inet') > 0 && !$pRules->hasGeoip('inet')) {
         $alert .= issabel_alert_html('error', _tr("GeoIP"),
             _tr("GeoIP rules are configured but the geoip match is not available. Install xtables-addons and generate /usr/share/xt_geoip, then apply the rules again."));
+    }
+    // La base v6 son los .iv6 de /usr/share/xt_geoip: tener la v4 no alcanza y
+    // la regla v6 no coincidiria con nada, en silencio.
+    if ($fwState['ipv6'] && $pRules->ObtainNumRulesGEOIP('inet6') > 0 && !$pRules->hasGeoip('inet6')) {
+        $alert .= issabel_alert_html('error', _tr("GeoIP"),
+            _tr("IPv6 GeoIP rules are configured but the IPv6 geoip data is not available. Run /etc/cron.daily/geoip_update.sh to generate the .iv6 files in /usr/share/xt_geoip, then apply the rules again."));
     }
 
     // `paloSantoGrid::setTitle()` no se imprime en la plantilla Modern
     // (_list.tpl), así que las secciones llevan su propio encabezado. La
-    // grilla GeoIP va primero, como en la interfaz histórica.
+    // grilla GeoIP va primero, como en la interfaz histórica. Las dos grillas
+    // son la misma tabla `filter`, así que el filtro de familia las afecta a
+    // ambas: no hay una pantalla aparte para IPv6.
     return $alert
-        . renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted)
+        . renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted, $family, $fwState)
+        . renderFamilyFilter($module_name, $family)
         . '<h4 class="fw-grid-title">'._tr('GeoIP')
         . ' <span class="fw-drag-hint">'._tr('Drag to reorder').'</span></h4>'
-        . '<div class="fw-grid" id="geoip_grid">'.renderRulesGrid($smarty, $module_name, $pDB, true).'</div>'
+        . '<div class="fw-grid" id="geoip_grid">'.renderRulesGrid($smarty, $module_name, $pDB, true, $family).'</div>'
         . '<h4 class="fw-grid-title">'._tr('Rules')
         . ' <span class="fw-drag-hint">'._tr('Drag to reorder').'</span></h4>'
-        . '<div class="fw-grid" id="rules_grid">'.renderRulesGrid($smarty, $module_name, $pDB, false).'</div>';
+        . '<div class="fw-grid" id="rules_grid">'.renderRulesGrid($smarty, $module_name, $pDB, false, $family).'</div>';
+}
+
+/**
+ * Filtro de familia de la grilla. Devuelve '' (todas), 'inet' o 'inet6'.
+ * `both` no existe como valor: una regla pertenece a una sola familia.
+ *
+ * Se lee sólo de la URL a propósito: el formulario de regla también envía
+ * `family` por POST y getParameter() prefiere POST, lo que dejaría la grilla
+ * filtrada por la familia de la regla recién guardada.
+ */
+function fwFamilyFilter()
+{
+    if (!isset($_GET['family'])) return '';
+    $family = (string)$_GET['family'];
+    return ($family === 'inet' || $family === 'inet6') ? $family : '';
+}
+
+/** Etiqueta visible de una familia. */
+function fwFamilyLabel($family)
+{
+    return ((string)$family === 'inet6') ? 'IPv6' : 'IPv4';
+}
+
+/**
+ * Estado de las dos familias. Cada consulta al helper privilegiado cuesta una
+ * llamada a `fwconfig`, así que se calcula una sola vez por carga.
+ *
+ * @return array  ipv6 (opt-in), ipv6Active (cadenas cargadas en ip6tables)
+ */
+function fwFamilyState($pRules)
+{
+    $state = array('ipv6' => $pRules->isIpv6Enabled(), 'ipv6Active' => FALSE);
+    if ($state['ipv6']) $state['ipv6Active'] = $pRules->isActive6();
+    return $state;
+}
+
+/**
+ * Indica si hay que ofrecer "Aplicar": cambios sin ejecutar, primera
+ * activación, o IPv6 habilitado sin cargar (fallo al aplicar, flush manual,
+ * arranque sin ip6tables.service).
+ */
+function fwNeedsApply($isFirst, $isExecuted, $fwState)
+{
+    return $isFirst || !$isExecuted || ($fwState['ipv6'] && !$fwState['ipv6Active']);
+}
+
+/** Comodín de origen/destino de una familia (sin la máscara). */
+function fwFamilyWildcard($family)
+{
+    return ((string)$family === 'inet6') ? '::' : '0.0.0.0';
+}
+
+/**
+ * Control segmentado Todas / IPv4 / IPv6. Es un filtro de la misma grilla, no
+ * una segunda tabla: el plan del módulo elige una sola lista con la familia
+ * como atributo.
+ */
+function renderFamilyFilter($module_name, $family)
+{
+    $options = array('' => _tr('All'), 'inet' => 'IPv4', 'inet6' => 'IPv6');
+    $html = '<div class="fw-segmented" role="group" aria-label="'
+          . htmlspecialchars(_tr('Family'), ENT_COMPAT, 'UTF-8').'">';
+    foreach ($options as $value => $label) {
+        $active = ($value === $family);
+        $href = '?menu='.$module_name.($value === '' ? '' : '&amp;family='.$value);
+        $html .= '<a class="fw-segmented__item'.($active ? ' fw-segmented__item--active' : '').'"'
+               . ' href="'.$href.'"'
+               . ($active ? ' aria-current="true"' : '')
+               . '>'.htmlspecialchars($label, ENT_COMPAT, 'UTF-8').'</a>';
+    }
+    return $html.'</div>';
 }
 
 /**
  * Barra única de acciones. Sustituye a las barras que paloSantoGrid genera
  * por cada grilla para que las dos tablas compartan un solo juego de botones.
  */
-function renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted)
+function renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted, $family = '', $fwState = array())
 {
     $hasSnapshot = $pRules->hasSnapshot();
-    $needsApply  = $isFirst || !$isExecuted;
+    if (!isset($fwState['ipv6'])) $fwState = fwFamilyState($pRules);
+    $ipv6 = $fwState['ipv6'];
+    $ipv6Active = $fwState['ipv6Active'];
+    $needsApply  = fwNeedsApply($isFirst, $isExecuted, $fwState);
     $applyLabel  = $isFirst ? _tr('Activate firewall') : _tr('Apply changes');
     $applyStatus = _tr('Applying changes...').' '
                  . _tr('The firewall rules are being applied. This may take a few seconds.');
 
     $html  = '<div class="fw-toolbar">';
+    // Switch de IPv6: es un opt-in. Mientras esté apagado, fwconfig no toca
+    // ip6tables; al cambiarlo queda pendiente hasta "Aplicar".
+    $html .= '<label class="fw-ipv6" for="fw_ipv6" title="'
+           . htmlspecialchars(_tr('IPv6 filtering'), ENT_COMPAT, 'UTF-8').'">'
+           . '<input type="checkbox" class="form-check-input" id="fw_ipv6"'
+           . ($ipv6 ? ' checked="checked"' : '')
+           . ' data-on-confirm="'
+           . htmlspecialchars(_tr('IPv6 filtering will be applied when you press Apply changes. Make sure ICMPv6 and loopback are allowed before continuing.'), ENT_COMPAT, 'UTF-8')
+           . '" data-off-confirm="'
+           . htmlspecialchars(_tr('IPv6 filtering will be removed from the server when you press Apply changes.'), ENT_COMPAT, 'UTF-8')
+           . '"> <span>IPv6</span></label>';
+    // Estado por familia: habilitado y cargado, habilitado y pendiente, o
+    // apagado (el propio interruptor lo dice). Con el firewall desactivado no
+    // se muestra: el aviso de la página ya lo explica.
+    if ($ipv6 && !$isFirst) {
+        if ($ipv6Active) {
+            $html .= '<span class="fw-applied-chip" title="'
+                   . htmlspecialchars(_tr('IPv6 rules are loaded in the firewall'), ENT_COMPAT, 'UTF-8').'">'
+                   . '<i class="ti ti-shield-check" aria-hidden="true"></i> '._tr('IPv6 active').'</span>';
+        } else {
+            $html .= '<span class="fw-applied-chip fw-applied-chip--pending" title="'
+                   . htmlspecialchars(_tr('IPv6 rules are enabled but not loaded yet'), ENT_COMPAT, 'UTF-8').'">'
+                   . '<i class="ti ti-clock" aria-hidden="true"></i> '._tr('IPv6 pending').'</span>';
+        }
+    }
     $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_delete" data-empty="'
            . htmlspecialchars(_tr('No rules were selected'), ENT_COMPAT, 'UTF-8') . '" data-confirm="'
            . htmlspecialchars(_tr('Are you sure you wish to delete the selected rules?'), ENT_COMPAT, 'UTF-8') . '">'
@@ -171,7 +290,8 @@ function renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted)
                . htmlspecialchars(_tr('Are you sure you wish to discard the changes?'), ENT_COMPAT, 'UTF-8') . '">'
                . '<i class="ti ti-arrow-back-up"></i> '._tr('Discard changes').'</button>';
     }
-    $html .= '<a class="btn btn-sm btn-outline-primary" href="?menu='.$module_name.'&amp;action=new">'
+    $html .= '<a class="btn btn-sm btn-outline-primary" href="?menu='.$module_name.'&amp;action=new'
+           . ($family !== '' ? '&amp;family='.$family : '').'">'
            . '<i class="ti ti-plus"></i> '._tr('New Rule').'</a>';
     $html .= '</div>';
 
@@ -198,7 +318,7 @@ function renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted)
     return $html;
 }
 
-function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo)
+function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo, $family = '')
 {
     $pRules = new paloSantoRules($pDB);
     $oGrid  = new paloSantoGrid($smarty);
@@ -212,6 +332,7 @@ function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo)
     $oGrid->setColumns(array(
         '',
         $hidden(_tr('Order')),
+        _tr('Family'),
         _tr('Traffic'),
         _tr('Target'),
         _tr('Interface'),
@@ -224,7 +345,9 @@ function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo)
     ));
 
     $oGrid->pagingShow(false);
-    $oGrid->setURL(array('menu' => $module_name));
+    $url = array('menu' => $module_name);
+    if ($family !== '') $url['family'] = $family;
+    $oGrid->setURL($url);
 
     // Mapa id de puerto => nombre, para mostrar los detalles de las reglas.
     $portNames = array();
@@ -242,32 +365,43 @@ function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo)
     );
 
     // El primer argumento es el límite de paginación, no la base de order.
-    $result = $isGeo ? $pRules->ObtainRulesGEOIP(100000, 0) : $pRules->ObtainRules(100000, 0);
+    $result = $isGeo ? $pRules->ObtainRulesGEOIP(100000, 0, $family) : $pRules->ObtainRules(100000, 0, $family);
     $data = array();
+    $position = 0;
     if (is_array($result)) {
         foreach ($result as $row) {
+            $position++;
             $id = (int)$row['id'];
             $activated = ($row['activated'] == '1');
-            $order = fwRuleOrder($row);
+            // Con el filtro en "Todas" se muestra el orden real (una sola
+            // secuencia global). Filtrada una familia, el número global
+            // confunde (arranca donde terminó la otra), así que se muestra el
+            // correlativo dentro de la familia.
+            $order = ($family === '') ? fwRuleOrder($row) : $position;
 
-            $arrTmp[0] = "<input type='checkbox' name='del_x[]' value='".$id."'>";
-            $arrTmp[1] = $order;
+            $arrTmp = array();
+            $arrTmp[] = "<input type='checkbox' name='del_x[]' value='".$id."'>";
+            $arrTmp[] = $order;
+
+            $rowFamily = ((string)($row['family'] ?? '') === 'inet6') ? 'inet6' : 'inet';
+            $arrTmp[] = '<span class="fw-family fw-family--'.$rowFamily.'">'
+                      . htmlspecialchars(fwFamilyLabel($rowFamily), ENT_COMPAT, 'UTF-8').'</span>';
 
             $traffic = (string)$row['traffic'];
             if (isset($trafficIcons[$traffic])) {
                 $label = htmlspecialchars(_tr($traffic), ENT_COMPAT, 'UTF-8');
-                $arrTmp[2] = '<span class="fw-traffic '.$trafficIcons[$traffic]['class'].'"'
+                $arrTmp[] = '<span class="fw-traffic '.$trafficIcons[$traffic]['class'].'"'
                            . ' role="img" aria-label="'.$label.'" title="'.$label.'">'
                            . '<i class="ti '.$trafficIcons[$traffic]['icon'].'" aria-hidden="true"></i>'
                            . '</span>';
             } else {
-                $arrTmp[2] = htmlspecialchars($traffic, ENT_COMPAT, 'UTF-8');
+                $arrTmp[] = htmlspecialchars($traffic, ENT_COMPAT, 'UTF-8');
             }
 
             $target = (string)$row['target'];
             $targetFile = ($target === 'ACCEPT') ? 'target_accept.gif' : 'target_drop.gif';
             $targetLabel = htmlspecialchars(_tr($target), ENT_COMPAT, 'UTF-8');
-            $arrTmp[3] = '<img class="fw-icon" src="modules/'.$module_name.'/images/'.$targetFile
+            $arrTmp[] = '<img class="fw-icon" src="modules/'.$module_name.'/images/'.$targetFile
                        . '" alt="'.$targetLabel.'" title="'.$targetLabel.'">';
 
             $iface = '';
@@ -276,34 +410,41 @@ function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo)
                 if ($iface !== '') $iface .= '<br>';
                 $iface .= _tr('OUTPUT').': '.htmlspecialchars((string)$row['eth_out'], ENT_COMPAT, 'UTF-8');
             }
-            $arrTmp[4] = $iface;
+            $arrTmp[] = $iface;
 
-            $arrTmp[5] = htmlspecialchars((string)$row['ip_source'], ENT_COMPAT, 'UTF-8');
-            $arrTmp[6] = htmlspecialchars((string)$row['ip_destiny'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[] = htmlspecialchars((string)$row['ip_source'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[] = htmlspecialchars((string)$row['ip_destiny'], ENT_COMPAT, 'UTF-8');
 
             if ((string)$row['protocol'] === 'GEOIP') {
-                $arrTmp[7] = '<span class="fw-protocol" title="GEOIP"><i class="ti ti-world"></i>'
+                $arrTmp[] = '<span class="fw-protocol" title="GEOIP"><i class="ti ti-world"></i>'
                            . '<span class="fw-sr-only">GEOIP</span></span>';
             } else {
-                $arrTmp[7] = htmlspecialchars((string)$row['protocol'], ENT_COMPAT, 'UTF-8');
+                $arrTmp[] = htmlspecialchars((string)$row['protocol'], ENT_COMPAT, 'UTF-8');
             }
 
-            $arrTmp[8] = ruleDetails($row, $portNames);
+            $arrTmp[] = ruleDetails($row, $portNames);
 
             $checked = $activated ? ' checked="checked"' : '';
-            $arrTmp[9] = '<div class="form-check form-switch fw-switch">'
+            $arrTmp[] = '<div class="form-check form-switch fw-switch">'
                        . '<input type="checkbox" class="form-check-input fw-toggle" role="switch" data-id="'.$id.'"'
                        . $checked.' aria-label="'.htmlspecialchars(_tr("Activated"), ENT_COMPAT, 'UTF-8').'"></div>';
 
-            $arrTmp[10] = '<span class="fw-drag" draggable="true" tabindex="0" role="button" data-id="'.$id.'"'
-                        . ' data-grid="'.($isGeo ? 'geoip' : 'rules').'"'
-                        . ' title="'.htmlspecialchars(_tr("Drag to reorder"), ENT_COMPAT, 'UTF-8').'"'
-                        . ' aria-label="'.htmlspecialchars(_tr("Drag to reorder"), ENT_COMPAT, 'UTF-8').'">'
-                        . '<i class="ti ti-grip-vertical"></i></span>'
-                        . '<a class="fw-edit" href="?menu='.$module_name.'&amp;action=edit&amp;id='.$id.'"'
-                        . ' title="'.htmlspecialchars(_tr("Edit"), ENT_COMPAT, 'UTF-8').'"'
-                        . ' aria-label="'.htmlspecialchars(_tr("Edit"), ENT_COMPAT, 'UTF-8').'">'
-                        . '<i class="ti ti-edit"></i></a>';
+            // El arrastre sólo tiene sentido sobre la lista completa: al
+            // filtrar por familia el resto de las filas sigue existiendo y
+            // renumerar 1..N dejaría huecos en la otra familia.
+            $options = '';
+            if ($family === '') {
+                $options .= '<span class="fw-drag" draggable="true" tabindex="0" role="button" data-id="'.$id.'"'
+                          . ' data-grid="'.($isGeo ? 'geoip' : 'rules').'"'
+                          . ' title="'.htmlspecialchars(_tr("Drag to reorder"), ENT_COMPAT, 'UTF-8').'"'
+                          . ' aria-label="'.htmlspecialchars(_tr("Drag to reorder"), ENT_COMPAT, 'UTF-8').'">'
+                          . '<i class="ti ti-grip-vertical"></i></span>';
+            }
+            $options .= '<a class="fw-edit" href="?menu='.$module_name.'&amp;action=edit&amp;id='.$id.'"'
+                      . ' title="'.htmlspecialchars(_tr("Edit"), ENT_COMPAT, 'UTF-8').'"'
+                      . ' aria-label="'.htmlspecialchars(_tr("Edit"), ENT_COMPAT, 'UTF-8').'">'
+                      . '<i class="ti ti-edit"></i></a>';
+            $arrTmp[] = $options;
 
             $data[] = $arrTmp;
         }
@@ -351,14 +492,16 @@ function editRulePage($smarty, $module_name, $local_templates_dir, &$pDB, $arrCo
 
     $src = explode('/', $row['ip_source']);
     $dst = explode('/', $row['ip_destiny']);
+    $rowFamily = ((string)($row['family'] ?? '') === 'inet6') ? 'inet6' : 'inet';
     $values = array(
         'id_traffic'      => $row['traffic'],
+        'family'          => $rowFamily,
         'interface_in'    => $row['eth_in'],
         'interface_out'   => $row['eth_out'],
-        'ip_source'       => isset($src[0]) ? $src[0] : '0.0.0.0',
-        'mask_source'     => isset($src[1]) ? $src[1] : '24',
-        'ip_destin'       => isset($dst[0]) ? $dst[0] : '0.0.0.0',
-        'mask_destin'     => isset($dst[1]) ? $dst[1] : '24',
+        'ip_source'       => isset($src[0]) ? $src[0] : fwFamilyWildcard($rowFamily),
+        'mask_source'     => isset($src[1]) ? $src[1] : ($rowFamily === 'inet6' ? '64' : '24'),
+        'ip_destin'       => isset($dst[0]) ? $dst[0] : fwFamilyWildcard($rowFamily),
+        'mask_destin'     => isset($dst[1]) ? $dst[1] : ($rowFamily === 'inet6' ? '64' : '24'),
         'port_in'         => $row['sport'],
         'port_out'        => $row['dport'],
         'type_icmp'       => $row['icmp_type'],
@@ -381,6 +524,7 @@ function constructForm($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     // Valores por defecto del formulario nuevo.
     $arrValues += array(
         'id_traffic'      => 'INPUT',
+        'family'          => 'inet',
         'id_protocol'     => 'ALL',
         'ip_source'       => '0.0.0.0',
         'mask_source'     => '24',
@@ -397,6 +541,13 @@ function constructForm($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     );
 
     $arrFormRules = createFieldForm($pDB,$arrValues);
+
+    // Los comodines de un formulario nuevo siguen la familia elegida: 0.0.0.0
+    // no es una dirección IPv6 válida y haría fallar el guardado.
+    if ($arrValues['family'] === 'inet6') {
+        if ($arrValues['ip_source'] === '0.0.0.0') { $arrValues['ip_source'] = '::'; $arrValues['mask_source'] = '0'; }
+        if ($arrValues['ip_destin'] === '0.0.0.0') { $arrValues['ip_destin'] = '::'; $arrValues['mask_destin'] = '0'; }
+    }
 
     // Recuadro rojo por campo, conservando form-control.
     $errors = isset($arrValues['errors']) ? $arrValues['errors'] : array();
@@ -526,6 +677,15 @@ function createFieldForm($pDB,$arrValues = array())
     }
 
     $arrFields = array(
+        "family"          => array( "LABEL"                  => _tr("Family"),
+            "REQUIRED"               => "yes",
+            "INPUT_TYPE"             => "SELECT",
+            "INPUT_EXTRA_PARAM"      => array('inet' => 'IPv4', 'inet6' => 'IPv6'),
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "ONCHANGE"               => "showElementByFamily();",
+            "EDITABLE"               => "yes",
+            ),
         "interface_in"    => array( "LABEL"                  => _tr("Interface IN"),
             "REQUIRED"               => "no",
             "INPUT_TYPE"             => "SELECT",
@@ -686,6 +846,16 @@ function validateRuleInput(&$values)
     if (!in_array($traffic, array('INPUT','OUTPUT','FORWARD'), true))
         $errors['id_traffic'] = sprintf(_tr('%s is invalid'), _tr('Traffic'));
 
+    // La familia manda en la validación de direcciones: una regla IPv6 con una
+    // IP IPv4 (o al revés) no se puede emitir sin perder el matcher.
+    $family = isset($values['family']) ? (string)$values['family'] : 'inet';
+    if (!in_array($family, array('inet', 'inet6'), true)) {
+        $errors['family'] = sprintf(_tr('%s is invalid'), _tr('Family'));
+        $family = 'inet';
+    }
+    $isV6 = ($family === 'inet6');
+    $wildcard = fwFamilyWildcard($family);
+
     if ($traffic == 'INPUT' || $traffic == 'FORWARD') {
         if (empty($values['interface_in'])) $errors['interface_in'] = sprintf(_tr('%s is required'), _tr('Interface IN'));
     }
@@ -695,19 +865,22 @@ function validateRuleInput(&$values)
 
     foreach (array('ip_source' => 'IP Source', 'ip_destin' => 'IP Destiny') as $f => $label) {
         $v = isset($values[$f]) ? trim((string)$values[$f]) : '';
-        if ($v !== '' && !filter_var($v, FILTER_VALIDATE_IP))
+        if ($v === '') continue;
+        $flag = $isV6 ? FILTER_FLAG_IPV6 : FILTER_FLAG_IPV4;
+        if (!filter_var($v, FILTER_VALIDATE_IP, $flag))
             $errors[$f] = sprintf(_tr('%s is invalid'), _tr($label));
     }
+    $maxMask = $isV6 ? 128 : 32;
     foreach (array('mask_source' => 'Mask', 'mask_destin' => 'Mask') as $f => $label) {
         $v = isset($values[$f]) ? trim((string)$values[$f]) : '';
-        if ($v !== '' && (!preg_match('/^[0-9]{1,2}$/', $v) || (int)$v > 32))
+        if ($v !== '' && (!preg_match('/^[0-9]{1,3}$/', $v) || (int)$v > $maxMask))
             $errors[$f] = sprintf(_tr('%s is invalid'), _tr($label));
     }
     // Una IP concreta con máscara 0 no es una regla válida.
-    if (!empty($values['ip_source']) && $values['ip_source'] !== '0.0.0.0'
+    if (!empty($values['ip_source']) && $values['ip_source'] !== $wildcard
         && isset($values['mask_source']) && (string)$values['mask_source'] === '0')
         $errors['mask_source'] = _tr('Wrong Mask');
-    if (!empty($values['ip_destin']) && $values['ip_destin'] !== '0.0.0.0'
+    if (!empty($values['ip_destin']) && $values['ip_destin'] !== $wildcard
         && isset($values['mask_destin']) && (string)$values['mask_destin'] === '0')
         $errors['mask_destin'] = _tr('Wrong Mask');
 
@@ -787,6 +960,7 @@ function fwAuditRuleDetails(&$pDB, $ruleId, $errMsg = '')
         $details['protocol']  = $row['protocol'];
         $details['target']    = $row['target'];
         $details['activated'] = ((string)$row['activated'] === '1') ? 'on' : 'off';
+        $details['family']    = ((string)($row['family'] ?? '') === 'inet6') ? 'inet6' : 'inet';
         if ((string)$row['eth_in'] !== '')  $details['iface_in']  = $row['eth_in'];
         if ((string)$row['eth_out'] !== '') $details['iface_out'] = $row['eth_out'];
         $details['src'] = ((string)$row['ip_source'] !== '') ? $row['ip_source'] : 'ANY';
@@ -852,6 +1026,9 @@ function saveRulePage($smarty, $module_name, $local_templates_dir, &$pDB, $arrCo
     $id = trim((string)getParameter('id'));
     $traffic = getParameter('id_traffic');
     $protocol = getParameter('id_protocol');
+    $family = (string)getParameter('family');
+    $family = ($family === 'inet6') ? 'inet6' : 'inet';
+    $wildcard = fwFamilyWildcard($family);
     $ip_source = trim((string)getParameter('ip_source'));
     $ip_destin = trim((string)getParameter('ip_destin'));
     $mask_source = trim((string)getParameter('mask_source'));
@@ -863,11 +1040,12 @@ function saveRulePage($smarty, $module_name, $local_templates_dir, &$pDB, $arrCo
         'id'              => $id,
         'id_traffic'      => $traffic,
         'traffic'         => $traffic,
+        'family'          => $family,
         'interface_in'    => getParameter('interface_in'),
         'interface_out'   => getParameter('interface_out'),
-        'ip_source'       => $ip_source === '' ? '0.0.0.0' : $ip_source,
+        'ip_source'       => $ip_source === '' ? $wildcard : $ip_source,
         'mask_source'     => $mask_source,
-        'ip_destin'       => $ip_destin === '' ? '0.0.0.0' : $ip_destin,
+        'ip_destin'       => $ip_destin === '' ? $wildcard : $ip_destin,
         'mask_destin'     => $mask_destin,
         'port_in'         => getParameter('port_in'),
         'port_out'        => getParameter('port_out'),
@@ -910,22 +1088,25 @@ function saveRulePage($smarty, $module_name, $local_templates_dir, &$pDB, $arrCo
         return constructForm($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $values, $id === '' ? 'new' : 'edit');
     }
 
-    // Normaliza red/máscara igual que la versión anterior.
+    // Normaliza red/máscara igual que la versión anterior. getNetAdress() es
+    // IPv4 puro: en IPv6 se guarda el CIDR tal como lo escribió el operador.
     $pNet = new paloNetwork();
     $pRules = new paloSantoRules($pDB);
-    $ip_source = ($values['ip_source'] == '') ? '0.0.0.0' : $values['ip_source'];
-    $ip_destin = ($values['ip_destin'] == '') ? '0.0.0.0' : $values['ip_destin'];
-    if ($ip_source != '0.0.0.0' && $values['mask_source'] !== '' && $values['mask_source'] !== '0') {
-        $ip_source = $pNet->getNetAdress($ip_source, $values['mask_source']);
-    }
-    if ($ip_destin != '0.0.0.0' && $values['mask_destin'] !== '' && $values['mask_destin'] !== '0') {
-        $ip_destin = $pNet->getNetAdress($ip_destin, $values['mask_destin']);
+    $ip_source = ($values['ip_source'] == '') ? $wildcard : $values['ip_source'];
+    $ip_destin = ($values['ip_destin'] == '') ? $wildcard : $values['ip_destin'];
+    if ($values['family'] !== 'inet6') {
+        if ($ip_source != $wildcard && $values['mask_source'] !== '' && $values['mask_source'] !== '0') {
+            $ip_source = $pNet->getNetAdress($ip_source, $values['mask_source']);
+        }
+        if ($ip_destin != $wildcard && $values['mask_destin'] !== '' && $values['mask_destin'] !== '0') {
+            $ip_destin = $pNet->getNetAdress($ip_destin, $values['mask_destin']);
+        }
     }
     // saveRule()/updateRule() añaden la máscara: se pasan por separado.
     $values['ip_source'] = $ip_source;
     $values['ip_destin'] = $ip_destin;
-    if ($ip_source == '0.0.0.0') $values['mask_source'] = '0';
-    if ($ip_destin == '0.0.0.0') $values['mask_destin'] = '0';
+    if ($ip_source == $wildcard) $values['mask_source'] = '0';
+    if ($ip_destin == $wildcard) $values['mask_destin'] = '0';
 
     // Sólo se guardan los campos que aplican al tráfico y al protocolo.
     if ($values['traffic'] != 'OUTPUT' && $values['traffic'] != 'FORWARD') $values['interface_out'] = null;
@@ -950,6 +1131,7 @@ function saveRulePage($smarty, $module_name, $local_templates_dir, &$pDB, $arrCo
         issabelFwAudit::log($isNew ? 'rule.create' : 'rule.update', 'error', array(
             'id'       => $id,
             'traffic'  => $values['traffic'],
+            'family'   => $values['family'],
             'protocol' => $values['protocol'],
             'target'   => $values['target'],
             'msg'      => $pRules->errMsg,
@@ -999,6 +1181,14 @@ function reorderRules(&$pDB)
     $ids = json_decode((string)getParameter('ids'), true);
     $isGeo = ((int)getParameter('geoip') === 1);
     $audit = array('geoip' => $isGeo ? 1 : 0, 'count' => is_array($ids) ? count($ids) : 0);
+
+    // Con la grilla filtrada por familia, renumerar 1..N dejaría huecos en la
+    // otra familia. El arrastre sólo se ofrece con todas las reglas visibles.
+    if (fwFamilyFilter() !== '') {
+        issabelFwAudit::log('rule.reorder', 'error', $audit + array('msg' => 'reorder requires all families visible'));
+        echo json_encode(array('status' => 'error', 'message' => _tr('The order can only be changed with all rules visible')));
+        return NULL;
+    }
 
     if (!is_array($ids) || count($ids) === 0) {
         issabelFwAudit::log('rule.reorder', 'error', $audit + array('msg' => 'missing rule list'));
@@ -1115,6 +1305,30 @@ function activateFirewall($smarty, $module_name, $local_templates_dir, &$pDB, $a
     return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
 }
 
+/**
+ * Enciende o apaga el filtrado IPv6 (opt-in). El cambio sólo queda guardado:
+ * las cadenas de ip6tables se cargan o se retiran al pulsar "Aplicar".
+ */
+function toggleIpv6($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf, $enable)
+{
+    $pRules = new paloSantoRules($pDB);
+    $ok = $pRules->setIpv6Enabled($enable);
+    $event = $enable ? 'firewall.ipv6.enable' : 'firewall.ipv6.disable';
+
+    $audit = array('enabled' => $enable ? 'on' : 'off');
+    if (!$ok) $audit['msg'] = $pRules->errMsg;
+    issabelFwAudit::log($event, $ok ? 'ok' : 'error', $audit);
+
+    if ($ok) {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"),
+            $enable ? _tr("IPv6 filtering is enabled. Press Apply changes to load it.")
+                    : _tr("IPv6 filtering is disabled. Press Apply changes to remove it.")));
+    } else {
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pRules->errMsg));
+    }
+    return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+}
+
 function desactivateFirewall($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
 {
     $pRules = new paloSantoRules($pDB);
@@ -1189,6 +1403,8 @@ function getAction()
     else if($isPost && getParameter("delete"))     return "delete";
     else if($isPost && getParameter("activatefirewall")) return "activatefirewall";
     else if($isPost && getParameter("desactivatefirewall")) return "desactivatefirewall";
+    else if($isPost && getParameter("enableipv6")) return "enableipv6";
+    else if($isPost && getParameter("disableipv6")) return "disableipv6";
     else if($isPost && getParameter("activate"))   return "activate";
     else if($isPost && getParameter("deactivate")) return "deactivate";
     else if($isPost && getParameter("reorder"))    return "reorder";

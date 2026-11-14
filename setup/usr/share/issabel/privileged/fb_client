@@ -51,9 +51,12 @@ function jailstatus($jail) {
 
     exec("/usr/bin/fail2ban-client status ".escapeshellarg($jail),$result,$status);
     if($status == 0){
+	$ips = '';
 	foreach($result as $value) {
             if(preg_match("/Banned IP/",$value)) {
-                $partes = preg_split("/:/",$value);
+                // Límite 2: las direcciones IPv6 llevan ':' y partir en todos
+                // los ':' truncaba la lista ("2001:db8::1" quedaba en "2001").
+                $partes = preg_split("/:/",$value,2);
                 $ips = trim($partes[1]);
             } 
         }

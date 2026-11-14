@@ -32,6 +32,50 @@ function showElementByTraffic() {
     setSpan('id_interface_out', both ? 2 : 4, both ? 3 : 6);
 }
 
+/*
+ * Familia de la regla en edición. Sólo hay dos valores: una regla pertenece a
+ * una única familia (`both` todavía no se expone).
+ */
+function fwFamily() {
+    var el = document.querySelector('[name="family"]');
+    return (el && el.value === 'inet6') ? 'inet6' : 'inet';
+}
+
+/*
+ * Ajusta el formulario a la familia: comodines de ejemplo y límite de máscara.
+ * El tipo ICMP de IPv4 no se puede reutilizar en IPv6 (los números de tipo son
+ * otros), así que con IPv6 el selector queda oculto.
+ */
+function showElementByFamily() {
+    var v6 = (fwFamily() === 'inet6');
+    var ipPlaceholder = v6 ? '::' : '0.0.0.0';
+    var maskPlaceholder = v6 ? '64' : '24';
+
+    // Al cambiar de familia, el comodín del otro protocolo no es una dirección
+    // válida: se cambia por el de la familia elegida en vez de dejar un valor
+    // que el servidor va a rechazar.
+    [['ip_source', 'mask_source'], ['ip_destin', 'mask_destin']].forEach(function (ids) {
+        var ip = document.getElementById(ids[0]);
+        var mask = document.getElementById(ids[1]);
+        if (!ip) return;
+        if (v6 && ip.value === '0.0.0.0') {
+            ip.value = '::';
+            if (mask) mask.value = '0';
+        } else if (!v6 && ip.value === '::') {
+            ip.value = '0.0.0.0';
+            if (mask) mask.value = '0';
+        }
+    });
+
+    [['ip_source', ipPlaceholder], ['ip_destin', ipPlaceholder],
+     ['mask_source', maskPlaceholder], ['mask_destin', maskPlaceholder]].forEach(function (pair) {
+        var el = document.getElementById(pair[0]);
+        if (el) el.placeholder = pair[1];
+    });
+
+    showElementByProtocol();
+}
+
 function showElementByProtocol() {
     var protocol = document.querySelector('[name="id_protocol"]');
     var value = protocol ? protocol.value : 'ALL';
@@ -45,7 +89,7 @@ function showElementByProtocol() {
 
     setDisplay('id_port_in', value === 'TCP' || value === 'UDP');
     setDisplay('id_port_out', value === 'TCP' || value === 'UDP');
-    setDisplay('id_type_icmp', value === 'ICMP');
+    setDisplay('id_type_icmp', value === 'ICMP' && fwFamily() !== 'inet6');
     setDisplay('id_id_ip', value === 'IP');
     setDisplay('id_established', value === 'STATE');
     setDisplay('id_related', value === 'STATE');
@@ -168,6 +212,21 @@ jQuery(function ($) {
     $('#fw_discard').on('click', function () {
         if (!confirmSubmit($(this).data('confirm'))) return;
         fwSubmit({ discardchanges: 1 });
+    });
+
+    /*
+     * Switch de IPv6 (opt-in). No aplica nada por sí solo: guarda el flag y
+     * deja el firewall pendiente hasta que el operador pulse "Aplicar".
+     */
+    $('#fw_ipv6').on('change', function () {
+        var $toggle = $(this);
+        var enabled = $toggle.is(':checked');
+        var message = enabled ? $toggle.data('on-confirm') : $toggle.data('off-confirm');
+        if (!confirmSubmit(message)) {
+            $toggle.prop('checked', !enabled);
+            return;
+        }
+        fwSubmit(enabled ? { enableipv6: 1 } : { disableipv6: 1 });
     });
 
     $(document).on('change', '.fw-toggle', function () {

@@ -71,12 +71,13 @@ function fail2ban_rejected()
     $id=0;    
     $rejected=array();
     foreach($allban as $jail=>$content) {
-        if(strlen($content)){
-            $allbanarr = explode(" ",$content);
-            foreach ($allbanarr as $v) {
-                $rejected[]=array("id"=>$id,"jail"=>$jail,"ip"=>$v);
-                $id++;
-            }
+        // preg_split: la salida de fb_client es una lista separada por espacios
+        // y puede traer espacios repetidos. Un token vacío sería una fila sin
+        // IP que después no se puede desbanear.
+        foreach (preg_split('/\s+/', trim($content)) as $v) {
+            if ($v === '') continue;
+            $rejected[]=array("id"=>$id,"jail"=>$jail,"ip"=>$v);
+            $id++;
         }
     }
     
@@ -135,7 +136,8 @@ function reportBloqueados($smarty, $module_name, $local_templates_dir, &$pDB, $a
 }
 
 /**
- * Clasifica una IP por rangos reservados (RFC 1918/5737/6598/3927 y CICNet).
+ * Clasifica una IP por rangos reservados (RFC 1918/5737/6598/3927 y CICNet en
+ * IPv4; loopback, link-local, ULA, documentación y multicast en IPv6).
  *
  * La geolocalización por IP se retiró en Issabel 6: la extensión PHP que la
  * resolvía (php-pecl-geoip) depende de libGeoIP, retirada upstream en 2019 y
@@ -151,9 +153,9 @@ function _getCountryLabel($ip)
         return "";
     }
 
-    // ip2long() no maneja IPv6: se resuelve antes de convertir.
+    // ip2long() no maneja IPv6: se clasifica por prefijo de 16 bytes.
     if ( filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ) {
-        return _tr("IPv6 address");
+        return _tr(_ipv6RangeLabel($ip));
     }
 
     $n = ip2long($ip);
@@ -188,6 +190,36 @@ function _getCountryLabel($ip)
     }
 
     return _tr("Public address");
+}
+
+/**
+ * Clasifica una dirección IPv6 por rango, con el mismo criterio que la tabla
+ * de IPv4 de arriba. Devuelve la clave de traducción (inglés) y el llamador
+ * la pasa por _tr().
+ *
+ * @param  string $ip
+ * @return string
+ */
+function _ipv6RangeLabel($ip)
+{
+    $packed = @inet_pton($ip);
+    if ( $packed === false || strlen($packed) !== 16 ) {
+        return "IPv6 address";
+    }
+
+    $b0 = ord($packed[0]);
+    $b1 = ord($packed[1]);
+
+    if ( $packed === inet_pton('::1') ) return "Loopback";
+    if ( $packed === inet_pton('::') )  return "Reserved";
+    if ( $b0 === 0xfe && ( $b1 & 0xc0 ) === 0x80 ) return "Link local";      // fe80::/10
+    if ( $b0 === 0xff ) return "Multicast";                                 // ff00::/8
+    if ( ( $b0 & 0xfe ) === 0xfc ) return "Private network";                // fc00::/7
+    if ( substr($packed, 0, 4) === "\x20\x01\x0d\xb8" ) return "Documentation"; // 2001:db8::/32
+    if ( ( $b0 & 0xe0 ) === 0x20 ) return "Public address";                 // 2000::/3
+
+    // Enlaces locales de otro tipo, IPv4-mapped, 6to4, Teredo, etc.
+    return "IPv6 address";
 }
 
 function deleteBloqueados($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)

@@ -223,6 +223,10 @@ function savewhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     $note       = isset($_POST['note']) ? trim((string)$_POST['note']) : '';
     $old_ip     = isset($_POST['id']) ? trim((string)$_POST['id']) : '';
     $action     = $isEdit ? 'edit' : 'new';
+    // IPv6 en forma canónica: si no, la misma dirección escrita de otra manera
+    // pasa el control de duplicados y el set termina con dos filas para un
+    // solo elemento.
+    if ($ip_address !== '') $ip_address = $oIssa->normalizeEntry($ip_address);
 
     $errors = array();
     if ($ip_address === '') {
@@ -270,7 +274,7 @@ function createFieldForm(){
         "ip_address" => array("LABEL"                  => _tr("IP Address"),
                               "REQUIRED"               => "yes",
                               "INPUT_TYPE"             => "TEXT",
-                              "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "placeholder" => "192.168.1.0/24"),
+                              "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "placeholder" => "192.168.1.0/24, 2001:db8::/32"),
                               "VALIDATION_TYPE"        => "text",
                               "VALIDATION_EXTRA_PARAM" => ""),
             "note" => array(  "LABEL"                  => _tr("Note"),

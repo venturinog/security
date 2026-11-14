@@ -34,6 +34,7 @@ $arrLangModule = array(
     'Edit IP Address' => 'Editar dirección IP',
     'IP Address' => 'Dirección IP',
     'Invalid Format' => 'Formato no válido',
+    'The IP address could not be added to the firewall' => 'No se pudo agregar la dirección IP al firewall',
     'Message' => 'Mensaje',
     'No records were selected' => 'No se seleccionaron registros',
     'Note' => 'Nota',

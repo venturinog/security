@@ -112,6 +112,8 @@ class Issabelwhitelist{
 
     function savewhitelist($ip_address,$note)
     {
+        // La base guarda siempre la forma canónica (ver normalizeEntry()).
+        $ip_address = $this->normalizeEntry($ip_address);
         $query = "INSERT INTO whitelist (ip_address,note) VALUES ( ?, ? )";
 
         $result = $this->_DB->genQuery($query,array($ip_address, $note));
@@ -126,6 +128,11 @@ class Issabelwhitelist{
         exec($sComando, $output, $ret);
 
         if ($ret != 0) {
+            // No dejar la fila guardada si el firewall no aceptó la entrada:
+            // la lista y el set quedarían desincronizados.
+            $this->errMsg = trim(implode(' ', $output));
+            if ($this->errMsg === '') $this->errMsg = _tr('The IP address could not be added to the firewall');
+            $this->_DB->genQuery("DELETE FROM whitelist WHERE ip_address=?", array($ip_address));
             return FALSE;
         }
         return TRUE;
@@ -135,10 +142,14 @@ class Issabelwhitelist{
     /**
      * Actualiza una entrada de la whitelist. Si cambia la IP hay que reflejarlo
      * también en el firewall (quitar la vieja y añadir la nueva).
+     *
+     * La comparación es canónica: `2001:DB8::1` y `2001:db8::1` son la misma
+     * dirección y no deben provocar un alta y una baja del mismo elemento.
      */
     function updatewhitelist($old_ip, $ip_address, $note)
     {
-        if ($old_ip === $ip_address) {
+        $ip_address = $this->normalizeEntry($ip_address);
+        if ($this->normalizeEntry($old_ip) === $ip_address) {
             $query = "UPDATE whitelist SET note=? WHERE ip_address=?";
             $result = $this->_DB->genQuery($query, array($note, $old_ip));
             if ($result == FALSE) {
@@ -159,33 +170,57 @@ class Issabelwhitelist{
         return TRUE;
     }
 
+    /**
+     * Forma canónica de una entrada: IPv6 comprimido y en minúsculas, prefijo
+     * tal cual. La tabla es UNIQUE sólo por texto, así que sin esto
+     * `2001:DB8::1` y `2001:db8::1` se guardarían como dos filas que en el set
+     * son el mismo elemento (y borrar una dejaría la otra sin efecto).
+     */
+    function normalizeEntry($value)
+    {
+        $value = trim((string)$value);
+        $parts = explode('/', $value);
+        $packed = @inet_pton($parts[0]);
+        if ($packed === false) return $value;
+        $address = inet_ntop($packed);
+        if (strpos($address, ':') !== false) $address = strtolower($address);
+        if (count($parts) === 2 && $parts[1] !== '') return $address.'/'.$parts[1];
+        return $address;
+    }
+
+    /**
+     * Validación de una entrada de la whitelist: IPv4 o IPv6, con prefijo
+     * opcional. Devuelve '' si es válida o el mensaje de error.
+     *
+     * El comodín de cada familia (0.0.0.0 y ::) se rechaza: la whitelist se
+     * inserta al principio de INPUT, así que aceptar "todo" allana el firewall.
+     */
     function validateIpOrMask($variable) {
+        $value = trim((string)$variable);
+        if ($value === '') return _tr("Invalid Format");
 
-        $error = "";
-        if(!preg_match("/^([[:digit:]]{1,3})\.([[:digit:]]{1,3})\.([[:digit:]]{1,3})\.([[:digit:]]{1,3})$/", $variable, $arrReg)) {
+        $parts = explode('/', $value);
+        if (count($parts) > 2) return _tr("Invalid Format");
 
-            if(!preg_match("/^([[:digit:]]{1,3})\.([[:digit:]]{1,3})\.([[:digit:]]{1,3})\.([[:digit:]]{1,3})\/([[:digit:]]{1,2})$/", $variable, $arrReg)) {
-                $error = _tr("Invalid Format");
-            } else {
-                if(($arrReg[1]<=255) and ($arrReg[1]>0) and ($arrReg[2]<=255) and ($arrReg[2]>=0) and
-                    ($arrReg[3]<=255) and ($arrReg[3]>=0) and ($arrReg[4]<=255) and ($arrReg[4]>=0) and
-                    ($arrReg[5]>=0) and ($arrReg[5]<=32)) {
-                    $return = true;
-                } else {
-                    $error = _tr("Invalid Format");
-                }
-            }
+        $address = $parts[0];
+        $isV6 = (strpos($address, ':') !== false);
+        $flag = $isV6 ? FILTER_FLAG_IPV6 : FILTER_FLAG_IPV4;
+        if (!filter_var($address, FILTER_VALIDATE_IP, $flag)) return _tr("Invalid Format");
 
-        } else {
-            if(($arrReg[1]<=255) and ($arrReg[1]>0) and ($arrReg[2]<=255) and ($arrReg[2]>=0) and
-               ($arrReg[3]<=255) and ($arrReg[3]>=0) and ($arrReg[4]<=255) and ($arrReg[4]>=0)) {
-                $return = true;
-            } else {
-                $error = _tr("Invalid Format");
-            }
+        $prefix = null;
+        if (count($parts) === 2) {
+            $max = $isV6 ? 128 : 32;
+            if (!preg_match('/^[0-9]{1,3}$/', $parts[1]) || (int)$parts[1] > $max)
+                return _tr("Invalid Format");
+            $prefix = (int)$parts[1];
         }
-        return $error;
 
+        // Sólo se bloquea el comodín que cubre todo; 0.0.0.0/1 o ::/1 son
+        // redes válidas aunque nadie debería usarlas aquí.
+        if (($address === '0.0.0.0' || $address === '::') && ($prefix === null || $prefix === 0))
+            return _tr("Invalid Format");
+
+        return "";
     }
 
     public function checkTable() {

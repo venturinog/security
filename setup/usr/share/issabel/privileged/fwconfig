@@ -30,8 +30,10 @@ $opt = Console_Getopt::getopt($argv, '', array(
     'flush',  // Remove all firewall rules from iptables
     'load',   // Load all firewall rules from database
     'isactive',
+    'isactive6',
     'save_wl',
     'isactivegeoip',
+    'isactivegeoip6',
     'listgeoblocked',
     'listgeopass',
     'listfail2banblocked',
@@ -51,8 +53,12 @@ case '--load':
     exit(action_loadFirewall($opt) ? 0 : 1);
 case '--isactive':
     exit(action_isactive() ? 0 : 1);
+case '--isactive6':
+    exit(action_isactive6() ? 0 : 1);
 case '--isactivegeoip':
     exit(isactivegeoip() ? 0 : 1);
+case '--isactivegeoip6':
+    exit(isactivegeoip6() ? 0 : 1);
 case '--listgeoblocked':
     exit(listgeoblocked() ? 0 : 1);
 case '--listfail2banblocked':
@@ -88,14 +94,17 @@ function action_flushFirewall($opt)
     file_put_contents("/etc/sysconfig/iptables",""); // Se blanque ese archivo para que no se vuelvan a cargar las reglas al reiniciar el servidor
     $ret = NULL;
     foreach (array(
-        '/sbin/iptables -F',
-        '/sbin/iptables -X',
-        '/sbin/iptables -Z',
-        '/sbin/iptables -t nat -F',
+        '/usr/sbin/iptables -F',
+        '/usr/sbin/iptables -X',
+        '/usr/sbin/iptables -Z',
+        '/usr/sbin/iptables -t nat -F',
         ) as $cmd) {
         system($cmd, $ret);
         if ($ret) return FALSE;
     }
+    // IPv6 se retira solo si el firewall de Issabel estaba cargado: si el
+    // operador nunca lo encendio, no se tocan reglas v6 de terceros.
+    if (_fwFamilyLoaded('inet6')) _fwTeardownFamily('inet6');
     manageF2B('same');
     return TRUE;
 }
@@ -104,18 +113,22 @@ function action_flushFirewall($opt)
 function action_loadFirewall($opt)
 {
 
-    $dispGEOIP = geoip_available();
+    $dispGEOIP  = FALSE;   // se resuelve por familia tras leer la base
+    $dispGEOIP6 = FALSE;
 
     $bExito = TRUE;
     $bFirewallActivo = FALSE;
+    $bIpv6 = FALSE;
+    // Cadenas por familia. Los nombres se repiten porque iptables e ip6tables
+    // son tablas independientes; el mapa es el mismo para las dos y las
+    // cadenas _GEOIP existen tambien en IPv6 desde F6.
     $issabelChains = array(
-        'INPUT'     =>   'ISSABEL_F2B',
-        'INPUT'     =>  'ISSABEL_INPUT',
-        'OUTPUT'    =>  'ISSABEL_OUTPUT',
-        'FORWARD'   =>  'ISSABEL_FORWARD',
-        'ISSABEL_INPUT'   =>   'ISSABEL_INPUT_GEOIP',
-        'ISSABEL_OUTPUT'  =>   'ISSABEL_OUTPUT_GEOIP',
-        'ISSABEL_FORWARD'  =>   'ISSABEL_FORWARD_GEOIP'
+        'INPUT'           =>  'ISSABEL_INPUT',
+        'OUTPUT'          =>  'ISSABEL_OUTPUT',
+        'FORWARD'         =>  'ISSABEL_FORWARD',
+        'ISSABEL_INPUT'   =>  'ISSABEL_INPUT_GEOIP',
+        'ISSABEL_OUTPUT'  =>  'ISSABEL_OUTPUT_GEOIP',
+        'ISSABEL_FORWARD' =>  'ISSABEL_FORWARD_GEOIP'
     );
 
     $rules = array();
@@ -133,12 +146,18 @@ function action_loadFirewall($opt)
         }
 
         $conn = new PDO('sqlite:/var/www/db/iptables.db');
-        // Fix missing 'filter.state' field in some Issabel installations
+        // Fix missing fields in some Issabel installations. Van con guarda para
+        // no repetir el ALTER del version_sql (una instalacion limpia aplica
+        // esquema y migraciones, y SQLite aborta por columna duplicada).
         $sth = $conn->query('SELECT * FROM filter LIMIT 1');
         $rules = $sth->fetchAll(PDO::FETCH_ASSOC);
         if (count($rules) > 0 && !array_key_exists('state', $rules[0])) {
             fputs(STDERR, "DEBUG: arreglando filter.state faltante...\n");
             $conn->query('ALTER TABLE filter ADD COLUMN state varchar(50)');
+        }
+        if (count($rules) > 0 && !array_key_exists('family', $rules[0])) {
+            fputs(STDERR, "DEBUG: arreglando filter.family faltante...\n");
+            $conn->query("ALTER TABLE filter ADD COLUMN family TEXT NOT NULL DEFAULT 'inet'");
         }
         $rules = array();
 
@@ -155,10 +174,16 @@ function action_loadFirewall($opt)
         }
         $rules = array();
 
-        // Is the firewall active?
-        $sth = $conn->query('SELECT first_time FROM tmp_execute');
-        foreach ($sth->fetchAll(PDO::FETCH_COLUMN) as $first_time) {
-            $bFirewallActivo = ($first_time == 0);
+        // Is the firewall active? IPv6 has its own opt-in flag and stays off
+        // until the operator turns it on from the rules page.
+        $sth = $conn->query('SELECT * FROM tmp_execute');
+        foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $executeRow) {
+            $bFirewallActivo = ($executeRow['first_time'] == 0);
+            if (array_key_exists('ipv6_enabled', $executeRow)) {
+                $bIpv6 = ($executeRow['ipv6_enabled'] == 1);
+            } else {
+                $conn->query('ALTER TABLE tmp_execute ADD COLUMN ipv6_enabled INTEGER NOT NULL DEFAULT 0');
+            }
         }
 
         if ($bFirewallActivo) {
@@ -213,20 +238,36 @@ PETICION_PK;
             // Read rule configuration from database
             $sth = $conn->query(
                 'SELECT traffic, eth_in, eth_out, ip_source, ip_destiny, protocol, ' .
-                    'sport, dport, target, state, countries, continents ' .
+                    'sport, dport, target, state, countries, continents, family ' .
                 'FROM  filter WHERE activated = 1 ORDER BY rule_order');
             $rules = array_merge($rules, $sth->fetchAll(PDO::FETCH_ASSOC));
         }
 
-        $geoRules = 0;
+        // El matcher y los datos se comprueban por familia: tener los .iv4 no
+        // habilita IPv6 (las reglas no coincidirian y fallarian en silencio).
+        $geoRules4 = 0;
+        $geoRules6 = 0;
         foreach ($rules as $r) {
-            if (isset($r['protocol']) && $r['protocol'] === 'GEOIP') $geoRules++;
+            if (!isset($r['protocol']) || $r['protocol'] !== 'GEOIP') continue;
+            if (_fwRuleFamily($r) === 'inet6') $geoRules6++; else $geoRules4++;
         }
-        if ($geoRules > 0 && !$dispGEOIP) {
-            fputs(STDERR, "GeoIP rules are configured but the geoip match is unavailable.\n"
-                . "Install xtables-addons (>= 3.27 for kernel 6.12) and generate /usr/share/xt_geoip "
-                . "(/etc/cron.daily/geoip_update.sh), then retry.\n");
-            return FALSE;
+        if ($geoRules4 > 0) {
+            $dispGEOIP = geoip_available('inet');
+            if (!$dispGEOIP) {
+                fputs(STDERR, "GeoIP rules are configured but the IPv4 geoip match is unavailable.\n"
+                    . "Install xtables-addons (>= 3.27 for kernel 6.12) and generate /usr/share/xt_geoip "
+                    . "(/etc/cron.daily/geoip_update.sh), then retry.\n");
+                return FALSE;
+            }
+        }
+        if ($geoRules6 > 0 && $bIpv6) {
+            $dispGEOIP6 = geoip_available('inet6');
+            if (!$dispGEOIP6) {
+                fputs(STDERR, "IPv6 GeoIP rules are configured but the IPv6 geoip match or data is unavailable.\n"
+                    . "Install xtables-addons (>= 3.27 for kernel 6.12) and generate /usr/share/xt_geoip "
+                    . "with the .iv6 files (/etc/cron.daily/geoip_update.sh), then retry.\n");
+                return FALSE;
+            }
         }
     } catch (PDOException $e) {            
         $bExito = FALSE;
@@ -234,64 +275,251 @@ PETICION_PK;
     }
 
     // Flush all firewall rules
-
-    // Flush all firewall rules
     if ($bExito) {
-        $ret = NULL;
-        foreach (array(
-            '/sbin/iptables -F',
-            '/sbin/iptables -X',
-            '/sbin/iptables -Z',
-            '/sbin/iptables -t nat -F',
-            ) as $cmd) {
-                system($cmd, $ret);
-                if ($ret) {
-                    $bExito = FALSE;
-                    break;
-                }
-        }
+        $bExito = _fwFlushFamily('inet');
+    }
+
+    // IPv6 se retira cuando el operador lo apaga: sin esto, quitar el switch
+    // dejaria las cadenas v6 cargadas hasta el reinicio.
+    if ($bExito && !$bIpv6 && _fwFamilyLoaded('inet6')) {
+        _fwTeardownFamily('inet6');
+    }
+    if ($bExito && $bIpv6) {
+        $bExito = _fwFlushFamily('inet6');
     }
 
     // Add ISSABEL_XXX chains to iptables configuration if not already present
     if ($bExito && $bFirewallActivo) {
-        $output = $ret = NULL;
-
-        // create white list ipset
-        exec("/usr/sbin/ipset -exist -N issabel_whitelist hash:ip", $output, $ret);
-
-        exec('/sbin/iptables -L -n', $output, $ret);
-        if ($ret) {
-            $bExito = FALSE;    
-        } else {
-            $currentChains = array();
-            foreach ($output as $sLinea) {
-                $regs = NULL;
-                if (preg_match('/^Chain (\S+)/', $sLinea, $regs))
-                    $currentChains[] = $regs[1];
-            }
-            foreach (array_diff($issabelChains, $currentChains) as $key => $sChain) {
-                system("/sbin/iptables -N $sChain", $ret);
-                if ($ret) { $bExito = FALSE; break; }
-                system("/sbin/iptables -A $key -j $sChain", $ret);
-                if ($ret) { $bExito = FALSE; break; }
-            }
-        }
+        // Los sets existen antes que las reglas que los referencian, y con el
+        // tipo correcto: en 5.x eran hash:ip, que no acepta redes.
+        $bExito = _fwEnsureWhitelistSets();
+        if ($bExito) $bExito = _fwCreateChains('inet', $issabelChains);
+        if ($bExito && $bIpv6) $bExito = _fwCreateChains('inet6', $issabelChains);
     }
 
     // Add rules to ISSABEL_XXX chains
-    if ($bExito && $bFirewallActivo) foreach ($rules as $rule) {
+    if ($bExito && $bFirewallActivo) {
+        $bExito = _fwApplyRules($rules, 'inet', $issabelChains, $mycontinent, $conn, $dispGEOIP);
+
+        if ($bExito && $bIpv6) {
+            $bExito = _fwApplyRules($rules, 'inet6', $issabelChains, $mycontinent, $conn, $dispGEOIP6);
+
+            // Default-DENY de IPv6, siempre al final de la cadena: una regla
+            // nueva queda por encima y nadie puede dejar IPv6 en fail-open
+            // borrandolo desde la UI (no es una fila de `filter`).
+            if ($bExito) {
+                $ret = NULL;
+                system('/usr/sbin/ip6tables -A ISSABEL_INPUT -j REJECT', $ret);
+                if (!$ret) system('/usr/sbin/ip6tables -A ISSABEL_FORWARD -j REJECT', $ret);
+                if ($ret) $bExito = FALSE;
+            }
+
+            // Si IPv6 fallo a medias no se deja la familia parcialmente
+            // aplicada: se retira para que el operador pueda reintentar.
+            if (!$bExito) {
+                fputs(STDERR, "ERR: IPv6 rules could not be applied, tearing IPv6 down\n");
+                _fwTeardownFamily('inet6');
+            }
+        }
+    }
+    
+    // Add White List check to INPUT, en las dos familias. Sólo con el firewall
+    // activo: sin cadenas de Issabel no hay nada que exceptuar (y los sets se
+    // crean en ese mismo bloque).
+    if ($bExito && $bFirewallActivo) {
+        $cmd = "/usr/sbin/iptables -I INPUT -m set --match-set issabel_whitelist src -j ACCEPT";
+        system($cmd, $ret);
+        if ($ret) {
+            fputs(STDERR, "ERR: could not hook the IPv4 whitelist into INPUT\n");
+            $bExito = FALSE;
+        }
+        if ($bExito && $bIpv6) {
+            $cmd = "/usr/sbin/ip6tables -I INPUT -m set --match-set issabel_whitelist6 src -j ACCEPT";
+            system($cmd, $ret);
+            if ($ret) {
+                fputs(STDERR, "ERR: could not hook the IPv6 whitelist into INPUT\n");
+                $bExito = FALSE;
+            }
+        }
+    }
+    if ($bExito && $bFirewallActivo) {
+        $bExito = _fwLoadWhitelist($wl);
+    }
+
+    // Save configuration to /etc/sysconfig/iptables
+    if ($bExito) {
+        $output = $ret = NULL;
+        system('/usr/sbin/iptables-save > /etc/sysconfig/iptables', $ret);
+        if ($ret) $bExito = FALSE;
+    }
+    if ($bExito && $bIpv6) {
+        $output = $ret = NULL;
+        system('/usr/sbin/ip6tables-save > /etc/sysconfig/ip6tables', $ret);
+        if ($ret) $bExito = FALSE;
+    }
+
+    // Ensure that iptables will actually be restored on reboot
+    if ($bExito) {
+        $ret = NULL;
+        system('/usr/bin/systemctl enable iptables.service', $ret);
+        if ($ret) { $bExito = FALSE; }
+    }
+    if ($bExito && $bIpv6) {
+        $ret = NULL;
+        system('/usr/bin/systemctl enable ip6tables.service', $ret);
+        if ($ret) { $bExito = FALSE; }
+    }
+
+    manageF2B('same');
+
+    return $bExito;
+}
+
+/**
+ * Binario de cada familia. Son tablas independientes: el nombre de la cadena
+ * se repite, el que cambia es el comando.
+ */
+function _fwBinaries()
+{
+    return array(
+        'inet'  => '/usr/sbin/iptables',
+        'inet6' => '/usr/sbin/ip6tables',
+    );
+}
+
+/**
+ * Familia de una regla. Las filas anteriores a la columna `family` y las que
+ * arma fwconfig en memoria (portknock) no la traen: son IPv4.
+ */
+function _fwRuleFamily($rule)
+{
+    if (!isset($rule['family'])) return 'inet';
+    return ((string)$rule['family'] === 'inet6') ? 'inet6' : 'inet';
+}
+
+/**
+ * Comprueba que un origen/destino pertenezca a la familia de la regla. Se usa
+ * como guarda antes de emitir IPv6: descartar el matcher dejaria la regla
+ * abierta a cualquier origen, que es peor que no cargarla.
+ */
+function _fwAddressesBelongToFamily($rule, $family)
+{
+    $flag = ($family === 'inet6') ? FILTER_FLAG_IPV6 : FILTER_FLAG_IPV4;
+    foreach (array('ip_source', 'ip_destiny') as $field) {
+        $value = trim((string)(isset($rule[$field]) ? $rule[$field] : ''));
+        if ($value === '') continue;
+        $parts = explode('/', $value);
+        $address = $parts[0];
+        if ($address === '0.0.0.0' || $address === '::') continue;
+        if (!filter_var($address, FILTER_VALIDATE_IP, $flag)) return FALSE;
+    }
+    return TRUE;
+}
+
+/**
+ * Indica si el firewall de Issabel tiene su cadena cargada en esa familia.
+ */
+function _fwFamilyLoaded($family)
+{
+    $bin = _fwBinaries();
+    $output = $ret = NULL;
+    exec($bin[$family].' -nL ISSABEL_INPUT 2>/dev/null', $output, $ret);
+    return $ret == 0;
+}
+
+/**
+ * Vacía las tablas de una familia. Para IPv4 se aborta si falla el flush de
+ * `nat` (comportamiento historico); para IPv6 es best effort, porque el
+ * soporte de esa tabla depende del kernel.
+ */
+function _fwFlushFamily($family)
+{
+    $bin = _fwBinaries();
+    $ret = NULL;
+    foreach (array('-F', '-X', '-Z', '-t nat -F') as $arg) {
+        system($bin[$family].' '.$arg, $ret);
+        if ($ret && $family === 'inet') return FALSE;
+    }
+    return TRUE;
+}
+
+/**
+ * Retira el filtrado de una familia: cadenas, archivo de arranque y servicio.
+ */
+function _fwTeardownFamily($family)
+{
+    _fwFlushFamily($family);
+    if ($family === 'inet6') {
+        file_put_contents('/etc/sysconfig/ip6tables', '');
+        $ret = NULL;
+        system('/usr/bin/systemctl disable ip6tables.service >/dev/null 2>&1', $ret);
+    }
+    return TRUE;
+}
+
+/**
+ * Crea las cadenas ISSABEL_XXX que falten y las engancha en las built-in.
+ */
+function _fwCreateChains($family, $chains)
+{
+    $bin = _fwBinaries();
+    $output = $ret = NULL;
+
+    exec($bin[$family].' -L -n', $output, $ret);
+    if ($ret) return FALSE;
+
+    $currentChains = array();
+    foreach ($output as $sLinea) {
+        $regs = NULL;
+        if (preg_match('/^Chain (\S+)/', $sLinea, $regs))
+            $currentChains[] = $regs[1];
+    }
+    foreach (array_diff($chains, $currentChains) as $key => $sChain) {
+        system($bin[$family].' -N '.$sChain, $ret);
+        if ($ret) return FALSE;
+        system($bin[$family].' -A '.$key.' -j '.$sChain, $ret);
+        if ($ret) return FALSE;
+    }
+    return TRUE;
+}
+
+/**
+ * Emite las reglas de una familia. Las filas de la otra familia (y las GeoIP
+ * cuando se emite IPv6) se saltan sin tocar sus matchers.
+ */
+function _fwApplyRules($rules, $family, $issabelChains, $mycontinent, $conn, $dispGEOIP)
+{
+    $bin = _fwBinaries();
+    $ipt = $bin[$family];
+    // "Sin origen/destino" es un /0 en cualquiera de las dos familias: no se
+    // traduce una direccion de una familia a la otra, se omite el matcher (que
+    // en las dos significa "cualquiera").
+    $wildcards = array('0.0.0.0/0', '::/0', '');
+
+    foreach ($rules as $rule) {
+        if (_fwRuleFamily($rule) !== $family) continue;
+        if (!isset($rule['protocol']) || $rule['protocol'] === '') continue;
+
+        if (!_fwAddressesBelongToFamily($rule, $family)) {
+            $ruleId = isset($rule['id']) ? $rule['id'] : '?';
+            fputs(STDERR, "ERR: rule $ruleId has an address from another family, not loading it\n");
+            return FALSE;
+        }
+
         $commandParams = array(
-                '/sbin/iptables',
+                $ipt,
                 );
         if ($rule['protocol'] == 'GEOIP') { 
             $commandParams[] = '-A '.$issabelChains[$rule['traffic']].'_GEOIP';
         } else {
             $commandParams[] = '-A '.$issabelChains[$rule['traffic']];
         }
-        if ($rule['ip_destiny'] != '0.0.0.0/0' && $rule['ip_destiny'] != '')
-            $commandParams[] = "-d ".escapeshellarg($rule['ip_destiny']);
-        if ($rule['ip_source'] != '0.0.0.0/0' && $rule['ip_source'] != '')
-            $commandParams[] = "-s ".escapeshellarg($rule['ip_source']);
+        $ip_destiny = isset($rule['ip_destiny']) ? (string)$rule['ip_destiny'] : '';
+        $ip_source  = isset($rule['ip_source']) ? (string)$rule['ip_source'] : '';
+        if (!in_array($ip_destiny, $wildcards, true))
+            $commandParams[] = "-d ".escapeshellarg($ip_destiny);
+        if (!in_array($ip_source, $wildcards, true))
+            $commandParams[] = "-s ".escapeshellarg($ip_source);
         switch ($rule['protocol']) {
             case 'TCP':
             case 'UDP':
@@ -303,8 +531,7 @@ PETICION_PK;
                         $r = $result->execute(array($rule['sport']));
                         if (!$r) {
                             fputs(STDERR, "ERROR: failed to query firewall rules\n");
-                            $bExito = false;
-                            break 2;
+                            return FALSE;
                         }
                         $arrResult = array();
                         if ($result!=null) {
@@ -313,20 +540,17 @@ PETICION_PK;
                             }
                         } else {
                             fputs(STDERR, "ERROR: failed to query firewall rules\n");
-                            $bExito = false;
-                            break 2;
+                            return FALSE;
                         }
                         if(isset($arrResult[0]["details"])) {
                             $port = $arrResult[0]["details"];
                         } else {
                             fputs(STDERR, "ERROR: some port was not found in database\n");
-                            $bExito = false;
-                            break 2;
+                            return FALSE;
                         }
                     } catch (PDOException $e) {            
                         fprintf(STDERR, "ERR: failed to query firewall rules - %s\n", $e->getMessage());
-                        $bExito = FALSE;
-                        break 2;
+                        return FALSE;
                     }
                     $commandParams[] = "--sport ".escapeshellarg($port);
                 }
@@ -337,8 +561,7 @@ PETICION_PK;
                         $r = $result->execute(array($rule['dport']));
                         if (!$r) {
                             fputs(STDERR, "ERROR: failed to query firewall rules\n");
-                            $bExito = false;
-                            break 2;
+                            return FALSE;
                         }
                         $arrResult = array();
                         if ($result!=null) {
@@ -347,26 +570,23 @@ PETICION_PK;
                             }
                         } else {
                             fputs(STDERR, "ERROR: failed to query firewall rules\n");
-                            $bExito = false;
-                            break 2;
+                            return FALSE;
                         }
                         if (isset($arrResult[0]["details"])) {
                             $port = $arrResult[0]["details"];
                         } else {
                             fputs(STDERR, "ERROR: some port was not found in database\n");
-                            $bExito = false;
-                            break 2;
+                            return FALSE;
                             }
                     } catch (PDOException $e) {            
                         fprintf(STDERR, "ERR: failed to query firewall rules - %s\n", $e->getMessage());
-                        $bExito = FALSE;
-                        break 2;
+                        return FALSE;
                     }
                         $commandParams[] = "--dport ".escapeshellarg($port);
                 }
                 break;
             case 'ICMP':
-                $commandParams[] = '-p icmp';
+                $commandParams[] = ($family === 'inet6') ? '-p ipv6-icmp' : '-p icmp';
                 break;
             case 'IP':
                 $commandParams[] = '-p ip';
@@ -382,6 +602,7 @@ PETICION_PK;
         if ($rule['eth_out'] != 'ANY' && $rule['eth_out'] != '') {
             $commandParams[] = "-o ".escapeshellarg($rule['eth_out']);
         }
+        $subsetcommand = NULL;
         if ($rule['protocol'] == 'GEOIP' && $rule['target'] == 'ACCEPT' && ($rule['countries'] != '' || $rule['continents'] != '')) {
     
             // expand continent into individual countries
@@ -471,41 +692,128 @@ PETICION_PK;
             }
         }
     
-        if ($ret) { $bExito = FALSE; break; }
-    
+        if ($ret) return FALSE;
     }
-    
-    // Add White List check to INPUT
-    $cmd = "/sbin/iptables -I INPUT -m set --match-set issabel_whitelist src -j ACCEPT";
-    system($cmd, $ret);
-    if(count($wl)>0) {
 
-        $cmd = "/usr/sbin/ipset flush issabel_whitelist";
-        system($cmd, $ret);
+    return TRUE;
+}
 
-        foreach($wl as $ip) {
-            $cmd = "/usr/sbin/ipset add issabel_whitelist $ip";
-            system($cmd, $ret);
+/**
+ * Sets de la whitelist. Un set de ipset tiene una sola familia, asi que cada
+ * una lleva el suyo. `hash:net` (y no `hash:ip`) porque la validacion del
+ * modulo acepta redes: hash:ip rechaza cualquier entrada con prefijo.
+ */
+function _fwWhitelistSets()
+{
+    return array(
+        'inet'  => array('name' => 'issabel_whitelist',  'family' => 'inet',  'type' => 'hash:net'),
+        'inet6' => array('name' => 'issabel_whitelist6', 'family' => 'inet6', 'type' => 'hash:net'),
+    );
+}
+
+/**
+ * Set que corresponde a una entrada de la whitelist, o NULL si no es una
+ * direccion valida. Acepta IP suelta o red con prefijo.
+ */
+function _fwWhitelistSetFor($value)
+{
+    $sets = _fwWhitelistSets();
+    $parts = explode('/', trim((string)$value));
+    $address = $parts[0];
+    if (!filter_var($address, FILTER_VALIDATE_IP)) return NULL;
+    $family = filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 'inet6' : 'inet';
+    return $sets[$family];
+}
+
+/**
+ * Crea un set si falta y lo recrea si quedo con el tipo viejo (hash:ip). Al
+ * recrear se pierden las entradas en el kernel: la carga de la whitelist las
+ * vuelve a agregar desde la base.
+ */
+function _fwEnsureWhitelistSet($spec)
+{
+    $name = $spec['name'];
+    $output = $ret = NULL;
+
+    exec('/usr/sbin/ipset list -t '.$name.' 2>/dev/null', $output, $ret);
+    if ($ret == 0) {
+        $type = NULL;
+        foreach ($output as $line) {
+            if (preg_match('/^Type:\s*(\S+)/', $line, $m)) { $type = $m[1]; break; }
+        }
+        if ($type === $spec['type']) return TRUE;
+
+        // Puede estar referenciado por una regla; en --load las cadenas ya se
+        // vaciaron, asi que se puede destruir.
+        $output = $ret = NULL;
+        exec('/usr/sbin/ipset destroy '.$name.' 2>&1', $output, $ret);
+        if ($ret != 0) {
+            fputs(STDERR, "ERR: ipset $name has type ".$type." and cannot be recreated: "
+                .implode(' ', $output)."\n");
+            return FALSE;
         }
     }
 
-    // Save configuration to /etc/sysconfig/iptables
-    if ($bExito) {
-        $output = $ret = NULL;
-        system('/sbin/iptables-save > /etc/sysconfig/iptables', $ret);
-        if ($ret) $bExito = FALSE;
+    $output = $ret = NULL;
+    exec('/usr/sbin/ipset -exist -N '.$name.' '.$spec['type']
+        .' family '.$spec['family'].' hashsize 1024 maxelem 65536', $output, $ret);
+    if ($ret != 0) {
+        fputs(STDERR, "ERR: could not create ipset $name: ".implode(' ', $output)."\n");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+function _fwEnsureWhitelistSets()
+{
+    foreach (_fwWhitelistSets() as $spec) {
+        if (!_fwEnsureWhitelistSet($spec)) return FALSE;
+    }
+    return TRUE;
+}
+
+/**
+ * Reescribe el contenido de los sets desde la base. Se hace en cada carga para
+ * que no queden entradas huerfanas (por ejemplo, las que dejaba la version
+ * anterior al fallar el alta de una red).
+ */
+function _fwLoadWhitelist($wl)
+{
+    $output = $ret = NULL;
+    foreach (_fwWhitelistSets() as $spec) {
+        exec('/usr/sbin/ipset flush '.$spec['name'], $output, $ret);
+        if ($ret != 0) {
+            fputs(STDERR, "ERR: could not flush ipset ".$spec['name']."\n");
+            return FALSE;
+        }
     }
 
-    // Ensure that iptables will actually be restored on reboot
-    if ($bExito) {
-        $ret = NULL;
-        system('/usr/bin/systemctl enable iptables.service', $ret);
-        if ($ret) { $bExito = FALSE; }
+    foreach ($wl as $ip) {
+        $spec = _fwWhitelistSetFor($ip);
+        if ($spec === NULL) {
+            fputs(STDERR, "ERR: invalid whitelist entry '$ip', skipped\n");
+            continue;
+        }
+        exec('/usr/sbin/ipset add '.$spec['name'].' '.escapeshellarg($ip), $output, $ret);
+        if ($ret != 0) {
+            fputs(STDERR, "ERR: could not add '$ip' to ".$spec['name'].": "
+                .implode(' ', $output)."\n");
+            return FALSE;
+        }
     }
+    return TRUE;
+}
 
-    manageF2B('same');
-
-    return $bExito;
+function action_isactive6()
+{
+    exec("/usr/sbin/ip6tables -nL ISSABEL_INPUT", $output, $return);
+    if ($return != 0) {
+        echo "ISSABEL IPV6 FIREWALL disabled\n";
+        return FALSE;
+    } else {
+        echo "ISSABEL IPV6 FIREWALL enabled\n";
+        return TRUE;
+    }
 }
 
 function manageF2B($opt)
@@ -559,7 +867,19 @@ function manageF2B($opt)
  * módulo del kernel y datos binarios. `modprobe` a secas no basta: si el
  * módulo ya está cargado devuelve 0 aunque falte libxt_geoip.so.
  */
-function geoip_available() {
+/**
+ * Comprueba las tres piezas necesarias para `-m geoip`: librería de usuarios,
+ * módulo del kernel y datos binarios. `modprobe` a secas no basta: si el
+ * módulo ya está cargado devuelve 0 aunque falte libxt_geoip.so.
+ *
+ * Los datos son por familia: el matcher de IPv4 consume los `.iv4` y el de
+ * IPv6 los `.iv6` de /usr/share/xt_geoip, que genera 20_build_xtables. Tener
+ * una familia no habilita la otra (la regla quedaría sin coincidencias y sin
+ * error visible), por eso cada familia se comprueba por separado.
+ *
+ * @param string $family  'inet' (IPv4) o 'inet6'
+ */
+function geoip_available($family = 'inet') {
     $hasLib = FALSE;
     foreach (array('/usr/lib64/xtables/libxt_geoip.so', '/usr/lib/xtables/libxt_geoip.so') as $lib) {
         if (is_file($lib)) { $hasLib = TRUE; break; }
@@ -569,28 +889,57 @@ function geoip_available() {
     exec('/usr/sbin/modprobe xt_geoip 2>&1', $output, $return);
     if ($return != 0) return FALSE;
 
-    $data = glob('/usr/share/xt_geoip/BE/*.iv4');
-    if (!$data) $data = glob('/usr/share/xt_geoip/LE/*.iv4');
-    if (!$data) $data = glob('/usr/share/xt_geoip/BE/*.iv6');
-    if (!$data) $data = glob('/usr/share/xt_geoip/LE/*.iv6');
+    $suffix = ($family === 'inet6') ? 'iv6' : 'iv4';
+    $data = glob('/usr/share/xt_geoip/BE/*.'.$suffix);
+    if (!$data) $data = glob('/usr/share/xt_geoip/LE/*.'.$suffix);
     if (empty($data)) return FALSE;
 
-    // Comprobación final: que iptables pueda cargar el match (backend nft
-    // incluido). Si falla aquí, tampoco funcionará en --load.
-    exec('/sbin/iptables -w -m geoip -h 2>&1', $out, $ret);
+    // Comprobación final: que iptables/ip6tables pueda cargar el match
+    // (backend nft incluido). Si falla aquí, tampoco funcionará en --load.
+    $binaries = _fwBinaries();
+    $output = $ret = NULL;
+    exec($binaries[$family].' -w -m geoip -h 2>&1', $output, $ret);
     return $ret == 0;
 }
 
 function isactivegeoip() {
-    if (!geoip_available()) {
+    if (!geoip_available('inet')) {
         echo "GeoIP match unavailable: install xtables-addons and generate /usr/share/xt_geoip\n";
         return FALSE;
     }
     return TRUE;
 }
 
+/**
+ * Igual que isactivegeoip(), para la familia IPv6: exige los `.iv6` y que
+ * ip6tables pueda cargar el match.
+ */
+function isactivegeoip6() {
+    if (!geoip_available('inet6')) {
+        echo "GeoIP IPv6 match unavailable: install xtables-addons and generate /usr/share/xt_geoip (.iv6)\n";
+        return FALSE;
+    }
+    return TRUE;
+}
+
+/**
+ * País de una dirección. Usa la base IPv6 cuando la dirección es v6: la base
+ * legacy de libGeoIP vive en archivos distintos (GeoIP.dat / GeoIPv6.dat) y
+ * `geoiplookup` no entiende direcciones v6.
+ *
+ * Acepta una dirección con prefijo ("2001:db8::7/128", como la imprime
+ * `ip6tables -nL`) y lo descarta antes de consultar.
+ */
 function geoip_country_code($ip) {
-    exec('/usr/bin/geoiplookup ' . escapeshellarg($ip) . ' 2>/dev/null', $output, $return);
+    $ip = trim((string)$ip);
+    $parts = explode('/', $ip);
+    $address = $parts[0];
+
+    $cmd = (strpos($address, ':') !== false) ? '/usr/bin/geoiplookup6' : '/usr/bin/geoiplookup';
+    if (!is_file($cmd)) return 'ZZ';
+
+    $output = $return = NULL;
+    exec($cmd . ' ' . escapeshellarg($address) . ' 2>/dev/null', $output, $return);
     if ($return == 0 && isset($output[0]) && preg_match('/:\s*([A-Z]{2})\b/', $output[0], $m)) {
         return $m[1];
     }
@@ -599,40 +948,64 @@ function geoip_country_code($ip) {
 
 function listgeopass() {
 
-    exec("iptables -nL ISSABEL_INPUT_GEOIP | grep RETURN | awk '{print $9}'", $output, $return);
-    if ($return == 0) {
+    // Las reglas de país se emiten en las dos familias; el mapa las muestra
+    // una sola vez por código.
+    $final = array();
+    foreach (array('/usr/sbin/iptables', '/usr/sbin/ip6tables') as $ipt) {
+        $output = $return = NULL;
+        exec($ipt." -nL ISSABEL_INPUT_GEOIP 2>/dev/null | grep RETURN | awk '{print \$9}'", $output, $return);
+        if ($return != 0 || !is_array($output)) continue;
         foreach($output as $line) {
-            $final[]=$line;
+            $line = trim((string)$line);
+            if ($line !== '') $final[$line] = TRUE;
         }
-        echo implode(",",$final);
-        return FALSE;
     }
-    return TRUE;
+    echo implode(",", array_keys($final));
 }
 
 
 function listgeoblocked() {
-    $final=array();
-    exec("iptables -nL ISSABEL_INPUT_GEOIP | grep 'DROP\|REJECT' | awk '{print $9}'", $output, $return);
-    if ($return == 0) {
+    $final = array();
+    foreach (array('/usr/sbin/iptables', '/usr/sbin/ip6tables') as $ipt) {
+        $output = $return = NULL;
+        exec($ipt." -nL ISSABEL_INPUT_GEOIP 2>/dev/null | grep 'DROP\\|REJECT' | awk '{print \$9}'", $output, $return);
+        if ($return != 0 || !is_array($output)) continue;
         foreach($output as $line) {
-            $final[]=$line;
+            $line = trim((string)$line);
+            if ($line !== '') $final[$line] = TRUE;
         }
-        if(count($final)>0) {
-            echo implode(",",$final);
-        }
-        return FALSE;
     }
-    return TRUE;
+    if(count($final)>0) {
+        echo implode(",", array_keys($final));
+    }
+    return FALSE;
 }
 
+/**
+ * Cuenta los baneos de fail2ban por país, en las dos familias. Se usa en el
+ * mapa GeoIP (`sec_geoip_map`). Las cadenas son `f2b-<jail>` y existen en
+ * `iptables` y en `ip6tables` por separado desde que el baneo es dual-stack.
+ */
 function fail2banblocked() {
     $blocked=array();
-    exec("iptables -vnL | grep f2b | grep Chain | awk '{ print \$2 }'", $output, $return);
-    foreach($output as $line) {
-        exec("iptables -nL $line | grep 'DROP\|REJECT' | awk '{ print \$4 }'", $output2, $return2);
-        if(count($output2)>0) {
+    foreach (array('/usr/sbin/iptables', '/usr/sbin/ip6tables') as $ipt) {
+        $output = $return = NULL;
+        exec($ipt." -vnL 2>/dev/null | grep f2b | grep Chain | awk '{ print \$2 }'", $output, $return);
+        if (!is_array($output)) continue;
+
+        foreach($output as $line) {
+            $chain = trim((string)$line);
+            // Sólo nombres de cadena válidos: la salida se usa para armar un
+            // comando de shell.
+            if (!preg_match('/^[A-Za-z0-9_.-]+$/', $chain)) continue;
+
+            $output2 = $return2 = NULL;
+            exec($ipt.' -nL '.escapeshellarg($chain)." | grep 'DROP\\|REJECT' | awk '{ print \$4 }'", $output2, $return2);
+            if (!is_array($output2)) continue;
+
             foreach($output2 as $ip) {
+                $ip = trim((string)$ip);
+                if ($ip === '' || $ip === '0.0.0.0/0' || $ip === '::/0') continue;
                 $country = geoip_country_code($ip);
                 if(!isset($blocked[$country])) { $blocked[$country]=0; }
                 $blocked[$country]++;
@@ -658,7 +1031,7 @@ function homecountry() {
 
 function action_isactive() {
 
-    exec("/sbin/iptables -nL ISSABEL_INPUT", $output, $return);
+    exec("/usr/sbin/iptables -nL ISSABEL_INPUT", $output, $return);
     if ($return != 0) {
         echo "ISSABEL FIREWALL disabled\n";
         return FALSE;
@@ -670,34 +1043,84 @@ function action_isactive() {
 }
 
 function add_whitelist($ip_address) {
-   exec("ipset add issabel_whitelist $ip_address", $output, $return);
-   if($return==1) { 
-       return FALSE; 
-   } else { 
-       generate_save_file();
-       return TRUE; 
-   }
+    $spec = _fwWhitelistSetFor($ip_address);
+    if ($spec === NULL) {
+        fputs(STDERR, "ERR: '$ip_address' is not a valid IP address or network\n");
+        return FALSE;
+    }
+    if (!_fwEnsureWhitelistSet($spec)) {
+        return FALSE;
+    }
+    $output = $ret = NULL;
+    exec('/usr/sbin/ipset add '.$spec['name'].' '.escapeshellarg($ip_address), $output, $ret);
+    if ($ret != 0) {
+        fputs(STDERR, "ERR: could not add '$ip_address' to ".$spec['name'].": "
+            .implode(' ', $output)."\n");
+        return FALSE;
+    }
+    return generate_save_file();
 }
 
 function remove_whitelist($ip_address) {
-   exec("ipset del issabel_whitelist $ip_address", $output, $return);
-   if($return==1) { 
-       return FALSE; 
-   } else { 
-       generate_save_file();
-       return TRUE; 
-   }
+    $spec = _fwWhitelistSetFor($ip_address);
+    if ($spec === NULL) {
+        fputs(STDERR, "ERR: '$ip_address' is not a valid IP address or network\n");
+        return FALSE;
+    }
+    // Si el set no existe (firewall nunca cargado), no hay nada que quitar en
+    // el kernel. Si existe pero la entrada no está, tampoco: la proxima carga
+    // repuebla los sets desde la base, asi que el archivo es la referencia.
+    $output = $ret = NULL;
+    exec('/usr/sbin/ipset list -t '.$spec['name'].' 2>/dev/null', $output, $ret);
+    if ($ret == 0) {
+        $output = $ret = NULL;
+        exec('/usr/sbin/ipset del '.$spec['name'].' '.escapeshellarg($ip_address), $output, $ret);
+        if ($ret != 0) {
+            fputs(STDERR, "WARN: could not remove '$ip_address' from ".$spec['name'].": "
+                .implode(' ', $output)."\n");
+        }
+    }
+    return generate_save_file();
 }
 
+/**
+ * Archivos de arranque de los sets, uno por familia. Se reescriben completos
+ * en cada alta o baja.
+ */
 function generate_save_file() {
-    $content = "create issabel_whitelist hash:ip family inet hashsize 1024 maxelem 65536\n";
-    $db = new SQLite3('/var/www/db/iptables.db');
-    $res = $db->query("select ip_address from whitelist");
-    while($row = $res->fetchArray()) {
-        $content.="add issabel_whitelist ".$row['ip_address']."\n";
+    $content = array();
+    foreach (_fwWhitelistSets() as $spec) {
+        $content[$spec['name']] = 'create '.$spec['name'].' '.$spec['type']
+            .' family '.$spec['family'].' hashsize 1024 maxelem 65536'."\n";
     }
-    file_put_contents("/etc/sysconfig/ipset.d/issabel_whitelist.set",$content);
-    return 0;
+
+    $db = new SQLite3('/var/www/db/iptables.db');
+    $db->busyTimeout(5000);
+    $res = $db->query("select ip_address from whitelist");
+    if ($res === false) {
+        fputs(STDERR, "ERR: could not read the whitelist from the database\n");
+        return FALSE;
+    }
+    while($row = $res->fetchArray()) {
+        $spec = _fwWhitelistSetFor($row['ip_address']);
+        if ($spec === NULL) continue;
+        $content[$spec['name']] .= 'add '.$spec['name'].' '.$row['ip_address']."\n";
+    }
+
+    $dir = '/etc/sysconfig/ipset.d';
+    if (!is_dir($dir) && !@mkdir($dir, 0755, true)) {
+        fputs(STDERR, "ERR: could not create $dir\n");
+        return FALSE;
+    }
+    $ok = TRUE;
+    foreach ($content as $name => $body) {
+        $file = $dir.'/'.$name.'.set';
+        if (@file_put_contents($file, $body) === FALSE) {
+            fputs(STDERR, "ERR: could not write $file\n");
+            $ok = FALSE;
+        }
+    }
+    return $ok;
 }
 
 function reorder_geoip($db) {
@@ -713,22 +1136,28 @@ function reorder_geoip($db) {
 
 }
 
-function _ipt_exists($chain, $rule)
+function _ipt_bin($family = 'inet')
 {
-    exec('/sbin/iptables -w -C '.$chain.' '.$rule.' 2>/dev/null', $out, $ret);
+    $binaries = _fwBinaries();
+    return isset($binaries[$family]) ? $binaries[$family] : $binaries['inet'];
+}
+
+function _ipt_exists($chain, $rule, $family = 'inet')
+{
+    exec(_ipt_bin($family).' -w -C '.$chain.' '.$rule.' 2>/dev/null', $out, $ret);
     return $ret == 0;
 }
 
-function _ipt_delete($chain, $rule)
+function _ipt_delete($chain, $rule, $family = 'inet')
 {
-    if (_ipt_exists($chain, $rule)) {
-        exec('/sbin/iptables -w -D '.$chain.' '.$rule.' 2>&1', $out, $ret);
+    if (_ipt_exists($chain, $rule, $family)) {
+        exec(_ipt_bin($family).' -w -D '.$chain.' '.$rule.' 2>&1', $out, $ret);
     }
 }
 
-function _ipt_insert($chain, $rule)
+function _ipt_insert($chain, $rule, $family = 'inet')
 {
-    exec('/sbin/iptables -w -I '.$chain.' '.$rule.' 2>&1', $out, $ret);
+    exec(_ipt_bin($family).' -w -I '.$chain.' '.$rule.' 2>&1', $out, $ret);
     if ($ret != 0) {
         fwrite(STDERR, implode("\n", $out)."\n");
         return false;
@@ -743,23 +1172,46 @@ function _ipt_insert($chain, $rule)
  */
 function _geoip_change($country, $mode)
 {
-    if (!geoip_available() || !preg_match('/^[A-Z]{2}$/', $country)) {
+    if (!geoip_available('inet') || !preg_match('/^[A-Z]{2}$/', $country)) {
         fwrite(STDERR, "GeoIP match unavailable or invalid country code\n");
         return false;
     }
 
     $db = new SQLite3('/var/www/db/iptables.db');
     $db->busyTimeout(5000);
+
+    // Con IPv6 habilitado, bloquear un pais tiene que cubrir las dos familias.
+    // Si falta la base .iv6 se aborta: dejar solo la regla v4 seria un
+    // fail-open silencioso para el trafico v6.
+    $bIpv6 = false;
+    $res = $db->query("SELECT ipv6_enabled FROM tmp_execute");
+    if ($res) {
+        $row = $res->fetchArray(SQLITE3_ASSOC);
+        $bIpv6 = !empty($row['ipv6_enabled']);
+    }
+    if ($bIpv6 && !geoip_available('inet6')) {
+        fwrite(STDERR, "IPv6 geoip data is unavailable: generate the .iv6 files in /usr/share/xt_geoip first\n");
+        $db->close();
+        return false;
+    }
+    $families = $bIpv6 ? array('inet', 'inet6') : array('inet');
+
     $iso = SQLite3::escapeString($country);
     $db->exec('BEGIN');
 
     $db->exec("DELETE FROM filter WHERE protocol='GEOIP' AND countries='$iso' AND (target='DROP' OR target='REJECT')");
     $db->exec("DELETE FROM filter WHERE protocol='GEOIP' AND countries='$iso' AND target='ACCEPT'");
 
+    $target = NULL;
     if ($mode === 'block') {
-        $db->exec("INSERT INTO filter (protocol,countries,target,rule_order,traffic,eth_in,eth_out,ip_source,ip_destiny,continents) VALUES ('GEOIP','$iso','DROP',100000,'INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','')");
+        $target = 'DROP';
     } elseif ($mode === 'whitelist') {
-        $db->exec("INSERT INTO filter (protocol,countries,target,rule_order,traffic,eth_in,eth_out,ip_source,ip_destiny,continents) VALUES ('GEOIP','$iso','ACCEPT',100000,'INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','')");
+        $target = 'ACCEPT';
+    }
+    if ($target !== NULL) {
+        foreach ($families as $family) {
+            $db->exec("INSERT INTO filter (protocol,countries,target,rule_order,traffic,eth_in,eth_out,ip_source,ip_destiny,continents,family) VALUES ('GEOIP','$iso','$target',100000,'INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','','$family')");
+        }
     }
     reorder_geoip($db);
 
@@ -768,14 +1220,22 @@ function _geoip_change($country, $mode)
     $dropRule   = "-m geoip --src-cc $cc -m state --state NEW -j DROP";
     $returnRule = "-m geoip --src-cc $cc -j RETURN";
 
-    _ipt_delete($chain, $dropRule);
-    _ipt_delete($chain, $returnRule);
-
     $ok = true;
-    if ($mode === 'block') {
-        $ok = _ipt_insert($chain, $dropRule);
-    } elseif ($mode === 'whitelist') {
-        $ok = _ipt_insert($chain, $returnRule);
+    foreach ($families as $family) {
+        // IPv6 habilitado pero sin cadenas cargadas: la fila queda guardada y
+        // el proximo --load la aplica. No se puede insertar en una cadena que
+        // no existe.
+        if ($family === 'inet6' && !_fwFamilyLoaded('inet6')) continue;
+
+        _ipt_delete($chain, $dropRule, $family);
+        _ipt_delete($chain, $returnRule, $family);
+
+        if ($mode === 'block') {
+            $ok = _ipt_insert($chain, $dropRule, $family);
+        } elseif ($mode === 'whitelist') {
+            $ok = _ipt_insert($chain, $returnRule, $family);
+        }
+        if (!$ok) break;
     }
 
     if (!$ok) {

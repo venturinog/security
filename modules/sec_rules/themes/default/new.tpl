@@ -11,6 +11,11 @@
     <div class="iss-reveal">
     <section class="iss-card">
         <div class="iss-card__body iss-formgrid fw-formgrid fw-formgrid--main">
+            <div class="iss-field fw-col-2 fw-g-2" id="id_family">
+                <span class="iss-field__label">{$family.LABEL}&nbsp;<span class="iss-required">*</span></span>
+                <span class="iss-field__control">{$family.INPUT}</span>
+                {if !empty($ERRORS.family)}<div class="invalid-feedback d-block">{$ERRORS.family}</div>{/if}
+            </div>
             <div class="iss-field fw-col-2 fw-g-2">
                 <span class="iss-field__label">{$traffic_label}&nbsp;<span class="iss-required">*</span></span>
                 <span class="iss-field__control">{$traffic_html}</span>
@@ -122,21 +127,33 @@
 (function () {
     var traffic = document.querySelector('[name="id_traffic"]');
     var protocol = document.querySelector('[name="id_protocol"]');
+    var family = document.querySelector('[name="family"]');
     if (traffic) showElementByTraffic();
-    if (protocol) showElementByProtocol();
+    if (family) showElementByFamily();
 
     function ip(v) {
         if (v === '') return true;
+        if (fwFamily() === 'inet6') {
+            // Forma abreviada y completa; el navegador no valida IPv6 en un
+            // input de texto, así que se comprueba aquí antes del servidor.
+            return /^[0-9a-fA-F:]+$/.test(v) && v.indexOf(':') !== -1 && v.length <= 45
+                && (v.match(/::/g) || []).length <= 1;
+        }
         var m = v.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
         if (!m) return false;
         for (var i = 1; i <= 4; i++) if (parseInt(m[i], 10) > 255) return false;
         return true;
     }
+    function mask(v) {
+        if (v === '') return true;
+        if (!/^[0-9]{1,3}$/.test(v)) return false;
+        return parseInt(v, 10) <= (fwFamily() === 'inet6' ? 128 : 32);
+    }
     IssabelValidate.attach(document.querySelector('form'), {
         ip_source: ip,
         ip_destin: ip,
-        mask_source: function (v) { return v === '' || (/^[0-9]{1,2}$/.test(v) && parseInt(v, 10) <= 32); },
-        mask_destin: function (v) { return v === '' || (/^[0-9]{1,2}$/.test(v) && parseInt(v, 10) <= 32); }
+        mask_source: mask,
+        mask_destin: mask
     });
 })();
 {/literal}
