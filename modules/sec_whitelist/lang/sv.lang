@@ -47,4 +47,6 @@ $arrLangModule = array(
     'View' => 'Visa',
     'View IP Address' => 'Visa IP-adress',
     'White List' => 'Vita listan',
+    'Hostname (DDNS)' => 'Hostname (DDNS)',
+    'The hostname could not be resolved' => 'The hostname could not be resolved',
 );

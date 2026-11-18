@@ -1,0 +1,142 @@
+#!/usr/bin/php
+<?php
+/*
+ * fwresponsive — demonio del Responsive Firewall simple.
+ *
+ * Escucha SuccessfulAuth por AMI y añade la IP del endpoint PJSIP al set
+ * issabel_responsive{,6} con timeout. El firewall abre SIP/RTP sólo para esas
+ * IPs; la probation (hashlimit) deja pasar el primer REGISTER.
+ *
+ * No banea: de eso sigue encargándose fail2ban.
+ */
+
+define('DB_PATH', '/var/www/db/iptables.db');
+define('AMI_SECRET', '/etc/issabel/firewall/ami.secret');
+define('LOG_FILE', '/var/log/issabel/firewall.log');
+define('AMI_HOST', '127.0.0.1');
+define('AMI_PORT', 5038);
+
+function logmsg($msg)
+{
+    @file_put_contents(LOG_FILE, date('Y-m-d H:i:s').' '.$msg."\n", FILE_APPEND);
+}
+
+function settings()
+{
+    $defaults = array('enabled' => 0, 'allow_timeout' => 7200, 'sip_port' => 5060);
+    try {
+        $db = new SQLite3(DB_PATH);
+        $db->busyTimeout(5000);
+        $res = @$db->query("SELECT * FROM responsive WHERE id=1");
+        $row = $res ? $res->fetchArray(SQLITE3_ASSOC) : false;
+        $db->close();
+        if (is_array($row)) return array_merge($defaults, $row);
+    } catch (Exception $e) {}
+    return $defaults;
+}
+
+function ensure_set($ip)
+{
+    $family = (strpos($ip, ':') !== false) ? 'inet6' : 'inet';
+    $name = ($family === 'inet6') ? 'issabel_responsive6' : 'issabel_responsive';
+    $s = settings();
+    $timeout = max(60, (int)$s['allow_timeout']);
+
+    exec('/usr/sbin/ipset list -t '.$name.' 2>/dev/null', $o, $r);
+    if ($r != 0) {
+        exec('/usr/sbin/ipset -exist create '.$name.' hash:ip family '.$family
+            .' timeout '.$timeout.' hashsize 1024 maxelem 65536', $o, $r);
+        if ($r != 0) {
+            logmsg("ERR: could not create $name");
+            return false;
+        }
+    }
+    exec('/usr/sbin/ipset -exist add '.$name.' '.escapeshellarg($ip).' timeout '.$timeout, $o, $r);
+    if ($r != 0) {
+        logmsg("ERR: could not add $ip to $name");
+        return false;
+    }
+    logmsg("allow $ip set=$name timeout=$timeout");
+    return true;
+}
+
+function remote_ip($value)
+{
+    $value = trim((string)$value);
+    if (preg_match('/^\[([0-9a-fA-F:]+)\]:\d+$/', $value, $m)) return $m[1];
+    if (preg_match('/^([0-9.]+):\d+$/', $value, $m)) return $m[1];
+    if (filter_var($value, FILTER_VALIDATE_IP)) return $value;
+    return '';
+}
+
+function connect_ami()
+{
+    $secret = is_file(AMI_SECRET) ? trim(file_get_contents(AMI_SECRET)) : '';
+    if ($secret === '') {
+        logmsg('ERR: AMI secret is missing');
+        return null;
+    }
+    $fp = @stream_socket_client('tcp://'.AMI_HOST.':'.AMI_PORT, $errno, $errstr, 5);
+    if (!is_resource($fp)) {
+        logmsg("ERR: AMI connect failed: $errstr");
+        return null;
+    }
+    stream_set_timeout($fp, 30);
+    fwrite($fp, "Action: Login\r\nUsername: issabel-firewall\r\nSecret: $secret\r\nEvents: security,system\r\n\r\n");
+    $response = '';
+    while (($line = fgets($fp)) !== false) {
+        $response .= $line;
+        if (rtrim($line, "\r\n") === '') break;
+    }
+    if (stripos($response, 'Response: Success') === false) {
+        logmsg('ERR: AMI login failed');
+        fclose($fp);
+        return null;
+    }
+    logmsg('AMI connected');
+    return $fp;
+}
+
+$s = settings();
+if (empty($s['enabled'])) {
+    exit(0);
+}
+
+while (true) {
+    $s = settings();
+    if (empty($s['enabled'])) {
+        logmsg('responsive disabled, exiting');
+        exit(0);
+    }
+
+    $fp = connect_ami();
+    if (!is_resource($fp)) {
+        sleep(5);
+        continue;
+    }
+
+    $event = array();
+    while (!feof($fp)) {
+        $line = fgets($fp);
+        if ($line === false) break;
+        $line = rtrim($line, "\r\n");
+        if ($line === '') {
+            if (isset($event['Event']) && $event['Event'] === 'SuccessfulAuth'
+                && isset($event['Service']) && strtoupper($event['Service']) === 'PJSIP') {
+                $ip = remote_ip(isset($event['RemoteAddress']) ? $event['RemoteAddress'] : '');
+                if ($ip !== '' && $ip !== '127.0.0.1' && $ip !== '::1') {
+                    ensure_set($ip);
+                }
+            }
+            $event = array();
+            continue;
+        }
+        $pos = strpos($line, ':');
+        if ($pos !== false) {
+            $event[trim(substr($line, 0, $pos))] = trim(substr($line, $pos + 1));
+        }
+    }
+    fclose($fp);
+    logmsg('AMI disconnected, reconnecting');
+    sleep(5);
+}

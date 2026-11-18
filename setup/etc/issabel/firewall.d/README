@@ -1,0 +1,31 @@
+Custom firewall rules for Issabel
+=================================
+
+Files in this directory are applied by `fwconfig --load` after the Issabel
+chains are created and before the normal rules are loaded.
+
+* `*.rules`  -> IPv4, applied with `iptables-restore --noflush`
+* `*.rules6` -> IPv6, applied with `ip6tables-restore --noflush`
+
+The files are applied in alphabetical order. They must be owned by
+`root:root`, must not be writable by group or others, and must not be
+symlinks. `fwconfig` runs `iptables-restore --test` first and aborts the
+whole load if a file is invalid.
+
+Use the Issabel chains rather than the built-in ones:
+
+  ISSABEL_HIGH      High-priority ACCEPT rules (before packetbl/GeoIP/Block List)
+  ISSABEL_BLOCK     Block List DROP rules
+  ISSABEL_INPUT     normal INPUT rules (before the final REJECT)
+  ISSABEL_FORWARD   normal FORWARD rules
+  ISSABEL_OUTPUT    normal OUTPUT rules
+
+Example (commented out in 10-custom.rules.sample):
+
+  *filter
+  -A ISSABEL_INPUT -p tcp --dport 8443 -j ACCEPT
+  COMMIT
+
+Remember that a rule appended to ISSABEL_INPUT by a custom file is placed
+before the rules managed from the web interface, because custom files are
+applied first.

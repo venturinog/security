@@ -51,4 +51,5 @@ $arrLangModule = array(
     'View Jail' => 'Погледај затвор',
     'Whitelist' => 'Бела листа',
     'Yes' => 'Да',
+    'Find Time (seconds)' => 'Find Time (seconds)',
 );

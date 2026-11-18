@@ -1,0 +1,175 @@
+#!/usr/bin/php
+<?php
+/*
+ * fwdiscover — lee la configuración generada por IssabelPBX y devuelve, en
+ * JSON, los puertos y peers/trunks que el firewall debería conocer.
+ *
+ * Es de sólo lectura: no crea reglas ni abre puertos. La página
+ * sec_discovery usa esta salida para sugerir y, si el administrador lo pide,
+ * crear el puerto o la regla desactivada.
+ */
+
+define('ASTETC', '/etc/asterisk');
+
+function parse_conf($file)
+{
+    $out = array();
+    if (!is_file($file) || !is_readable($file)) return $out;
+    $section = null;
+    foreach (file($file) as $line) {
+        $line = trim($line);
+        if ($line === '' || $line[0] === ';' || $line[0] === '#') continue;
+        if (preg_match('/^\[(.+)\]$/', $line, $m)) {
+            $section = trim($m[1]);
+            if (!isset($out[$section])) $out[$section] = array();
+            continue;
+        }
+        if ($section !== null && strpos($line, '=') !== false) {
+            list($k, $v) = explode('=', $line, 2);
+            $out[$section][trim($k)] = trim($v);
+        }
+    }
+    return $out;
+}
+
+function port_from_bind($bind, $fallback = null)
+{
+    $bind = trim((string)$bind);
+    if ($bind !== '' && preg_match('/:(\d+)$/', $bind, $m)) return (int)$m[1];
+    return $fallback;
+}
+
+function add_service(&$services, $proto, $transport, $port, $source, $confidence = 'high')
+{
+    $port = (int)$port;
+    if ($port < 1 || $port > 65535) return;
+    $key = $proto.'|'.$transport.'|'.$port;
+    foreach ($services as $s) {
+        if ($s['key'] === $key) return;
+    }
+    $services[] = array(
+        'key'        => $key,
+        'proto'      => $proto,
+        'transport'  => $transport,
+        'port'       => $port,
+        'source'     => $source,
+        'confidence' => $confidence,
+    );
+}
+
+$services = array();
+$peers = array();
+$warnings = array();
+$rtp = array('start' => null, 'end' => null);
+
+/* PJSIP transports */
+$pjsipTransport = parse_conf(ASTETC.'/pjsip_transport_additional.conf');
+foreach ($pjsipTransport as $name => $conf) {
+    if (strpos($name, 'transport-') !== 0) continue;
+    $proto = isset($conf['protocol']) ? strtoupper($conf['protocol']) : 'UDP';
+    $port = port_from_bind(isset($conf['bind']) ? $conf['bind'] : '', isset($conf['port']) ? $conf['port'] : null);
+    if ($port === null) {
+        $warnings[] = "pjsip transport $name has no port";
+        continue;
+    }
+    add_service($services, 'PJSIP', strtolower($proto), $port, 'pjsip_transport_additional.conf');
+}
+
+/* PJSIP peers/trunks */
+$pjsip = parse_conf(ASTETC.'/pjsip_additional.conf');
+foreach ($pjsip as $name => $conf) {
+    $host = '';
+    if (!empty($conf['host'])) $host = $conf['host'];
+    elseif (!empty($conf['match'])) $host = $conf['match'];
+    elseif (!empty($conf['contact']) && preg_match('/sip:([^;]+)/', $conf['contact'], $m)) $host = $m[1];
+    if ($host === '') continue;
+    $dynamic = (strtolower($host) === 'dynamic' || strtolower($host) === 'sip:dynamic');
+    $peers[] = array(
+        'name'     => $name,
+        'tech'     => 'pjsip',
+        'host'     => $host,
+        'dynamic'  => $dynamic,
+        'source'   => 'pjsip_additional.conf',
+    );
+}
+
+/* chan_sip */
+$sipGeneralFile = ASTETC.'/sip_general_additional.conf';
+if (is_file($sipGeneralFile)) {
+    $sipGeneral = parse_conf($sipGeneralFile);
+    $sipGeneral = isset($sipGeneral['general']) ? $sipGeneral['general'] : array();
+    $sipPort = isset($sipGeneral['bindport']) ? (int)$sipGeneral['bindport'] : 5060;
+    add_service($services, 'SIP', 'udp', $sipPort, 'sip_general_additional.conf', 'medium');
+    if (isset($sipGeneral['tcpenable']) && strtolower($sipGeneral['tcpenable']) === 'yes') {
+        add_service($services, 'SIP', 'tcp', $sipPort, 'sip_general_additional.conf', 'medium');
+    }
+    if (isset($sipGeneral['tlsenable']) && strtolower($sipGeneral['tlsenable']) === 'yes') {
+        $tls = isset($sipGeneral['tlsbindport']) ? (int)$sipGeneral['tlsbindport'] : 5061;
+        add_service($services, 'SIP', 'tls', $tls, 'sip_general_additional.conf', 'medium');
+    }
+}
+
+$sip = parse_conf(ASTETC.'/sip_additional.conf');
+foreach ($sip as $name => $conf) {
+    if (empty($conf['host'])) continue;
+    $host = $conf['host'];
+    $peers[] = array(
+        'name'    => $name,
+        'tech'    => 'sip',
+        'host'    => $host,
+        'dynamic' => (strtolower($host) === 'dynamic'),
+        'source'  => 'sip_additional.conf',
+    );
+}
+
+/* IAX */
+$iaxGeneralFile = ASTETC.'/iax_general_additional.conf';
+if (is_file($iaxGeneralFile)) {
+    $iaxGeneral = parse_conf($iaxGeneralFile);
+    $iaxGeneral = isset($iaxGeneral['general']) ? $iaxGeneral['general'] : array();
+    $iaxPort = isset($iaxGeneral['bindport']) ? (int)$iaxGeneral['bindport'] : 4569;
+    add_service($services, 'IAX', 'udp', $iaxPort, 'iax_general_additional.conf', 'medium');
+}
+
+$iax = parse_conf(ASTETC.'/iax_additional.conf');
+foreach ($iax as $name => $conf) {
+    if (empty($conf['host'])) continue;
+    $host = $conf['host'];
+    $peers[] = array(
+        'name'    => $name,
+        'tech'    => 'iax',
+        'host'    => $host,
+        'dynamic' => (strtolower($host) === 'dynamic'),
+        'source'  => 'iax_additional.conf',
+    );
+}
+
+/* RTP */
+$rtpConf = parse_conf(ASTETC.'/rtp_additional.conf');
+$rtpConf = isset($rtpConf['general']) ? $rtpConf['general'] : array();
+if (isset($rtpConf['rtpstart'])) $rtp['start'] = (int)$rtpConf['rtpstart'];
+if (isset($rtpConf['rtpend']))   $rtp['end']   = (int)$rtpConf['rtpend'];
+
+/* Catálogo actual de puertos */
+$catalog = array();
+try {
+    $db = new SQLite3('/var/www/db/iptables.db');
+    $db->busyTimeout(5000);
+    $res = @$db->query("SELECT id,name,protocol,details FROM port");
+    if ($res) {
+        while ($row = $res->fetchArray(SQLITE3_ASSOC)) $catalog[] = $row;
+    } else {
+        $warnings[] = 'could not read the port catalog';
+    }
+    $db->close();
+} catch (Exception $e) {
+    $warnings[] = 'could not read the port catalog';
+}
+
+echo json_encode(array(
+    'services' => $services,
+    'peers'    => $peers,
+    'rtp'      => $rtp,
+    'catalog'  => $catalog,
+    'warnings' => $warnings,
+), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";

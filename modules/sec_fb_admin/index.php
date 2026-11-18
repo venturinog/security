@@ -103,7 +103,7 @@ function reportJails($smarty, $module_name, $local_templates_dir, &$pDB, $arrCon
 
     $arrData = null;
     $arrResult = $iJails->obtainJails($limit, $offset);
-    $arrColumns = array(_tr("Name"),_tr("Count Failed Attempts"),_tr("Ban Time (hours)"),_tr("Whitelist"),_tr("Enabled"),_tr("Options"));
+    $arrColumns = array(_tr("Name"),_tr("Count Failed Attempts"),_tr("Ban Time (hours)"),_tr("Find Time (seconds)"),_tr("Whitelist"),_tr("Enabled"),_tr("Options"));
     $oGrid->setColumns($arrColumns);
     if( is_array($arrResult) && $total>0 ){
         foreach($arrResult as $key => $value){
@@ -111,9 +111,10 @@ function reportJails($smarty, $module_name, $local_templates_dir, &$pDB, $arrCon
             $arrTmp[0] = htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8');
             $arrTmp[1] = htmlspecialchars((string)$value['maxretry'], ENT_COMPAT, 'UTF-8');
             $arrTmp[2] = htmlspecialchars((string)$value['bantime'], ENT_COMPAT, 'UTF-8');
-            $arrTmp[3] = htmlspecialchars((string)$value['ignoreip'], ENT_COMPAT, 'UTF-8');
-            $arrTmp[4] = ($value['enabled'] ? _tr('Yes') : _tr('No'));
-            $arrTmp[5] = "&nbsp;<a href='?menu=$module_name&action=view&id=".$id."'>"._tr('View')."</a>";
+            $arrTmp[3] = htmlspecialchars((string)(isset($value['findtime']) ? $value['findtime'] : 600), ENT_COMPAT, 'UTF-8');
+            $arrTmp[4] = htmlspecialchars((string)$value['ignoreip'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[5] = ($value['enabled'] ? _tr('Yes') : _tr('No'));
+            $arrTmp[6] = "&nbsp;<a href='?menu=$module_name&action=view&id=".$id."'>"._tr('View')."</a>";
             $arrData[] = $arrTmp;
         }
     }
@@ -147,13 +148,14 @@ function NewViewZone($smarty, $module_name, $local_templates_dir, &$pDB, $arrCon
                 'name'      => $result['name'],
                 'maxretry'  => $result['maxretry'],
                 'bantime'   => $result['bantime'],
+                'findtime'  => isset($result['findtime']) ? $result['findtime'] : 600,
                 'ignoreip'  => $result['ignoreip'],
                 'enabled'   => $result['enabled'] == '1' ? 'on' : 'off',
             );
         }
     }
 
-    foreach (array('maxretry','bantime','ignoreip') as $f) {
+    foreach (array('maxretry','bantime','findtime','ignoreip') as $f) {
         if (!isset($errors[$f])) continue;
         if (!isset($arrFormNew[$f]['INPUT_EXTRA_PARAM']) || !is_array($arrFormNew[$f]['INPUT_EXTRA_PARAM']))
             $arrFormNew[$f]['INPUT_EXTRA_PARAM'] = array();
@@ -219,6 +221,15 @@ function createFieldFormNew() {
             "VALIDATION_TYPE"        => "numeric",
             "VALIDATION_EXTRA_PARAM" => ""
         ),
+        "findtime" => array(
+            "LABEL"                  => _tr("Find Time (seconds)"),
+            "REQUIRED"               => "yes",
+            "INPUT_TYPE"             => "TEXT",
+            "INPUT_EXTRA_PARAM"      => array("class" => "form-control"),
+            "EDITABLE"               => "yes",
+            "VALIDATION_TYPE"        => "numeric",
+            "VALIDATION_EXTRA_PARAM" => ""
+        ),
         "ignoreip" => array(
             "LABEL"                  => _tr("Whitelist"),
             "REQUIRED"               => "no",
@@ -266,6 +277,7 @@ function saveJail($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
     $mode       = getParameter("mode");
     $maxretry   = trim((string)getParameter("maxretry"));
     $bantime    = trim((string)getParameter("bantime"));
+    $findtime   = trim((string)getParameter("findtime"));
     $ignoreip   = trim((string)getParameter("ignoreip"));
     $enabled    = getParameter("enabled");
 
@@ -280,6 +292,8 @@ function saveJail($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
         $errors['maxretry'] = sprintf(_tr('%s is invalid'), _tr('Count Failed Attempts'));
     if ($bantime === '' || !preg_match('/^[0-9]+$/', $bantime) || (int)$bantime < 1)
         $errors['bantime'] = sprintf(_tr('%s is invalid'), _tr('Ban Time (hours)'));
+    if ($findtime === '' || !preg_match('/^[0-9]+$/', $findtime) || (int)$findtime < 1)
+        $errors['findtime'] = sprintf(_tr('%s is invalid'), _tr('Find Time (seconds)'));
     if (!validIpList($ignoreip))
         $errors['ignoreip'] = sprintf(_tr('%s is invalid'), _tr('Whitelist'));
 
@@ -288,13 +302,13 @@ function saveJail($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
     if (count($errors) > 0) {
         return NewViewZone($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $mode, $errors, array(
             'id' => $id_except, 'name' => getParameter('name'), 'maxretry' => $maxretry,
-            'bantime' => $bantime, 'ignoreip' => $ignoreip,
+            'bantime' => $bantime, 'findtime' => $findtime, 'ignoreip' => $ignoreip,
             'enabled' => $enabled == '1' ? 'on' : 'off',
         ));
     }
 
     $iJails = new IssabelF2BService($pDB);
-    if($iJails->updateJail($id_except, $maxretry, $bantime, $ignoreip, $enabled)) {
+    if($iJails->updateJail($id_except, $maxretry, $bantime, $ignoreip, $enabled, $findtime)) {
         $iJails->F2BUpdateJails($pDB);
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("Update correctly")));
     }

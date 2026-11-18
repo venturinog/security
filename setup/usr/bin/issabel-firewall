@@ -1,0 +1,300 @@
+#!/usr/bin/php
+<?php
+/*
+ * issabel-firewall — CLI de operación del firewall de Issabel.
+ *
+ * Uso:
+ *   issabel-firewall status [--json]
+ *   issabel-firewall enable | disable [--force] | apply
+ *   issabel-firewall list whitelist|blocklist
+ *   issabel-firewall trust <ip> | untrust <ip>
+ *   issabel-firewall blocklist add|del <ip>
+ *   issabel-firewall block <ip> | unblock <ip>      (alias)
+ *   issabel-firewall check
+ *   issabel-firewall safemode status|apply
+ *
+ * Debe ejecutarse como root (lo normal es `sudo issabel-firewall ...`).
+ */
+
+define('FWCONFIG', '/usr/share/issabel/privileged/fwconfig');
+define('FWRESTORE', '/usr/share/issabel/privileged/fwrestore');
+define('DB_PATH', '/var/www/db/iptables.db');
+define('LOCK_FILE', '/etc/issabel/firewall/locked');
+define('SAFEMODE_FLAG', '/run/issabel-fw-safemode');
+define('AUDIT_LOG', '/var/log/issabel/audit.log');
+
+if (trim((string)shell_exec('id -u')) !== '0') {
+    fwrite(STDERR, "issabel-firewall must be run as root\n");
+    exit(1);
+}
+
+function run($cmd, &$output = null, &$ret = null)
+{
+    $output = array();
+    $ret = 0;
+    exec($cmd . ' 2>&1', $output, $ret);
+    return $ret === 0;
+}
+
+function db()
+{
+    $db = new SQLite3(DB_PATH);
+    $db->busyTimeout(5000);
+    return $db;
+}
+
+function valid_entry($value)
+{
+    $value = trim((string)$value);
+    $parts = explode('/', $value);
+    if (count($parts) > 2) return false;
+    $ip = $parts[0];
+    if (!filter_var($ip, FILTER_VALIDATE_IP)) return false;
+    if (count($parts) === 2) {
+        $max = (strpos($ip, ':') !== false) ? 128 : 32;
+        if (!preg_match('/^[0-9]{1,3}$/', $parts[1]) || (int)$parts[1] > $max) return false;
+    }
+    if (($ip === '0.0.0.0' || $ip === '::') && (!isset($parts[1]) || (int)$parts[1] === 0)) {
+        return false;
+    }
+    return true;
+}
+
+function audit($event, $result, $details = '')
+{
+    $line = sprintf("%s FIREWALL root: %s %s result=%s from local.\n",
+        date('Y-m-d H:i:s'), $event, $details, $result);
+    @file_put_contents(AUDIT_LOG, $line, FILE_APPEND);
+}
+
+function fail($message, $event = null)
+{
+    if ($event !== null) audit($event, 'error', 'msg='.escapeshellarg($message));
+    fwrite(STDERR, $message . "\n");
+    exit(1);
+}
+
+function db_count($table)
+{
+    if (!is_file(DB_PATH)) return 0;
+    try {
+        $db = db();
+        $r = @$db->querySingle("SELECT COUNT(*) FROM $table");
+        $db->close();
+        return (int)$r;
+    } catch (Exception $e) {
+        return 0;
+    }
+}
+
+function status($asJson)
+{
+    $active = run(FWCONFIG . ' --isactive');
+    $ipv6 = run(FWCONFIG . ' --isactive6');
+    $f2b = trim((string)shell_exec('systemctl is-active fail2ban 2>/dev/null'));
+    $state = array(
+        'active'      => $active,
+        'ipv6_active' => $ipv6,
+        'rules'       => db_count('filter'),
+        'whitelist'   => db_count('whitelist'),
+        'blocklist'   => db_count('blocklist'),
+        'fail2ban'    => $f2b,
+        'locked'      => file_exists(LOCK_FILE),
+        'safemode'    => file_exists(SAFEMODE_FLAG),
+    );
+
+    if ($asJson) {
+        echo json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+        return 0;
+    }
+
+    echo "Firewall:   " . ($state['active'] ? 'active' : 'inactive') . "\n";
+    echo "IPv6:       " . ($state['ipv6_active'] ? 'active' : 'inactive') . "\n";
+    echo "Rules:      " . $state['rules'] . "\n";
+    echo "Whitelist:  " . $state['whitelist'] . "\n";
+    echo "Block List: " . $state['blocklist'] . "\n";
+    echo "fail2ban:   " . ($state['fail2ban'] !== '' ? $state['fail2ban'] : 'unknown') . "\n";
+    echo "Locked:     " . ($state['locked'] ? 'yes' : 'no') . "\n";
+    echo "Safe Mode:  " . ($state['safemode'] ? 'yes' : 'no') . "\n";
+    return 0;
+}
+
+function add_entry($table, $ip, $flag, $event)
+{
+    if (!valid_entry($ip)) fail("Invalid IP address or network: $ip", $event);
+    $db = db();
+    $stmt = $db->prepare("INSERT OR IGNORE INTO $table(ip_address,note) VALUES(?, 'cli')");
+    $stmt->bindValue(1, $ip, SQLITE3_TEXT);
+    if ($stmt->execute() === false) {
+        $db->close();
+        fail("Could not update $table", $event);
+    }
+    $db->close();
+
+    if (!run(FWCONFIG . " $flag " . escapeshellarg($ip), $out, $ret)) {
+        $db = db();
+        $stmt = $db->prepare("DELETE FROM $table WHERE ip_address=?");
+        $stmt->bindValue(1, $ip, SQLITE3_TEXT);
+        $stmt->execute();
+        $db->close();
+        fail("Could not add $ip to $table", $event);
+    }
+    audit($event, 'ok', "ip=$ip");
+    echo "$ip added to $table\n";
+    return 0;
+}
+
+function del_entry($table, $ip, $flag, $event)
+{
+    if (!valid_entry($ip)) fail("Invalid IP address or network: $ip", $event);
+    $db = db();
+    $stmt = $db->prepare("DELETE FROM $table WHERE ip_address=?");
+    $stmt->bindValue(1, $ip, SQLITE3_TEXT);
+    if ($stmt->execute() === false) {
+        $db->close();
+        fail("Could not update $table", $event);
+    }
+    $db->close();
+
+    if (!run(FWCONFIG . " $flag " . escapeshellarg($ip), $out, $ret)) {
+        fail("Could not remove $ip from $table", $event);
+    }
+    audit($event, 'ok', "ip=$ip");
+    echo "$ip removed from $table\n";
+    return 0;
+}
+
+function list_entries($table)
+{
+    try {
+        $db = db();
+        $res = $db->query("SELECT ip_address,note FROM $table ORDER BY ip_address");
+        while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
+            echo $row['ip_address'];
+            if (isset($row['note']) && $row['note'] !== '') echo "\t".$row['note'];
+            echo "\n";
+        }
+        $db->close();
+    } catch (Exception $e) {
+        fail("Could not read $table");
+    }
+    return 0;
+}
+
+function check()
+{
+    $ok = true;
+    $problems = array();
+
+    if (!run(FWCONFIG . ' --isactive')) {
+        $ok = false;
+        $problems[] = 'firewall is not active';
+    }
+    $chains = trim((string)shell_exec('iptables -S ISSABEL_INPUT 2>/dev/null'));
+    if ($chains === '') {
+        $ok = false;
+        $problems[] = 'ISSABEL_INPUT chain is missing';
+    }
+    $set = trim((string)shell_exec('ipset list -n issabel_whitelist 2>/dev/null'));
+    if ($set === '') {
+        $ok = false;
+        $problems[] = 'issabel_whitelist set is missing';
+    }
+    $f2b = trim((string)shell_exec('systemctl is-active fail2ban 2>/dev/null'));
+    if ($f2b !== 'active') {
+        $ok = false;
+        $problems[] = 'fail2ban is not active';
+    }
+
+    echo json_encode(array('ok' => $ok, 'problems' => $problems), JSON_PRETTY_PRINT) . "\n";
+    return $ok ? 0 : 1;
+}
+
+$cmd = isset($argv[1]) ? $argv[1] : 'help';
+$sub = isset($argv[2]) ? $argv[2] : '';
+$force = in_array('--force', $argv, true);
+
+switch ($cmd) {
+case 'status':
+    exit(status(in_array('--json', $argv, true)));
+
+case 'enable':
+    if (!run(FWCONFIG . ' --load', $out, $ret)) fail(implode("\n", $out), 'cli.enable');
+    audit('cli.enable', 'ok');
+    echo "Firewall enabled\n";
+    exit(0);
+
+case 'disable':
+    if (file_exists(LOCK_FILE) && !$force) {
+        fail('The firewall is locked; use --force to override', 'cli.disable');
+    }
+    $cmdline = FWCONFIG . ' --flush' . ($force ? ' --force' : '');
+    if (!run($cmdline, $out, $ret)) fail(implode("\n", $out), 'cli.disable');
+    audit('cli.disable', 'ok');
+    echo "Firewall disabled\n";
+    exit(0);
+
+case 'apply':
+    if (!run(FWCONFIG . ' --load', $out, $ret)) fail(implode("\n", $out), 'cli.apply');
+    audit('cli.apply', 'ok');
+    echo "Rules applied\n";
+    exit(0);
+
+case 'list':
+    if ($sub === 'whitelist') exit(list_entries('whitelist'));
+    if ($sub === 'blocklist') exit(list_entries('blocklist'));
+    fail("Usage: issabel-firewall list whitelist|blocklist");
+
+case 'trust':
+    exit(add_entry('whitelist', $sub, '--add_wl', 'cli.trust'));
+
+case 'untrust':
+    exit(del_entry('whitelist', $sub, '--remove_wl', 'cli.untrust'));
+
+case 'blocklist':
+    $action = isset($argv[2]) ? $argv[2] : '';
+    $ip = isset($argv[3]) ? $argv[3] : '';
+    if ($action === 'add') exit(add_entry('blocklist', $ip, '--add_bl', 'cli.blocklist.add'));
+    if ($action === 'del') exit(del_entry('blocklist', $ip, '--remove_bl', 'cli.blocklist.del'));
+    fail("Usage: issabel-firewall blocklist add|del <ip>");
+
+case 'block':
+    exit(add_entry('blocklist', $sub, '--add_bl', 'cli.blocklist.add'));
+
+case 'unblock':
+    exit(del_entry('blocklist', $sub, '--remove_bl', 'cli.blocklist.del'));
+
+case 'check':
+    exit(check());
+
+case 'safemode':
+    if ($sub === 'status') {
+        echo file_exists(SAFEMODE_FLAG) ? "Safe Mode: on\n" : "Safe Mode: off\n";
+        exit(0);
+    }
+    if ($sub === 'apply') {
+        if (!run(FWRESTORE, $out, $ret)) fail(implode("\n", $out), 'cli.safemode.apply');
+        audit('cli.safemode.apply', 'ok');
+        echo "Safe Mode restore requested\n";
+        exit(0);
+    }
+    fail("Usage: issabel-firewall safemode status|apply");
+
+case 'responsive':
+    if (!in_array($sub, array('on','off','status','flush','apply'), true)) {
+        fail("Usage: issabel-firewall responsive on|off|status|flush|apply");
+    }
+    if (!run(FWCONFIG . ' --responsive '.$sub, $out, $ret)) fail(implode("\n", $out), 'cli.responsive.'.$sub);
+    audit('cli.responsive.'.$sub, 'ok');
+    echo implode("\n", $out) . "\n";
+    exit(0);
+
+default:
+    echo "Usage: issabel-firewall status [--json] | enable | disable [--force] | apply\n";
+    echo "       issabel-firewall list whitelist|blocklist\n";
+    echo "       issabel-firewall trust <ip> | untrust <ip>\n";
+    echo "       issabel-firewall blocklist add|del <ip> | block <ip> | unblock <ip>\n";
+    echo "       issabel-firewall check | safemode status|apply\n";
+    echo "       issabel-firewall responsive on|off|status|flush|apply\n";
+    exit(0);
+}

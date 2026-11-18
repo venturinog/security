@@ -1,0 +1,12 @@
+[Unit]
+Description=Issabel Responsive Firewall
+After=network.target asterisk.service
+
+[Service]
+Type=simple
+ExecStart=/usr/share/issabel/privileged/fwresponsive
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

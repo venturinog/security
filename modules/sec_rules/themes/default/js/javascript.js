@@ -30,6 +30,20 @@ function showElementByTraffic() {
     setDisplay('id_interface_out', value === 'OUTPUT' || both);
     setSpan('id_interface_in', both ? 2 : 4, both ? 3 : 6);
     setSpan('id_interface_out', both ? 2 : 4, both ? 3 : 6);
+    showPriority();
+}
+
+/*
+ * Priority sólo aplica a reglas ACCEPT de INPUT/FORWARD. En el resto de
+ * combinaciones el servidor la fuerza a normal y aquí se oculta para no
+ * ofrecer una opción que no se va a guardar.
+ */
+function showPriority() {
+    var target = document.querySelector('[name="target"]');
+    var traffic = document.querySelector('[name="id_traffic"]');
+    var t = target ? target.value : 'ACCEPT';
+    var tr = traffic ? traffic.value : 'INPUT';
+    setDisplay('id_priority', t === 'ACCEPT' && (tr === 'INPUT' || tr === 'FORWARD'));
 }
 
 /*
@@ -207,6 +221,11 @@ jQuery(function ($) {
     $('#fw_deactivate').on('click', function () {
         if (!confirmSubmit($(this).data('confirm'))) return;
         fwSubmit({ desactivatefirewall: 1 });
+    });
+
+    $('#fw_safemode').on('click', function () {
+        if (!confirmSubmit($(this).data('confirm'))) return;
+        fwSubmit({ restorefirewall: 1 });
     });
 
     $('#fw_discard').on('click', function () {

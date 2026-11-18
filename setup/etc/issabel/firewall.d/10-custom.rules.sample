@@ -1,0 +1,15 @@
+# Custom IPv4 rules for Issabel.
+#
+# Copy this file to a name ending in .rules (for example 20-custom.rules),
+# remove the leading '#' from the lines you need and run:
+#
+#   issabel-firewall apply
+#
+# The file must be root:root and must not be writable by group or others.
+# Use the Issabel chains: ISSABEL_HIGH, ISSABEL_BLOCK, ISSABEL_INPUT,
+# ISSABEL_FORWARD, ISSABEL_OUTPUT.
+
+*filter
+# -A ISSABEL_INPUT -p tcp --dport 8443 -j ACCEPT
+# -A ISSABEL_HIGH  -s 203.0.113.0/24 -p tcp --dport 1194 -j ACCEPT
+COMMIT

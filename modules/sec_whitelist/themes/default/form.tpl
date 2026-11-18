@@ -22,6 +22,10 @@
                 <span class="iss-field__control iss-field__value{if $VALUES.ip_address eq ''} iss-field__value--empty{/if}">{if $VALUES.ip_address eq ''}&mdash;{else}{$VALUES.ip_address|escape}{/if}</span>
             </div>
             <div class="iss-field">
+                <span class="iss-field__label">{$hostname.LABEL}</span>
+                <span class="iss-field__control iss-field__value{if $VALUES.hostname eq ''} iss-field__value--empty{/if}">{if $VALUES.hostname eq ''}&mdash;{else}{$VALUES.hostname|escape}{/if}</span>
+            </div>
+            <div class="iss-field">
                 <span class="iss-field__label">{$note.LABEL}</span>
                 <span class="iss-field__control iss-field__value{if $VALUES.note eq ''} iss-field__value--empty{/if}">{if $VALUES.note eq ''}&mdash;{else}{$VALUES.note|escape}{/if}</span>
             </div>
@@ -34,6 +38,11 @@
                 <span class="iss-field__label">{$ip_address.LABEL}&nbsp;<span class="iss-required">*</span></span>
                 <span class="iss-field__control">{$ip_address.INPUT}</span>
                 {if $ERRORS.ip_address}<div class="invalid-feedback d-block">{$ERRORS.ip_address}</div>{/if}
+            </div>
+            <div class="iss-field" id="hostname">
+                <span class="iss-field__label">{$hostname.LABEL}</span>
+                <span class="iss-field__control">{$hostname.INPUT}</span>
+                {if $ERRORS.hostname}<div class="invalid-feedback d-block">{$ERRORS.hostname}</div>{/if}
             </div>
             <div class="iss-field">
                 <span class="iss-field__label">{$note.LABEL}</span>

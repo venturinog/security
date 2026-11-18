@@ -48,23 +48,50 @@ class IssabelF2BService {
     /*HERE YOUR FUNCTIONS*/
 
     function creaTablaSiNoExiste() {
+        $created = false;
         $query = "SELECT name FROM sqlite_master WHERE type='table' AND name='jails'";
         $result = $this->_DB->fetchTable($query, true, array());
         if(count($result)==0) {
             // Debo crear la tabla
-            $query = "CREATE TABLE jails (id integer primary key, name varchar(30) not null, maxretry integer, bantime integer, ignoreip text, enabled integer)";
+            $query = "CREATE TABLE jails (id integer primary key, name varchar(30) not null unique, maxretry integer, bantime integer, findtime integer, ignoreip text, enabled integer)";
             $result = $this->_DB->genQuery($query,array());
-
             if( $result == false ){
                 $this->errMsg = $this->_DB->errMsg;
                 return false;
             }
-            $jails = array('asterisk','sshd','postfix','apache');
-            foreach($jails as $jail) {
-                $query = "INSERT INTO jails (name,maxretry,bantime,ignoreip,enabled) VALUES ('$jail','5','12','127.0.0.1',1)";
-                $result = $this->_DB->genQuery($query,array());
+            $created = true;
+        } else {
+            // Bases que traian la tabla creada en runtime, sin findtime.
+            $hasFindtime = false;
+            $cols = $this->_DB->fetchTable("PRAGMA table_info(jails)", true, array());
+            foreach ($cols as $col) {
+                if (isset($col['name']) && $col['name'] === 'findtime') { $hasFindtime = true; break; }
+            }
+            if (!$hasFindtime) {
+                if ($this->_DB->genQuery("ALTER TABLE jails ADD COLUMN findtime integer", array()) == false) {
+                    $this->errMsg = $this->_DB->errMsg;
+                    return false;
+                }
             }
         }
+
+        // Sólo se siembra si la tabla se acaba de crear. En una tabla vieja
+        // sin UNIQUE(name), repetir el INSERT en cada carga duplicaria filas;
+        // la expansion de los 4 grupos la hace el version_sql.
+        if ($created) {
+            $jails = array('asterisk','asterisk-ami','apache-auth','apache-badbots',
+                'apache-botsearch','apache-fakegooglebot','apache-modsecurity',
+                'apache-nohome','apache-noscript','apache-overflows','apache-shellshock',
+                'issabel-gui','sshd','postfix','postfix-sasl');
+            foreach ($jails as $jail) {
+                $query = "INSERT OR IGNORE INTO jails (name,maxretry,bantime,findtime,ignoreip,enabled) VALUES (?,5,12,600,'127.0.0.1',1)";
+                $this->_DB->genQuery($query, array($jail));
+            }
+            // El grupo `apache` no es un jail real.
+            $this->_DB->genQuery("DELETE FROM jails WHERE name='apache'", array());
+        }
+        $this->_DB->genQuery("UPDATE jails SET findtime=600 WHERE findtime IS NULL", array());
+        return true;
     }
 
     /**
@@ -126,12 +153,17 @@ class IssabelF2BService {
      *
      * @return bool      false if an error occurs or true if the port is correctly updated
      */
-    function updateJail($id, $maxretry, $bantime, $ignoreip, $enabled)
+    function updateJail($id, $maxretry, $bantime, $ignoreip, $enabled, $findtime = null)
     {
-        $query = "UPDATE jails SET maxretry=?, bantime=?, ignoreip=?, enabled=? ".
-                 "WHERE id = ?";
-
-        $arrParm = array($maxretry, $bantime, $ignoreip, $enabled, $id);   
+        if ($findtime === null) {
+            $query = "UPDATE jails SET maxretry=?, bantime=?, ignoreip=?, enabled=? ".
+                     "WHERE id = ?";
+            $arrParm = array($maxretry, $bantime, $ignoreip, $enabled, $id);
+        } else {
+            $query = "UPDATE jails SET maxretry=?, bantime=?, findtime=?, ignoreip=?, enabled=? ".
+                     "WHERE id = ?";
+            $arrParm = array($maxretry, $bantime, $findtime, $ignoreip, $enabled, $id);
+        }
 
         $result = $this->_DB->genQuery($query,$arrParm);
 
@@ -171,71 +203,38 @@ class IssabelF2BService {
 
     function F2BUpdateJails(&$pDB) {
 
-    $ini_file = "/etc/fail2ban/jail.d/issabel.conf";
-    $datosini = parse_ini_file($ini_file,true);
+        $ini_file = "/etc/fail2ban/jail.d/issabel.conf";
+        if (!is_file($ini_file)) return false;
 
-    $iJails     = new IssabelF2BService($pDB);
-    $arrResult = $iJails->obtainJails();
-    $dbdatos = array();
-    $finaldatos = array();
+        $datosini = @parse_ini_file($ini_file, true);
+        if ($datosini === false || !is_array($datosini)) return false;
 
-    foreach($arrResult as $idx => $datos) {
-        $dbdatos[$datos['name']]['maxretry']=$datos['maxretry'];
-        $dbdatos[$datos['name']]['bantime']=$datos['bantime'];
-        $dbdatos[$datos['name']]['ignoreip']=$datos['ignoreip'];
-        $dbdatos[$datos['name']]['enabled']=$datos['enabled'];
-    }
+        $iJails = new IssabelF2BService($pDB);
+        $arrResult = $iJails->obtainJails();
 
-    foreach($dbdatos as $jail => $conf) {
+        // Sin filas no se escribe nada: antes se truncaba el fichero y se
+        // perdian los 15 jails (B4).
+        if (!is_array($arrResult) || count($arrResult) == 0) return false;
 
-        $conf['bantime'] = $conf['bantime'] * 60 * 60;
+        foreach ($arrResult as $datos) {
+            $name = isset($datos['name']) ? (string)$datos['name'] : '';
+            if ($name === '' || !isset($datosini[$name])) continue;
 
-        if($jail=='apache') {
-            $dojails = array  ( 'apache-auth','apache-badbots','apache-botsearch','apache-fakegooglebot',
-                                'apache-modsecurity','apache-nohome','apache-noscript','apache-overflows', 'apache-shellshock', 'issabel-gui');
-            foreach($dojails as $individualjail) {
-                if(file_exists("/etc/fail2ban/filter.d/{$individualjail}.conf")) {
-                    $finaldatos[$individualjail]=$conf;
-                }
-            }
-        } else if($jail=='postfix') {
-            $dojails = array('postfix','postfix-sasl');
-            foreach($dojails as $individualjail) {
-                if(file_exists("/etc/fail2ban/filter.d/{$individualjail}.conf")) {
-                    $finaldatos[$individualjail]=$conf;
-                }
-            }
-        } else if($jail=='sshd') {
-            $dojails = array('sshd');
-            foreach($dojails as $individualjail) {
-                if(file_exists("/etc/fail2ban/filter.d/{$individualjail}.conf")) {
-                    $finaldatos[$individualjail]=$conf;
-                }
-            }
-        } else if($jail=='asterisk') {
-            $dojails = array('asterisk','asterisk-ami');
-            foreach($dojails as $individualjail) {
-                if(file_exists("/etc/fail2ban/filter.d/{$individualjail}.conf")) {
-                    $finaldatos[$individualjail]=$conf;
-                }
-            }
-
-        } else {
-            $finaldatos[$jail]=$conf;
+            $conf = $datosini[$name];
+            $conf['maxretry'] = $datos['maxretry'];
+            // La BD guarda horas (como la UI); fail2ban usa segundos.
+            $conf['bantime'] = ((int)$datos['bantime']) * 3600;
+            $conf['findtime'] = (isset($datos['findtime']) && $datos['findtime'] !== null && $datos['findtime'] !== '')
+                ? (int)$datos['findtime'] : 600;
+            $conf['ignoreip'] = $datos['ignoreip'];
+            $conf['enabled'] = $datos['enabled'];
+            $datosini[$name] = $conf;
         }
 
-    }
-    $finalini=array();
-    foreach($datosini as $section => $conf) {
-        if(isset($finaldatos[$section])) {
-             $finalini[$section]=array_merge($conf,$finaldatos[$section]);
-        }
-    }
+        $this->write_php_ini($datosini, $ini_file);
 
-    $this->write_php_ini($finalini,$ini_file);
-
-    exec('/usr/bin/issabel-helper fb_client reload', $respuesta, $retorno);
-
+        exec('/usr/bin/issabel-helper fb_client reload', $respuesta, $retorno);
+        return true;
     }
 
     function write_php_ini($array, $file) {
@@ -248,7 +247,7 @@ class IssabelF2BService {
                 $res[] = "$key = ".(is_numeric($val) ? $val : ''.$val.'');
             }
         }
-        $this->safefilerewrite($file, implode("\r\n", $res));
+        $this->safefilerewrite($file, implode("\n", $res)."\n");
     }
 
     function safefilerewrite($fileName, $dataToSave) {

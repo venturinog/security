@@ -47,4 +47,6 @@ $arrLangModule = array(
     'View' => '查看',
     'View IP Address' => '查看IP地址',
     'White List' => '白名单',
+    'Hostname (DDNS)' => 'Hostname (DDNS)',
+    'The hostname could not be resolved' => 'The hostname could not be resolved',
 );

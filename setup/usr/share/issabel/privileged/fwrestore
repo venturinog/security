@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# Restaura el ruleset completo guardado por fwboot-pre y recarga el firewall.
+# Se ejecuta desde el botón "Aplicar ahora" de Safe Mode (issabel-helper) y
+# desde la unidad transitoria programada por fwboot-pre.
+
+set -u
+
+STATE_DIR=/var/lib/issabel/firewall
+FULL_RULES="$STATE_DIR/full.rules"
+FLAG=/run/issabel-fw-safemode
+AUDIT=/var/log/issabel/audit.log
+FWCONFIG=/usr/share/issabel/privileged/fwconfig
+
+if [ -f "$FULL_RULES" ]; then
+    cp -f "$FULL_RULES" /etc/sysconfig/iptables 2>/dev/null || true
+fi
+
+# Se restaura el ruleset guardado sin depender de PEAR/fwconfig (B1 sigue
+# abierto). fail2ban se reinicia para recrear F2B_INPUT/F2B_RBL.
+if [ -s /etc/sysconfig/iptables ]; then
+    /usr/sbin/iptables-restore < /etc/sysconfig/iptables
+    rc=$?
+else
+    "$FWCONFIG" --load >/dev/null 2>&1
+    rc=$?
+fi
+/usr/bin/systemctl restart fail2ban >/dev/null 2>&1 || true
+
+# El flag sólo se retira si la restauración funcionó: si falla, el banner
+# sigue visible para que el administrador lo vea.
+if [ "$rc" -eq 0 ]; then
+    rm -f "$FLAG" 2>/dev/null || true
+fi
+
+if [ -d "$(dirname "$AUDIT")" ]; then
+    if [ "$rc" -eq 0 ]; then
+        printf '%s FIREWALL system: firewall.safemode.end result=ok from local.\n' "$(date '+%Y-%m-%d %H:%M:%S')" >> "$AUDIT" 2>/dev/null || true
+    else
+        printf '%s FIREWALL system: firewall.safemode.end result=error from local.\n' "$(date '+%Y-%m-%d %H:%M:%S')" >> "$AUDIT" 2>/dev/null || true
+    fi
+fi
+
+exit "$rc"

@@ -23,15 +23,60 @@
   +----------------------------------------------------------------------+
 */
 
-require_once 'Console/Getopt.php';
+// Parser de opciones largo propio. Antes se usaba Console_Getopt de PEAR,
+// que no esta declarado en el spec y en EL10 puede no estar instalado (B1).
+// El formato que devuelve imita a Console_Getopt: array($opciones, $no_opts),
+// con cada opcion como array('--nombre', valor|null).
+function fw_getopt($argv, $spec)
+{
+    $options = array();
+    $nonOpts = array();
+    $wants = array();
+    foreach ($spec as $s) {
+        if (substr($s, -1) === '=') $wants[substr($s, 0, -1)] = TRUE;
+        else $wants[$s] = FALSE;
+    }
+    for ($i = 1; $i < count($argv); $i++) {
+        $arg = $argv[$i];
+        if (strncmp($arg, '--', 2) !== 0) { $nonOpts[] = $arg; continue; }
+        $name = substr($arg, 2);
+        $value = NULL;
+        $eq = strpos($name, '=');
+        if ($eq !== FALSE) {
+            $value = substr($name, $eq + 1);
+            $name = substr($name, 0, $eq);
+        }
+        if (!array_key_exists($name, $wants)) {
+            fwrite(STDERR, "Unknown option --$name\n");
+            return FALSE;
+        }
+        if ($wants[$name] && $value === NULL) {
+            // Se acepta tanto --opt=valor como --opt valor: los helpers y
+            // las llamadas historicas usan la forma con espacio.
+            if (isset($argv[$i + 1]) && strncmp($argv[$i + 1], '--', 2) !== 0) {
+                $value = $argv[++$i];
+            } else {
+                fwrite(STDERR, "Option --$name requires a value\n");
+                return FALSE;
+            }
+        }
+        if (!$wants[$name] && $value !== NULL) {
+            fwrite(STDERR, "Option --$name does not take a value\n");
+            return FALSE;
+        }
+        $options[] = array('--'.$name, $value);
+    }
+    return array($options, $nonOpts);
+}
 
 // Parse command-line options
-$opt = Console_Getopt::getopt($argv, '', array(
+$opt = fw_getopt($argv, array(
     'flush',  // Remove all firewall rules from iptables
     'load',   // Load all firewall rules from database
     'isactive',
     'isactive6',
     'save_wl',
+    'save_bl',
     'isactivegeoip',
     'isactivegeoip6',
     'listgeoblocked',
@@ -42,9 +87,19 @@ $opt = Console_Getopt::getopt($argv, '', array(
     'whitelist_country=',
     'none_country=',
     'add_wl=',
-    'remove_wl='
+    'remove_wl=',
+    'resolve_wl',
+    'add_bl=',
+    'remove_bl=',
+    'lock=',
+    'islocked',
+    'check',
+    'le-open=',
+    'le-close',
+    'responsive=',
+    'force'
 ));
-if (PEAR::isError($opt)) error_exit($opt->getMessage()."\n");
+if ($opt === FALSE) error_exit("Invalid options\n");
 //validateOptions($opt);
 foreach ($opt[0] as $option) switch ($option[0]) {
 case '--flush':
@@ -71,8 +126,28 @@ case '--add_wl':
     exit(add_whitelist($option[1]) ? 0 : 1);
 case '--remove_wl':
     exit(remove_whitelist($option[1]) ? 0 : 1);
+case '--resolve_wl':
+    exit(resolve_whitelist() ? 0 : 1);
+case '--add_bl':
+    exit(add_blocklist($option[1]) ? 0 : 1);
+case '--remove_bl':
+    exit(remove_blocklist($option[1]) ? 0 : 1);
 case '--save_wl':
     exit(generate_save_file() ? 0 : 1);
+case '--save_bl':
+    exit(generate_save_file() ? 0 : 1);
+case '--lock':
+    exit(set_lock($option[1]) ? 0 : 1);
+case '--islocked':
+    exit(is_locked() ? 0 : 1);
+case '--check':
+    exit(action_check() ? 0 : 1);
+case '--le-open':
+    exit(_fwLeOpen($option[1]) ? 0 : 1);
+case '--le-close':
+    exit(_fwLeClose() ? 0 : 1);
+case '--responsive':
+    exit(action_responsive($option[1]) ? 0 : 1);
 case '--block_country':
     exit(block_country($option[1]) ? 0 : 1);
 case '--whitelist_country':
@@ -88,9 +163,62 @@ function error_exit($sMsg, $errorcode = 1)
     exit($errorcode);
 }
 
+/**
+ * Flag root-owned que impide apagar el firewall desde la GUI. La consola
+ * puede saltarlo con --force; la web no, porque el POST de desactivacion
+ * llama a `fwconfig --flush` sin ese flag.
+ */
+function _fwLockDir()  { return '/etc/issabel/firewall'; }
+function _fwLockFile() { return _fwLockDir().'/locked'; }
+
+function is_locked()
+{
+    return file_exists(_fwLockFile());
+}
+
+function set_lock($value)
+{
+    $value = strtolower(trim((string)$value));
+    if ($value !== 'on' && $value !== 'off') {
+        fputs(STDERR, "ERR: --lock expects on|off\n");
+        return FALSE;
+    }
+    $dir = _fwLockDir();
+    if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
+        fputs(STDERR, "ERR: could not create $dir\n");
+        return FALSE;
+    }
+    if ($value === 'on') {
+        if (@file_put_contents(_fwLockFile(), "locked\n") === FALSE) {
+            fputs(STDERR, "ERR: could not create ". _fwLockFile() ."\n");
+            return FALSE;
+        }
+        @chmod(_fwLockFile(), 0640);
+    } else {
+        if (file_exists(_fwLockFile()) && !@unlink(_fwLockFile())) {
+            fputs(STDERR, "ERR: could not remove ". _fwLockFile() ."\n");
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+function _fwOptPresent($opt, $name)
+{
+    if (!is_array($opt) || !isset($opt[0]) || !is_array($opt[0])) return FALSE;
+    foreach ($opt[0] as $o) {
+        if (isset($o[0]) && $o[0] === $name) return TRUE;
+    }
+    return FALSE;
+}
+
 // Flush all firewall rules and remove all chains.
 function action_flushFirewall($opt)
 {
+    if (is_locked() && !_fwOptPresent($opt, '--force')) {
+        fputs(STDERR, "ERR: the firewall is locked; use --force from the console to override\n");
+        return FALSE;
+    }
     file_put_contents("/etc/sysconfig/iptables",""); // Se blanque ese archivo para que no se vuelvan a cargar las reglas al reiniciar el servidor
     $ret = NULL;
     foreach (array(
@@ -105,6 +233,8 @@ function action_flushFirewall($opt)
     // IPv6 se retira solo si el firewall de Issabel estaba cargado: si el
     // operador nunca lo encendio, no se tocan reglas v6 de terceros.
     if (_fwFamilyLoaded('inet6')) _fwTeardownFamily('inet6');
+    @unlink('/run/issabel-fw-safemode');
+    _fwResponsiveFlush();
     manageF2B('same');
     return TRUE;
 }
@@ -159,6 +289,22 @@ function action_loadFirewall($opt)
             fputs(STDERR, "DEBUG: arreglando filter.family faltante...\n");
             $conn->query("ALTER TABLE filter ADD COLUMN family TEXT NOT NULL DEFAULT 'inet'");
         }
+        if (count($rules) > 0 && !array_key_exists('priority', $rules[0])) {
+            fputs(STDERR, "DEBUG: arreglando filter.priority faltante...\n");
+            $conn->query("ALTER TABLE filter ADD COLUMN priority varchar(10) NOT NULL DEFAULT 'normal'");
+        } else {
+            // La tabla puede estar vacia: el array de arriba no trae columnas.
+            // Se comprueba el esquema para no dejar la SELECT de abajo sin
+            // `priority` en una base antigua sin reglas.
+            $hasPriority = FALSE;
+            foreach ($conn->query('PRAGMA table_info(filter)')->fetchAll(PDO::FETCH_ASSOC) as $col) {
+                if (isset($col['name']) && $col['name'] === 'priority') { $hasPriority = TRUE; break; }
+            }
+            if (!$hasPriority) {
+                fputs(STDERR, "DEBUG: arreglando filter.priority faltante...\n");
+                $conn->query("ALTER TABLE filter ADD COLUMN priority varchar(10) NOT NULL DEFAULT 'normal'");
+            }
+        }
         $rules = array();
 
         $wl = array();
@@ -173,6 +319,20 @@ function action_loadFirewall($opt)
             }
         }
         $rules = array();
+
+        // Block List. La tabla puede no existir todavia si el version_sql
+        // quedo diferido: se degrada a lista vacia, no se aborta la carga.
+        $bl = array();
+        try {
+            $sth = $conn->query('SELECT ip_address FROM blocklist');
+            if ($sth) {
+                foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $blentry) {
+                    $bl[] = $blentry['ip_address'];
+                }
+            }
+        } catch (PDOException $e) {
+            fputs(STDERR, "WARN: blocklist table is not available yet\n");
+        }
 
         // Is the firewall active? IPv6 has its own opt-in flag and stays off
         // until the operator turns it on from the rules page.
@@ -238,7 +398,7 @@ PETICION_PK;
             // Read rule configuration from database
             $sth = $conn->query(
                 'SELECT traffic, eth_in, eth_out, ip_source, ip_destiny, protocol, ' .
-                    'sport, dport, target, state, countries, continents, family ' .
+                    'sport, dport, target, state, countries, continents, family, priority ' .
                 'FROM  filter WHERE activated = 1 ORDER BY rule_order');
             $rules = array_merge($rules, $sth->fetchAll(PDO::FETCH_ASSOC));
         }
@@ -276,6 +436,11 @@ PETICION_PK;
 
     // Flush all firewall rules
     if ($bExito) {
+        // Cierra un 80 que quedó abierto por un certbot interrumpido, salvo
+        // que haya un certbot en curso.
+        if (trim((string)shell_exec('pgrep -f "[c]ertbot" 2>/dev/null')) === '') {
+            _fwLeClose();
+        }
         $bExito = _fwFlushFamily('inet');
     }
 
@@ -293,8 +458,23 @@ PETICION_PK;
         // Los sets existen antes que las reglas que los referencian, y con el
         // tipo correcto: en 5.x eran hash:ip, que no acepta redes.
         $bExito = _fwEnsureWhitelistSets();
+        if ($bExito) $bExito = _fwEnsureBlocklistSets();
         if ($bExito) $bExito = _fwCreateChains('inet', $issabelChains);
         if ($bExito && $bIpv6) $bExito = _fwCreateChains('inet6', $issabelChains);
+        if ($bExito) $bExito = _fwInitAuxChains('inet');
+        if ($bExito && $bIpv6) $bExito = _fwInitAuxChains('inet6');
+        if ($bExito) $bExito = _fwInitLeRule('inet');
+        if ($bExito && $bIpv6) $bExito = _fwInitLeRule('inet6');
+        $resp = _fwResponsiveSettings();
+        if ($bExito && !empty($resp['enabled'])) {
+            $bExito = _fwEnsureResponsiveSets($resp);
+            if ($bExito) $bExito = _fwInitResponsive('inet', $resp);
+            if ($bExito && $bIpv6) $bExito = _fwInitResponsive('inet6', $resp);
+        }
+        // Reglas propias del operador, antes de las normales para que no
+        // queden detras del REJECT final.
+        if ($bExito) $bExito = _fwApplyCustomRules('inet');
+        if ($bExito && $bIpv6) $bExito = _fwApplyCustomRules('inet6');
     }
 
     // Add rules to ISSABEL_XXX chains
@@ -323,6 +503,13 @@ PETICION_PK;
         }
     }
     
+    // Engancha las cadenas en las built-in. Se hace después de aplicar las
+    // reglas para que ISSABEL_PRE quede antes de ISSABEL_INPUT.
+    if ($bExito && $bFirewallActivo) {
+        $bExito = _fwInstallJumps('inet', $issabelChains);
+        if ($bExito && $bIpv6) $bExito = _fwInstallJumps('inet6', $issabelChains);
+    }
+
     // Add White List check to INPUT, en las dos familias. Sólo con el firewall
     // activo: sin cadenas de Issabel no hay nada que exceptuar (y los sets se
     // crean en ese mismo bloque).
@@ -344,6 +531,9 @@ PETICION_PK;
     }
     if ($bExito && $bFirewallActivo) {
         $bExito = _fwLoadWhitelist($wl);
+    }
+    if ($bExito && $bFirewallActivo) {
+        $bExito = _fwLoadBlocklist($bl);
     }
 
     // Save configuration to /etc/sysconfig/iptables
@@ -368,6 +558,15 @@ PETICION_PK;
         $ret = NULL;
         system('/usr/bin/systemctl enable ip6tables.service', $ret);
         if ($ret) { $bExito = FALSE; }
+    }
+
+    // Si el administrador aplica reglas durante Safe Mode, ese ruleset pasa a
+    // ser el bueno y Safe Mode termina: no se debe restaurar el viejo a los
+    // 5 minutos. fwrestore usa iptables-restore y no pasa por aquí.
+    if ($bExito && file_exists('/run/issabel-fw-safemode')) {
+        @mkdir('/var/lib/issabel/firewall', 0750, true);
+        @copy('/etc/sysconfig/iptables', '/var/lib/issabel/firewall/full.rules');
+        @unlink('/run/issabel-fw-safemode');
     }
 
     manageF2B('same');
@@ -458,7 +657,25 @@ function _fwTeardownFamily($family)
 }
 
 /**
- * Crea las cadenas ISSABEL_XXX que falten y las engancha en las built-in.
+ * Cadenas auxiliares del orden nuevo: PRE (HIGH + BLOCK) y sus equivalentes
+ * de FORWARD. Se crean siempre, aunque estén vacías: el salto desde la
+ * built-in tiene que existir para que el orden sea determinista.
+ */
+function _fwAuxChains()
+{
+    return array(
+        'ISSABEL_PRE',
+        'ISSABEL_HIGH',
+        'ISSABEL_BLOCK',
+        'ISSABEL_PRE_FORWARD',
+        'ISSABEL_HIGH_FORWARD',
+    );
+}
+
+/**
+ * Crea las cadenas ISSABEL_XXX que falten. No engancha saltos: eso lo hace
+ * _fwInstallJumps() después de aplicar las reglas, para que PRE quede antes
+ * de ISSABEL_INPUT y no al revés.
  */
 function _fwCreateChains($family, $chains)
 {
@@ -474,13 +691,150 @@ function _fwCreateChains($family, $chains)
         if (preg_match('/^Chain (\S+)/', $sLinea, $regs))
             $currentChains[] = $regs[1];
     }
-    foreach (array_diff($chains, $currentChains) as $key => $sChain) {
+
+    $wanted = array_merge(array_values($chains), _fwAuxChains());
+    foreach (array_diff(array_unique($wanted), $currentChains) as $sChain) {
         system($bin[$family].' -N '.$sChain, $ret);
-        if ($ret) return FALSE;
-        system($bin[$family].' -A '.$key.' -j '.$sChain, $ret);
         if ($ret) return FALSE;
     }
     return TRUE;
+}
+
+/**
+ * Engancha las cadenas en las built-in en el orden acordado:
+ *
+ *   INPUT 1 whitelist (lo inserta action_loadFirewall)
+ *   INPUT 2 F2B_INPUT (lo inserta fail2ban)
+ *   INPUT 3 ISSABEL_PRE
+ *   INPUT 4 F2B_RBL (lo inserta la accion de packetbl)
+ *   INPUT 5 ISSABEL_INPUT
+ *
+ * ISSABEL_PRE se inserta antes de que se agregue ISSABEL_INPUT; si F2B_INPUT
+ * no existe todavía, iptables lo pega al final y fail2ban lo empuja a 2 al
+ * arrancar.
+ */
+function _fwInstallJumps($family, $chains)
+{
+    $bin = _fwBinaries();
+    $ret = NULL;
+
+    if (!_ipt_insert_at('INPUT', 3, '-j ISSABEL_PRE', $family)) return FALSE;
+    system($bin[$family].' -A INPUT -j '.$chains['INPUT'], $ret);
+    if ($ret) return FALSE;
+
+    if (!_ipt_insert_at('FORWARD', 1, '-j ISSABEL_PRE_FORWARD', $family)) return FALSE;
+    system($bin[$family].' -A FORWARD -j '.$chains['FORWARD'], $ret);
+    if ($ret) return FALSE;
+
+    system($bin[$family].' -A OUTPUT -j '.$chains['OUTPUT'], $ret);
+    if ($ret) return FALSE;
+
+    return TRUE;
+}
+
+/**
+ * Contenido fijo de las cadenas auxiliares. BLOCK usa el set de su familia;
+ * los sets ya existen cuando se llama a esta función.
+ */
+function _fwInitAuxChains($family)
+{
+    $bin = _fwBinaries();
+    $set = ($family === 'inet6') ? 'issabel_blocklist6' : 'issabel_blocklist';
+    $ret = NULL;
+
+    foreach (array(
+        '-A ISSABEL_PRE -j ISSABEL_HIGH',
+        '-A ISSABEL_PRE -j ISSABEL_BLOCK',
+        '-A ISSABEL_PRE_FORWARD -j ISSABEL_HIGH_FORWARD',
+        '-A ISSABEL_PRE_FORWARD -j ISSABEL_BLOCK',
+        '-A ISSABEL_BLOCK -m set --match-set '.$set.' src -j DROP',
+    ) as $rule) {
+        system($bin[$family].' '.$rule, $ret);
+        if ($ret) return FALSE;
+    }
+    return TRUE;
+}
+
+function _ipt_insert_at($chain, $pos, $rule, $family = 'inet')
+{
+    exec(_ipt_bin($family).' -w -I '.$chain.' '.(int)$pos.' '.$rule.' 2>&1', $out, $ret);
+    if ($ret != 0) {
+        fwrite(STDERR, implode("\n", $out)."\n");
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Reglas propias del operador en /etc/issabel/firewall.d/*.rules (v4) y
+ * *.rules6 (v6). Se aplican antes de las reglas normales, para que una regla
+ * custom de ISSABEL_INPUT no quede detrás del REJECT final.
+ *
+ * Los ficheros deben ser root:root y no escribibles por grupo/otros, y no
+ * pueden ser symlinks. Se valida con iptables-restore --test antes de tocar
+ * el kernel; si algo falla, se aborta la carga entera.
+ */
+function _fwApplyCustomRules($family)
+{
+    $dir = '/etc/issabel/firewall.d';
+    if (!is_dir($dir)) return TRUE;
+
+    $suffix = ($family === 'inet6') ? '.rules6' : '.rules';
+    $files = glob($dir.'/*'.$suffix);
+    if (!is_array($files) || count($files) === 0) return TRUE;
+    sort($files);
+
+    $restore = ($family === 'inet6') ? '/usr/sbin/ip6tables-restore' : '/usr/sbin/iptables-restore';
+    $out = $ret = NULL;
+
+    foreach ($files as $file) {
+        if (is_link($file)) {
+            fputs(STDERR, "ERR: custom rules file $file is a symlink\n");
+            return FALSE;
+        }
+        $st = @stat($file);
+        if (!is_array($st) || $st['uid'] != 0 || ($st['mode'] & 0022) != 0) {
+            fputs(STDERR, "ERR: custom rules file $file must be root:root and not group/world writable\n");
+            return FALSE;
+        }
+
+        $out = $ret = NULL;
+        exec($restore.' --test < '.escapeshellarg($file).' 2>&1', $out, $ret);
+        if ($ret != 0) {
+            fputs(STDERR, "ERR: custom rules file $file is invalid: ".implode(' ', $out)."\n");
+            return FALSE;
+        }
+
+        $out = $ret = NULL;
+        exec($restore.' --noflush < '.escapeshellarg($file).' 2>&1', $out, $ret);
+        if ($ret != 0) {
+            fputs(STDERR, "ERR: could not apply custom rules file $file: ".implode(' ', $out)."\n");
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+/**
+ * Cadena donde se emite una regla. Las reglas High sólo se aceptan para
+ * INPUT/FORWARD con target ACCEPT; el resto va a su cadena normal (o a la
+ * _GEOIP si el protocolo es GEOIP).
+ */
+function _fwRuleChain($rule, $issabelChains)
+{
+    $traffic = isset($rule['traffic']) ? $rule['traffic'] : 'INPUT';
+    $priority = isset($rule['priority']) ? (string)$rule['priority'] : 'normal';
+    $target = isset($rule['target']) ? (string)$rule['target'] : '';
+    $isHigh = ($priority === 'high' && $target === 'ACCEPT'
+               && ($traffic === 'INPUT' || $traffic === 'FORWARD'));
+
+    if ($isHigh) {
+        return ($traffic === 'FORWARD') ? 'ISSABEL_HIGH_FORWARD' : 'ISSABEL_HIGH';
+    }
+    if ($rule['protocol'] == 'GEOIP') {
+        return $issabelChains[$traffic].'_GEOIP';
+    }
+    return $issabelChains[$traffic];
 }
 
 /**
@@ -509,11 +863,7 @@ function _fwApplyRules($rules, $family, $issabelChains, $mycontinent, $conn, $di
         $commandParams = array(
                 $ipt,
                 );
-        if ($rule['protocol'] == 'GEOIP') { 
-            $commandParams[] = '-A '.$issabelChains[$rule['traffic']].'_GEOIP';
-        } else {
-            $commandParams[] = '-A '.$issabelChains[$rule['traffic']];
-        }
+        $commandParams[] = '-A '._fwRuleChain($rule, $issabelChains);
         $ip_destiny = isset($rule['ip_destiny']) ? (string)$rule['ip_destiny'] : '';
         $ip_source  = isset($rule['ip_source']) ? (string)$rule['ip_source'] : '';
         if (!in_array($ip_destiny, $wildcards, true))
@@ -816,6 +1166,388 @@ function action_isactive6()
     }
 }
 
+/**
+ * Sets de la Block List. Mismo tipo que la whitelist: hash:net para aceptar
+ * redes, una familia por set.
+ */
+function _fwBlocklistSets()
+{
+    return array(
+        'inet'  => array('name' => 'issabel_blocklist',  'family' => 'inet',  'type' => 'hash:net'),
+        'inet6' => array('name' => 'issabel_blocklist6', 'family' => 'inet6', 'type' => 'hash:net'),
+    );
+}
+
+function _fwBlocklistSetFor($value)
+{
+    $sets = _fwBlocklistSets();
+    $parts = explode('/', trim((string)$value));
+    $address = $parts[0];
+    if (!filter_var($address, FILTER_VALIDATE_IP)) return NULL;
+    $family = filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 'inet6' : 'inet';
+    return $sets[$family];
+}
+
+function _fwEnsureBlocklistSets()
+{
+    foreach (_fwBlocklistSets() as $spec) {
+        if (!_fwEnsureWhitelistSet($spec)) return FALSE;
+    }
+    return TRUE;
+}
+
+function _fwLoadBlocklist($bl)
+{
+    $output = $ret = NULL;
+    foreach (_fwBlocklistSets() as $spec) {
+        exec('/usr/sbin/ipset flush '.$spec['name'], $output, $ret);
+        if ($ret != 0) {
+            fputs(STDERR, "ERR: could not flush ipset ".$spec['name']."\n");
+            return FALSE;
+        }
+    }
+
+    foreach ($bl as $ip) {
+        $spec = _fwBlocklistSetFor($ip);
+        if ($spec === NULL) {
+            fputs(STDERR, "ERR: invalid blocklist entry '$ip', skipped\n");
+            continue;
+        }
+        exec('/usr/sbin/ipset add '.$spec['name'].' '.escapeshellarg($ip), $output, $ret);
+        if ($ret != 0) {
+            fputs(STDERR, "ERR: could not add '$ip' to ".$spec['name'].": "
+                .implode(' ', $output)."\n");
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+/**
+ * Set de puertos para la validación HTTP-01 de Let's Encrypt. Es un
+ * bitmap:port (no una lista de IPs): mientras está vacío, el puerto está
+ * cerrado; ssl_certbot añade el 80 justo antes de certbot y lo vacía después.
+ */
+function _fwLeportsName()
+{
+    return 'issabel_leports';
+}
+
+function _fwEnsureLeportsSet()
+{
+    $name = _fwLeportsName();
+    $out = $ret = NULL;
+    exec('/usr/sbin/ipset list -t '.$name.' 2>/dev/null', $out, $ret);
+    if ($ret == 0) return TRUE;
+
+    $out = $ret = NULL;
+    exec('/usr/sbin/ipset -exist create '.$name.' bitmap:port range 0-65535', $out, $ret);
+    if ($ret != 0) {
+        fputs(STDERR, "ERR: could not create ipset $name: ".implode(' ', $out)."\n");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+function _fwLeOpen($port)
+{
+    $port = (int)$port;
+    if ($port < 1 || $port > 65535) {
+        fputs(STDERR, "ERR: invalid port '$port'\n");
+        return FALSE;
+    }
+    // Sin firewall activo no hay regla que consulte el set: no-op.
+    if (!_fwFamilyLoaded('inet')) return TRUE;
+    if (!_fwEnsureLeportsSet()) return FALSE;
+
+    $out = $ret = NULL;
+    exec('/usr/sbin/ipset -exist add '._fwLeportsName().' '.$port, $out, $ret);
+    if ($ret != 0) {
+        fputs(STDERR, "ERR: could not add port $port to "._fwLeportsName().": "
+            .implode(' ', $out)."\n");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+function _fwLeClose()
+{
+    $name = _fwLeportsName();
+    $out = $ret = NULL;
+    exec('/usr/sbin/ipset list -t '.$name.' 2>/dev/null', $out, $ret);
+    if ($ret != 0) return TRUE; // nunca se creó: nada que cerrar
+    $out = $ret = NULL;
+    exec('/usr/sbin/ipset flush '.$name, $out, $ret);
+    if ($ret != 0) {
+        fputs(STDERR, "ERR: could not flush ipset $name: ".implode(' ', $out)."\n");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+/**
+ * Regla que acepta los puertos del set en ISSABEL_INPUT. Va en posición 1
+ * para quedar antes del REJECT final.
+ */
+function _fwInitLeRule($family)
+{
+    if (!_fwEnsureLeportsSet()) return FALSE;
+    return _ipt_insert_at('ISSABEL_INPUT', 1,
+        '-m set --match-set '._fwLeportsName().' dst,dst -j ACCEPT', $family);
+}
+
+function _fwResponsiveSettings()
+{
+    $defaults = array(
+        'enabled' => 0, 'allow_timeout' => 7200, 'sip_port' => 5060,
+        'rtp_start' => 10000, 'rtp_end' => 20000,
+        'probe_rate' => 6, 'probe_burst' => 3,
+    );
+    try {
+        $db = new SQLite3('/var/www/db/iptables.db');
+        $db->busyTimeout(5000);
+        $res = @$db->query("SELECT * FROM responsive WHERE id=1");
+        $row = $res ? $res->fetchArray(SQLITE3_ASSOC) : false;
+        $db->close();
+        if (is_array($row)) return array_merge($defaults, $row);
+    } catch (Exception $e) { /* tabla diferida: defaults */ }
+    return $defaults;
+}
+
+function _fwResponsiveEnabled()
+{
+    $s = _fwResponsiveSettings();
+    return !empty($s['enabled']);
+}
+
+function _fwResponsiveSetSpec($family, $settings)
+{
+    $timeout = max(60, (int)$settings['allow_timeout']);
+    return array(
+        'name'   => ($family === 'inet6') ? 'issabel_responsive6' : 'issabel_responsive',
+        'family' => $family,
+        'type'   => 'hash:ip',
+        'timeout'=> $timeout,
+    );
+}
+
+function _fwEnsureResponsiveSet($spec)
+{
+    $out = $ret = NULL;
+    exec('/usr/sbin/ipset list -t '.$spec['name'].' 2>/dev/null', $out, $ret);
+    if ($ret == 0) return TRUE;
+    $out = $ret = NULL;
+    exec('/usr/sbin/ipset -exist create '.$spec['name'].' hash:ip family '.$spec['family']
+        .' timeout '.$spec['timeout'].' hashsize 1024 maxelem 65536', $out, $ret);
+    if ($ret != 0) {
+        fputs(STDERR, "ERR: could not create ipset ".$spec['name'].": ".implode(' ', $out)."\n");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+function _fwEnsureResponsiveSets($settings)
+{
+    foreach (array('inet', 'inet6') as $family) {
+        if (!_fwEnsureResponsiveSet(_fwResponsiveSetSpec($family, $settings))) return FALSE;
+    }
+    return TRUE;
+}
+
+function _fwResponsiveFlush()
+{
+    $out = $ret = NULL;
+    foreach (array('issabel_responsive', 'issabel_responsive6') as $name) {
+        exec('/usr/sbin/ipset list -t '.$name.' 2>/dev/null', $out, $ret);
+        if ($ret == 0) exec('/usr/sbin/ipset flush '.$name, $out, $ret);
+    }
+    return TRUE;
+}
+
+function _fwInitResponsive($family, $settings)
+{
+    $bin = _fwBinaries();
+    $chain = 'ISSABEL_RESPONSIVE';
+    $spec = _fwResponsiveSetSpec($family, $settings);
+    if (!_fwEnsureResponsiveSet($spec)) return FALSE;
+
+    $out = $ret = NULL;
+    system($bin[$family].' -N '.$chain.' 2>/dev/null', $ret); // si ya existe, sigue
+    if (!_ipt_insert_at('ISSABEL_INPUT', 1, '-j '.$chain, $family)) return FALSE;
+
+    $sip = max(1, min(65535, (int)$settings['sip_port']));
+    $rtpStart = max(1, min(65535, (int)$settings['rtp_start']));
+    $rtpEnd = max($rtpStart, min(65535, (int)$settings['rtp_end']));
+    $rate = max(1, (int)$settings['probe_rate']);
+    $burst = max(1, (int)$settings['probe_burst']);
+    $hname = ($family === 'inet6') ? 'sip_probe6' : 'sip_probe';
+
+    $rules = array(
+        '-A '.$chain.' -m set --match-set '.$spec['name'].' src -p udp --dport '.$sip.' -j ACCEPT',
+        '-A '.$chain.' -m set --match-set '.$spec['name'].' src -p udp --dport '.$rtpStart.':'.$rtpEnd.' -j ACCEPT',
+        '-A '.$chain.' -p udp --dport '.$sip
+            .' -m hashlimit --hashlimit-name '.$hname.' --hashlimit-mode srcip'
+            .' --hashlimit-upto '.$rate.'/min --hashlimit-burst '.$burst.' -j ACCEPT',
+    );
+    foreach ($rules as $rule) {
+        system($bin[$family].' '.$rule, $ret);
+        if ($ret) return FALSE;
+    }
+    return TRUE;
+}
+
+function _fwAmiPing()
+{
+    $fp = @fsockopen('127.0.0.1', 5038, $errno, $errstr, 2);
+    if (!is_resource($fp)) return FALSE;
+    fclose($fp);
+    return TRUE;
+}
+
+function _fwAmiSecretFile()
+{
+    return '/etc/issabel/firewall/ami.secret';
+}
+
+function _fwResponsiveAmiUser($enable)
+{
+    $file = '/etc/asterisk/manager_custom.conf';
+    $secretFile = _fwAmiSecretFile();
+
+    if (!$enable) {
+        if (is_file($file)) {
+            $content = file_get_contents($file);
+            $content = preg_replace('/\n?; BEGIN issabel-firewall.*?; END issabel-firewall\n?/s', "\n", $content);
+            @file_put_contents($file, $content);
+        }
+        @unlink($secretFile);
+        if (trim((string)shell_exec('pgrep -x asterisk 2>/dev/null')) !== '') {
+            @exec('/usr/sbin/asterisk -rx "manager reload" 2>/dev/null');
+        }
+        return TRUE;
+    }
+
+    $dir = dirname($secretFile);
+    if (!is_dir($dir) && !@mkdir($dir, 0750, true)) return FALSE;
+
+    $secret = is_file($secretFile) ? trim(file_get_contents($secretFile)) : '';
+    if ($secret === '') {
+        $secret = bin2hex(random_bytes(16));
+    }
+    if (@file_put_contents($secretFile, $secret."\n") === FALSE) return FALSE;
+    @chmod($secretFile, 0600);
+
+    $content = is_file($file) ? file_get_contents($file) : '';
+    $block = "; BEGIN issabel-firewall\n"
+        ."[issabel-firewall]\n"
+        ."secret = $secret\n"
+        ."deny = 0.0.0.0/0.0.0.0\n"
+        ."permit = 127.0.0.1/255.255.255.0\n"
+        ."read = security,system\n"
+        ."write =\n"
+        ."; END issabel-firewall\n";
+
+    if (preg_match('/; BEGIN issabel-firewall.*?; END issabel-firewall\n?/s', $content)) {
+        $content = preg_replace('/; BEGIN issabel-firewall.*?; END issabel-firewall\n?/s', $block, $content);
+    } else {
+        $content = rtrim($content)."\n\n".$block;
+    }
+    if (@file_put_contents($file, $content) === FALSE) return FALSE;
+    @chmod($file, 0640);
+    @chown($file, 'asterisk');
+    @chgrp($file, 'asterisk');
+
+    if (trim((string)shell_exec('pgrep -x asterisk 2>/dev/null')) !== '') {
+        @exec('/usr/sbin/asterisk -rx "manager reload" 2>/dev/null');
+    }
+    return TRUE;
+}
+
+function action_responsive($cmd)
+{
+    $cmd = strtolower(trim((string)$cmd));
+    $settings = _fwResponsiveSettings();
+
+    if ($cmd === 'status') {
+        $state = $settings;
+        $state['enabled'] = (int)$state['enabled'];
+        $state['service'] = trim((string)shell_exec('/usr/bin/systemctl is-active issabel-fwresponsive 2>/dev/null'));
+        echo json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n";
+        return TRUE;
+    }
+    if ($cmd === 'flush') {
+        _fwResponsiveFlush();
+        @file_put_contents('/var/log/issabel/audit.log',
+            sprintf("%s FIREWALL system: responsive.flush result=ok from local.\n", date('Y-m-d H:i:s')), FILE_APPEND);
+        return TRUE;
+    }
+    if ($cmd === 'apply') {
+        $ok = action_loadFirewall(array());
+        if ($ok) @exec('/usr/bin/systemctl restart issabel-fwresponsive >/dev/null 2>&1');
+        return $ok;
+    }
+    if ($cmd === 'on') {
+        @exec('/usr/sbin/modprobe xt_hashlimit 2>/dev/null', $o, $r);
+        if ($r != 0) {
+            fputs(STDERR, "ERR: xt_hashlimit is not available\n");
+            return FALSE;
+        }
+        if (!_fwResponsiveAmiUser(TRUE)) {
+            fputs(STDERR, "ERR: could not create the AMI user\n");
+            return FALSE;
+        }
+        if (!_fwAmiPing()) {
+            fputs(STDERR, "ERR: AMI is not reachable on 127.0.0.1:5038\n");
+            _fwResponsiveAmiUser(FALSE);
+            return FALSE;
+        }
+
+        $db = new SQLite3('/var/www/db/iptables.db');
+        $db->busyTimeout(5000);
+        $db->exec("UPDATE responsive SET enabled=1 WHERE id=1");
+        $db->close();
+
+        if (!action_loadFirewall(array())) {
+            $db = new SQLite3('/var/www/db/iptables.db');
+            $db->exec("UPDATE responsive SET enabled=0 WHERE id=1");
+            $db->close();
+            _fwResponsiveAmiUser(FALSE);
+            fputs(STDERR, "ERR: could not load the responsive rules\n");
+            return FALSE;
+        }
+        @exec('/usr/bin/systemctl enable --now issabel-fwresponsive >/dev/null 2>&1', $o, $r);
+        if ($r != 0) {
+            $db = new SQLite3('/var/www/db/iptables.db');
+            $db->exec("UPDATE responsive SET enabled=0 WHERE id=1");
+            $db->close();
+            action_loadFirewall(array());
+            _fwResponsiveAmiUser(FALSE);
+            fputs(STDERR, "ERR: could not start issabel-fwresponsive\n");
+            return FALSE;
+        }
+        @file_put_contents('/var/log/issabel/audit.log',
+            sprintf("%s FIREWALL system: responsive.enable result=ok from local.\n", date('Y-m-d H:i:s')), FILE_APPEND);
+        return TRUE;
+    }
+    if ($cmd === 'off') {
+        $db = new SQLite3('/var/www/db/iptables.db');
+        $db->busyTimeout(5000);
+        $db->exec("UPDATE responsive SET enabled=0 WHERE id=1");
+        $db->close();
+
+        action_loadFirewall(array());
+        @exec('/usr/bin/systemctl disable --now issabel-fwresponsive >/dev/null 2>&1');
+        _fwResponsiveFlush();
+        _fwResponsiveAmiUser(FALSE);
+        @file_put_contents('/var/log/issabel/audit.log',
+            sprintf("%s FIREWALL system: responsive.disable result=ok from local.\n", date('Y-m-d H:i:s')), FILE_APPEND);
+        return TRUE;
+    }
+
+    fputs(STDERR, "ERR: --responsive expects on|off|flush|status|apply\n");
+    return FALSE;
+}
+
 function manageF2B($opt)
 {
     switch ($opt) {
@@ -1042,6 +1774,124 @@ function action_isactive() {
  
 }
 
+/**
+ * Posición del salto -j <chain> dentro de una built-in, o NULL si no está.
+ */
+function _fwChainJumpPos($builtin, $chain)
+{
+    $out = shell_exec('/usr/sbin/iptables -S '.$builtin.' 2>/dev/null');
+    if (!is_string($out) || trim($out) === '') return NULL;
+    $pos = 0;
+    foreach (explode("\n", $out) as $line) {
+        $line = trim($line);
+        if ($line === '') continue;
+        $pos++;
+        if (preg_match('/-j '.preg_quote($chain, '/').'\s*$/', $line)) return $pos;
+    }
+    return NULL;
+}
+
+/**
+ * Comprobación de integridad. Devuelve JSON y sale 0 si todo cuadra.
+ * No re-aplica nada: sólo informa.
+ */
+function action_check()
+{
+    $problems = array();
+    $newInterfaces = array();
+    $active = _fwFamilyLoaded('inet');
+
+    if (!$active) {
+        $problems[] = 'firewall is not active';
+    } else {
+        $f2b = _fwChainJumpPos('INPUT', 'F2B_INPUT');
+        $pre = _fwChainJumpPos('INPUT', 'ISSABEL_PRE');
+        $rbl = _fwChainJumpPos('INPUT', 'F2B_RBL');
+        $in  = _fwChainJumpPos('INPUT', 'ISSABEL_INPUT');
+
+        if ($pre === NULL) $problems[] = 'INPUT -j ISSABEL_PRE is missing';
+        if ($f2b === NULL) $problems[] = 'INPUT -j F2B_INPUT is missing';
+        if ($in  === NULL) $problems[] = 'INPUT -j ISSABEL_INPUT is missing';
+
+        if ($f2b !== NULL && $pre !== NULL && $f2b > $pre)
+            $problems[] = 'F2B_INPUT must be before ISSABEL_PRE';
+        if ($pre !== NULL && $rbl !== NULL && $pre > $rbl)
+            $problems[] = 'ISSABEL_PRE must be before F2B_RBL';
+        if ($rbl !== NULL && $in !== NULL && $rbl > $in)
+            $problems[] = 'F2B_RBL must be before ISSABEL_INPUT';
+        if ($rbl === NULL && $pre !== NULL && $in !== NULL && $pre > $in)
+            $problems[] = 'ISSABEL_PRE must be before ISSABEL_INPUT';
+
+        $inputRules = (string)shell_exec('/usr/sbin/iptables -S INPUT 2>/dev/null');
+        if (strpos($inputRules, 'issabel_whitelist') === false)
+            $problems[] = 'the whitelist is not hooked into INPUT';
+
+        foreach (array('issabel_whitelist', 'issabel_blocklist') as $set) {
+            $names = trim((string)shell_exec('/usr/sbin/ipset list -n '.$set.' 2>/dev/null'));
+            if ($names === '') $problems[] = "ipset $set is missing";
+        }
+
+        $f2bInput = (string)shell_exec('/usr/sbin/iptables -S F2B_INPUT 2>/dev/null');
+        if (strpos($f2bInput, 'NFQUEUE') !== false)
+            $problems[] = 'packetbl NFQUEUE is in F2B_INPUT; it must be in F2B_RBL';
+
+        if (is_file('/etc/fail2ban/action.d/iptables-multiport-issabelrbl.conf')) {
+            $f2bRbl = (string)shell_exec('/usr/sbin/iptables -S F2B_RBL 2>/dev/null');
+            if (strpos($f2bRbl, 'NFQUEUE') === false)
+                $problems[] = 'F2B_RBL does not contain the packetbl NFQUEUE rule';
+        }
+
+        exec('/usr/bin/systemctl -q is-active fail2ban', $o, $r);
+        if ($r != 0) $problems[] = 'fail2ban is not active';
+
+        $resp = _fwResponsiveSettings();
+        if (!empty($resp['enabled'])) {
+            $inputRules2 = (string)shell_exec('/usr/sbin/iptables -S INPUT 2>/dev/null');
+            if (strpos($inputRules2, 'ISSABEL_RESPONSIVE') === false)
+                $problems[] = 'responsive is enabled but ISSABEL_RESPONSIVE is not hooked into INPUT';
+            foreach (array('issabel_responsive', 'issabel_responsive6') as $set) {
+                $names = trim((string)shell_exec('/usr/sbin/ipset list -n '.$set.' 2>/dev/null'));
+                if ($names === '') $problems[] = "ipset $set is missing";
+            }
+            exec('/usr/bin/systemctl -q is-active issabel-fwresponsive', $o2, $r2);
+            if ($r2 != 0) $problems[] = 'issabel-fwresponsive is not active';
+        }
+
+        // Interfaces del sistema que no aparecen en ninguna regla.
+        $known = array();
+        try {
+            $db = new SQLite3('/var/www/db/iptables.db');
+            $res = $db->query("SELECT DISTINCT eth_in FROM filter WHERE eth_in<>'' AND eth_in<>'ANY'");
+            if ($res) while ($row = $res->fetchArray(SQLITE3_ASSOC)) $known[$row['eth_in']] = true;
+            $db->close();
+        } catch (Exception $e) { /* sin DB, no se comprueba */ }
+        foreach (glob('/sys/class/net/*') as $path) {
+            $iface = basename($path);
+            if ($iface === 'lo' || preg_match('/^(docker|veth|virbr|tun|tap)/', $iface)) continue;
+            if (!isset($known[$iface])) $newInterfaces[] = $iface;
+        }
+    }
+
+    $ok = (count($problems) === 0);
+    $state = array(
+        'ok'             => $ok,
+        'active'         => $active,
+        'locked'         => is_locked(),
+        'safemode'       => file_exists('/run/issabel-fw-safemode'),
+        'new_interfaces' => $newInterfaces,
+        'problems'       => $problems,
+    );
+    echo json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n";
+
+    if (!$ok && $active) {
+        @file_put_contents('/var/log/issabel/audit.log',
+            sprintf("%s FIREWALL system: integrity.check result=error msg=%s from local.\n",
+                date('Y-m-d H:i:s'), escapeshellarg(implode('; ', $problems))),
+            FILE_APPEND);
+    }
+    return $ok;
+}
+
 function add_whitelist($ip_address) {
     $spec = _fwWhitelistSetFor($ip_address);
     if ($spec === NULL) {
@@ -1052,7 +1902,7 @@ function add_whitelist($ip_address) {
         return FALSE;
     }
     $output = $ret = NULL;
-    exec('/usr/sbin/ipset add '.$spec['name'].' '.escapeshellarg($ip_address), $output, $ret);
+    exec('/usr/sbin/ipset -exist add '.$spec['name'].' '.escapeshellarg($ip_address), $output, $ret);
     if ($ret != 0) {
         fputs(STDERR, "ERR: could not add '$ip_address' to ".$spec['name'].": "
             .implode(' ', $output)."\n");
@@ -1083,6 +1933,134 @@ function remove_whitelist($ip_address) {
     return generate_save_file();
 }
 
+function _fwResolveHost($host)
+{
+    $ips = array();
+    $records = @dns_get_record($host, DNS_A | DNS_AAAA);
+    if (is_array($records)) {
+        foreach ($records as $r) {
+            if (isset($r['ip']) && filter_var($r['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                $ips[] = $r['ip'];
+            } elseif (isset($r['ipv6']) && filter_var($r['ipv6'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                $ips[] = $r['ipv6'];
+            }
+        }
+    }
+    if (count($ips) === 0) {
+        $v4 = gethostbyname($host);
+        if ($v4 !== $host && filter_var($v4, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $ips[] = $v4;
+        }
+    }
+    return array_values(array_unique($ips));
+}
+
+/**
+ * Resuelve las entradas con hostname de la whitelist. `ip_address` sigue
+ * siendo la IP efectiva; si cambia, se actualiza y se recarga el set.
+ */
+function resolve_whitelist()
+{
+    $db = new SQLite3('/var/www/db/iptables.db');
+    $db->busyTimeout(5000);
+
+    // Si el version_sql quedo diferido, la columna aun no existe: no es un
+    // error del timer, se reintenta en la siguiente pasada.
+    $hasHostname = false;
+    $cols = $db->query("PRAGMA table_info(whitelist)");
+    if ($cols) {
+        while ($c = $cols->fetchArray(SQLITE3_ASSOC)) {
+            if (isset($c['name']) && $c['name'] === 'hostname') { $hasHostname = true; break; }
+        }
+    }
+    if (!$hasHostname) {
+        $db->close();
+        return TRUE;
+    }
+
+    $res = $db->query("SELECT ip_address,hostname FROM whitelist WHERE hostname IS NOT NULL AND hostname<>''");
+    if ($res === false) {
+        fputs(STDERR, "ERR: could not read the whitelist\n");
+        $db->close();
+        return FALSE;
+    }
+
+    $changed = FALSE;
+    while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
+        $ips = _fwResolveHost($row['hostname']);
+        if (count($ips) === 0) continue;
+
+        $new = $ips[0];
+        if ($new !== $row['ip_address']) {
+            $check = $db->querySingle("SELECT COUNT(*) FROM whitelist WHERE ip_address='".SQLite3::escapeString($new)."'");
+            if ((int)$check > 0) continue; // otra fila ya usa esa IP
+
+            $stmt = $db->prepare("UPDATE whitelist SET ip_address=?, resolved_at=datetime('now') WHERE hostname=?");
+            $stmt->bindValue(1, $new, SQLITE3_TEXT);
+            $stmt->bindValue(2, $row['hostname'], SQLITE3_TEXT);
+            if ($stmt->execute() === false) continue;
+
+            @file_put_contents('/var/log/issabel/audit.log',
+                sprintf("%s FIREWALL system: whitelist.resolve host=%s old=%s new=%s result=ok from local.\n",
+                    date('Y-m-d H:i:s'), $row['hostname'], $row['ip_address'], $new),
+                FILE_APPEND);
+            $changed = TRUE;
+        } else {
+            $db->exec("UPDATE whitelist SET resolved_at=datetime('now') WHERE hostname='".SQLite3::escapeString($row['hostname'])."'");
+        }
+    }
+    $db->close();
+
+    if ($changed) {
+        $db = new SQLite3('/var/www/db/iptables.db');
+        $wl = array();
+        $res = $db->query("SELECT ip_address FROM whitelist");
+        if ($res) while ($row = $res->fetchArray(SQLITE3_ASSOC)) $wl[] = $row['ip_address'];
+        $db->close();
+        if (_fwEnsureWhitelistSets()) _fwLoadWhitelist($wl);
+        generate_save_file();
+    }
+    return TRUE;
+}
+
+function add_blocklist($ip_address) {
+    $spec = _fwBlocklistSetFor($ip_address);
+    if ($spec === NULL) {
+        fputs(STDERR, "ERR: '$ip_address' is not a valid IP address or network\n");
+        return FALSE;
+    }
+    if (!_fwEnsureBlocklistSets()) {
+        return FALSE;
+    }
+    $output = $ret = NULL;
+    exec('/usr/sbin/ipset -exist add '.$spec['name'].' '.escapeshellarg($ip_address), $output, $ret);
+    if ($ret != 0) {
+        fputs(STDERR, "ERR: could not add '$ip_address' to ".$spec['name'].": "
+            .implode(' ', $output)."\n");
+        return FALSE;
+    }
+    return generate_save_file();
+}
+
+function remove_blocklist($ip_address) {
+    $spec = _fwBlocklistSetFor($ip_address);
+    if ($spec === NULL) {
+        fputs(STDERR, "ERR: '$ip_address' is not a valid IP address or network\n");
+        return FALSE;
+    }
+    $output = $ret = NULL;
+    exec('/usr/sbin/ipset list -t '.$spec['name'].' 2>/dev/null', $output, $ret);
+    if ($ret == 0) {
+        $output = $ret = NULL;
+        exec('/usr/sbin/ipset del '.$spec['name'].' '.escapeshellarg($ip_address), $output, $ret);
+        if ($ret != 0) {
+            fputs(STDERR, "WARN: could not remove '$ip_address' from ".$spec['name'].": "
+                .implode(' ', $output)."\n");
+        }
+    }
+    return generate_save_file();
+}
+
 /**
  * Archivos de arranque de los sets, uno por familia. Se reescriben completos
  * en cada alta o baja.
@@ -1093,6 +2071,18 @@ function generate_save_file() {
         $content[$spec['name']] = 'create '.$spec['name'].' '.$spec['type']
             .' family '.$spec['family'].' hashsize 1024 maxelem 65536'."\n";
     }
+    foreach (_fwBlocklistSets() as $spec) {
+        $content[$spec['name']] = 'create '.$spec['name'].' '.$spec['type']
+            .' family '.$spec['family'].' hashsize 1024 maxelem 65536'."\n";
+    }
+    // Set de puertos de Let's Encrypt: sólo create, sin entradas (se abren
+    // durante la validación y se vacían al terminar).
+    $content['issabel_leports'] = "create issabel_leports bitmap:port range 0-65535\n";
+
+    $resp = _fwResponsiveSettings();
+    $rt = max(60, (int)$resp['allow_timeout']);
+    $content['issabel_responsive'] = "create issabel_responsive hash:ip family inet timeout $rt hashsize 1024 maxelem 65536\n";
+    $content['issabel_responsive6'] = "create issabel_responsive6 hash:ip family inet6 timeout $rt hashsize 1024 maxelem 65536\n";
 
     $db = new SQLite3('/var/www/db/iptables.db');
     $db->busyTimeout(5000);
@@ -1105,6 +2095,16 @@ function generate_save_file() {
         $spec = _fwWhitelistSetFor($row['ip_address']);
         if ($spec === NULL) continue;
         $content[$spec['name']] .= 'add '.$spec['name'].' '.$row['ip_address']."\n";
+    }
+
+    // La tabla blocklist puede no existir si el version_sql quedo diferido.
+    $res = @$db->query("select ip_address from blocklist");
+    if ($res !== false) {
+        while($row = $res->fetchArray()) {
+            $spec = _fwBlocklistSetFor($row['ip_address']);
+            if ($spec === NULL) continue;
+            $content[$spec['name']] .= 'add '.$spec['name'].' '.$row['ip_address']."\n";
+        }
     }
 
     $dir = '/etc/sysconfig/ipset.d';

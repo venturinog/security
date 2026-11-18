@@ -1,0 +1,14 @@
+<html>
+    <header>
+        <link rel="stylesheet" href="/themes/{$THEMENAME}/styles.css">
+        <link rel="stylesheet" href="/themes/{$THEMENAME}/help.css">
+    </header>
+    <body>
+        <h1>{$node_name}</h1>
+	<p>The "Block List" option on "Security" menu allows you to define individual IP addresses or Networks to be blocklisted from any possbile Firewall rules you define, including the realtime black list Issabel Guru RBL.</p>
+        <p>Click the "Add" button to add new IP addresses with the format 192.168.1.1 or IP/Subnet with the format 192.168.1.0/24</p>
+        <p>IPv6 addresses and networks are accepted too, for example 2001:db8::1 or 2001:db8::/32 (prefix from 0 to 128). Each entry is loaded into the set of its own family, and the IPv6 entries only take effect when IPv6 filtering is enabled in the firewall rules page.</p>
+        <p>The wildcard of each family (0.0.0.0/0 and ::/0) is not accepted: the Block List is inserted before any other rule, so accepting everything would defeat the firewall.</p>
+        <p>There is no need to "Apply Changes" on the firewall rules when you add or remove entries to the Block List</p>
+    </body>
+</html>

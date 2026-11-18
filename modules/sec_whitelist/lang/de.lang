@@ -47,4 +47,6 @@ $arrLangModule = array(
     'View' => 'Anzeigen',
     'View IP Address' => 'IP-Adresse anzeigen',
     'White List' => 'Weiße Liste',
+    'Hostname (DDNS)' => 'Hostname (DDNS)',
+    'The hostname could not be resolved' => 'The hostname could not be resolved',
 );

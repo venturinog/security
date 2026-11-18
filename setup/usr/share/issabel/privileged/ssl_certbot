@@ -49,6 +49,7 @@ define('LE_SSL_CONF',        '/etc/httpd/conf.d/ssl.conf');
 define('LE_SSL_BACKUP',      '/etc/httpd/conf.d/ssl.conf.issabel.bak');
 define('LE_CERTBOT',         '/usr/bin/certbot');
 define('LE_SELF',            '/usr/share/issabel/privileged/ssl_certbot');
+define('LE_FWCONFIG',        '/usr/share/issabel/privileged/fwconfig');
 
 if (!isset($argv[1])) {
     fwrite(STDERR, "ERR: missing command\n");
@@ -77,7 +78,15 @@ switch ($argv[1]) {
         $credentialsPath = le_prepare_credentials($params['method_data'], $credentials);
 
         $args = le_issue_argv($params, $credentialsPath, false);
-        list($code, $output) = le_run($args);
+        $isHttp = ($params['method_data']['group'] === 'http');
+        if ($isHttp && !le_le_open(80)) {
+            exit(1);
+        }
+        try {
+            list($code, $output) = le_run($args);
+        } finally {
+            if ($isHttp) le_le_close();
+        }
         if ($code !== 0) {
             fwrite(STDERR, "ERR: failed to run /usr/bin/certbot. Output follows:\n".$output."\n");
             exit(1);
@@ -117,7 +126,15 @@ switch ($argv[1]) {
         $credentialsPath = le_prepare_credentials($params['method_data'], $credentials, false);
 
         $args = le_issue_argv($params, $credentialsPath, true);
-        list($code, $output) = le_run($args);
+        $isHttp = ($params['method_data']['group'] === 'http');
+        if ($isHttp && !le_le_open(80)) {
+            exit(1);
+        }
+        try {
+            list($code, $output) = le_run($args);
+        } finally {
+            if ($isHttp) le_le_close();
+        }
         echo $output."\n";
         exit($code === 0 ? 0 : 1);
         break;
@@ -139,8 +156,17 @@ switch ($argv[1]) {
 
     case 'renewcertificate':
         le_lock();
+        // Limpia un 80 que quedó abierto por una ejecución interrumpida.
+        le_le_close();
+        if (!le_le_open(80)) {
+            exit(1);
+        }
         $args = array(LE_CERTBOT, 'renew', '--deploy-hook', LE_SELF.' afterdeploy');
-        list($code, $output) = le_run($args);
+        try {
+            list($code, $output) = le_run($args);
+        } finally {
+            le_le_close();
+        }
         echo $output."\n";
         if ($code !== 0) {
             fwrite(STDERR, "ERR: failed to run /usr/bin/certbot renew\n");
@@ -670,6 +696,41 @@ function le_shell_preview($args)
         $escaped[] = escapeshellarg($arg);
     }
     return implode(' ', $escaped);
+}
+
+/**
+ * Abre/cierra el puerto de validación HTTP-01 en el firewall (set
+ * issabel_leports). Si el firewall está apagado, fwconfig lo trata como no-op.
+ */
+function le_le_open($port)
+{
+    list($code, $output) = le_run(array(LE_FWCONFIG, '--le-open', (string)$port));
+    if ($code !== 0) {
+        fwrite(STDERR, "ERR: could not open port $port for Let's Encrypt: $output\n");
+        le_audit('letsencrypt.http01.open', 'error', "port=$port msg=".escapeshellarg($output));
+        return false;
+    }
+    le_audit('letsencrypt.http01.open', 'ok', "port=$port");
+    return true;
+}
+
+function le_le_close()
+{
+    list($code, $output) = le_run(array(LE_FWCONFIG, '--le-close'));
+    if ($code !== 0) {
+        fwrite(STDERR, "ERR: could not close the Let's Encrypt port set: $output\n");
+        le_audit('letsencrypt.http01.close', 'error', 'msg='.escapeshellarg($output));
+        return false;
+    }
+    le_audit('letsencrypt.http01.close', 'ok');
+    return true;
+}
+
+function le_audit($event, $result, $details = '')
+{
+    $line = sprintf("%s FIREWALL system: %s %s result=%s from local.\n",
+        date('Y-m-d H:i:s'), $event, $details, $result);
+    @file_put_contents('/var/log/issabel/audit.log', $line, FILE_APPEND);
 }
 
 /* ------------------------------------------------------------------------ */

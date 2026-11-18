@@ -68,6 +68,9 @@ function _moduleContent(&$smarty, $module_name)
         case "desactivatefirewall":
             $content = desactivateFirewall($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
             break;
+        case "restorefirewall":
+            $content = restoreFirewall($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+            break;
         case "activatefirewall":
             $content = activateFirewall($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
             break;
@@ -118,6 +121,19 @@ function showRulesPage($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     $needsApply = fwNeedsApply($isFirst, $isExecuted, $fwState);
 
     $alert = (string)$smarty->getTemplateVars('SECURITY_ALERT');
+    if ($pRules->isSafeMode()) {
+        $alert .= issabel_alert_html('warning', _tr('Safe Mode'),
+            _tr('The firewall is in Safe Mode: only SSH and HTTPS are open for 5 minutes.'));
+    }
+    if (!$isFirst) {
+        $integrity = $pRules->checkIntegrity();
+        if (empty($integrity['ok']) && !empty($integrity['active'])) {
+            $problems = isset($integrity['problems']) && is_array($integrity['problems'])
+                ? implode('; ', $integrity['problems']) : '';
+            $alert .= issabel_alert_html('error', _tr('Firewall integrity'),
+                sprintf(_tr('The running firewall does not match the expected configuration: %s'), $problems));
+        }
+    }
     if ($isFirst) {
         // `first_time` también queda a 1 al desactivar, así que se consulta el
         // flag explícito para no decir "nunca activado" a quien lo apagó.
@@ -238,6 +254,8 @@ function renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted, $f
     if (!isset($fwState['ipv6'])) $fwState = fwFamilyState($pRules);
     $ipv6 = $fwState['ipv6'];
     $ipv6Active = $fwState['ipv6Active'];
+    $locked = $pRules->isLocked();
+    $safeMode = $pRules->isSafeMode();
     $needsApply  = fwNeedsApply($isFirst, $isExecuted, $fwState);
     $applyLabel  = $isFirst ? _tr('Activate firewall') : _tr('Apply changes');
     $applyStatus = _tr('Applying changes...').' '
@@ -273,10 +291,19 @@ function renderToolbar($smarty, $module_name, $pRules, $isFirst, $isExecuted, $f
            . htmlspecialchars(_tr('No rules were selected'), ENT_COMPAT, 'UTF-8') . '" data-confirm="'
            . htmlspecialchars(_tr('Are you sure you wish to delete the selected rules?'), ENT_COMPAT, 'UTF-8') . '">'
            . '<i class="ti ti-trash"></i> '._tr('Delete').'</button>';
-    if (!$isFirst) {
+    if (!$isFirst && $safeMode) {
+        $html .= '<button type="button" class="btn btn-sm btn-outline-danger" id="fw_safemode" data-confirm="'
+               . htmlspecialchars(_tr('Restore the full firewall ruleset now?'), ENT_COMPAT, 'UTF-8') . '">'
+               . '<i class="ti ti-shield-check"></i> '._tr('Apply now').'</button>';
+    }
+    if (!$isFirst && !$locked) {
         $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_deactivate" data-confirm="'
                . htmlspecialchars(_tr('Are you sure you wish to deactivate the firewall?'), ENT_COMPAT, 'UTF-8') . '">'
                . '<i class="ti ti-power"></i> '._tr('Deactivate firewall').'</button>';
+    } elseif (!$isFirst && $locked) {
+        $html .= '<span class="fw-applied-chip" title="'
+               . htmlspecialchars(_tr('The firewall is locked and cannot be deactivated from the web interface'), ENT_COMPAT, 'UTF-8') . '">'
+               . '<i class="ti ti-lock" aria-hidden="true"></i> '._tr('Firewall locked').'</span>';
     }
     if ($needsApply) {
         $html .= '<button type="button" class="btn btn-sm btn-outline-primary" id="fw_apply">'
@@ -335,6 +362,7 @@ function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo, $family = '')
         _tr('Family'),
         _tr('Traffic'),
         _tr('Target'),
+        _tr('Priority'),
         _tr('Interface'),
         _tr('IP Source'),
         _tr('IP Destiny'),
@@ -403,6 +431,13 @@ function renderRulesGrid($smarty, $module_name, &$pDB, $isGeo, $family = '')
             $targetLabel = htmlspecialchars(_tr($target), ENT_COMPAT, 'UTF-8');
             $arrTmp[] = '<img class="fw-icon" src="modules/'.$module_name.'/images/'.$targetFile
                        . '" alt="'.$targetLabel.'" title="'.$targetLabel.'">';
+
+            $priority = isset($row['priority']) ? (string)$row['priority'] : 'normal';
+            if ($priority === 'high') {
+                $arrTmp[] = '<span class="badge bg-red-lt">'.htmlspecialchars(_tr('High'), ENT_COMPAT, 'UTF-8').'</span>';
+            } else {
+                $arrTmp[] = '<span class="text-muted">'.htmlspecialchars(_tr('Normal'), ENT_COMPAT, 'UTF-8').'</span>';
+            }
 
             $iface = '';
             if ((string)$row['eth_in'] !== '') $iface .= _tr('INPUT').': '.htmlspecialchars((string)$row['eth_in'], ENT_COMPAT, 'UTF-8');
@@ -508,6 +543,7 @@ function editRulePage($smarty, $module_name, $local_templates_dir, &$pDB, $arrCo
         'id_ip'           => $row['number_ip'],
         'id_protocol'     => $row['protocol'],
         'target'          => $row['target'],
+        'priority'        => isset($row['priority']) ? $row['priority'] : 'normal',
         'orden'           => $row['rule_order'],
         'state'           => $row['state'],
         'geoipcountries'  => $row['countries'] !== '' ? explode(',', $row['countries']) : array(),
@@ -531,6 +567,7 @@ function constructForm($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
         'ip_destin'       => '0.0.0.0',
         'mask_destin'     => '24',
         'target'          => 'ACCEPT',
+        'priority'        => 'normal',
         'id'              => '',
         'state'           => '',
         'orden'           => '',
@@ -808,6 +845,14 @@ function createFieldForm($pDB,$arrValues = array())
             "VALIDATION_EXTRA_PARAM" => "",
             "EDITABLE"               => "yes",
             ),
+        "priority"        => array( "LABEL"                  => _tr("Priority"),
+            "REQUIRED"               => "no",
+            "INPUT_TYPE"             => "SELECT",
+            "INPUT_EXTRA_PARAM"      => array('normal' => _tr('Normal'), 'high' => _tr('High')),
+            "VALIDATION_TYPE"        => "text",
+            "VALIDATION_EXTRA_PARAM" => "",
+            "EDITABLE"               => "yes",
+            ),
         "orden"           => array(  "LABEL"                  => _tr("Order"),
             "REQUIRED"               => "no",
             "INPUT_TYPE"             => "TEXT",
@@ -903,6 +948,17 @@ function validateRuleInput(&$values)
 
     if (empty($values['target'])) $errors['target'] = sprintf(_tr('%s is required'), _tr('Target'));
 
+    // La prioridad sólo tiene sentido en ACCEPT de INPUT/FORWARD. Cualquier
+    // otra combinación se guarda como normal; no se rechaza para no romper
+    // formularios antiguos.
+    $priority = isset($values['priority']) ? (string)$values['priority'] : 'normal';
+    if (!in_array($priority, array('normal', 'high'), true)) $priority = 'normal';
+    if (($values['target'] ?? '') !== 'ACCEPT'
+        || !in_array($traffic, array('INPUT', 'FORWARD'), true)) {
+        $priority = 'normal';
+    }
+    $values['priority'] = $priority;
+
     return $errors;
 }
 
@@ -959,6 +1015,7 @@ function fwAuditRuleDetails(&$pDB, $ruleId, $errMsg = '')
         $details['traffic']   = $row['traffic'];
         $details['protocol']  = $row['protocol'];
         $details['target']    = $row['target'];
+        if (isset($row['priority']) && $row['priority'] === 'high') $details['priority'] = 'high';
         $details['activated'] = ((string)$row['activated'] === '1') ? 'on' : 'off';
         $details['family']    = ((string)($row['family'] ?? '') === 'inet6') ? 'inet6' : 'inet';
         if ((string)$row['eth_in'] !== '')  $details['iface_in']  = $row['eth_in'];
@@ -1054,6 +1111,7 @@ function saveRulePage($smarty, $module_name, $local_templates_dir, &$pDB, $arrCo
         'id_protocol'     => $protocol,
         'protocol'        => $protocol,
         'target'          => getParameter('target'),
+        'priority'        => getParameter('priority'),
         'orden'           => getParameter('orden'),
         'geoipcountries'  => $geoipCountriesRaw,
         'geoipcontinents' => $geoipContinentsRaw,
@@ -1337,6 +1395,12 @@ function desactivateFirewall($smarty, $module_name, $local_templates_dir, &$pDB,
     if ($pRules->isFirstTime()) {
         return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
     }
+    if ($pRules->isLocked()) {
+        issabelFwAudit::log('firewall.disable', 'error', array('msg' => 'the firewall is locked'));
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"),
+            _tr("The firewall is locked and cannot be deactivated from the web interface")));
+        return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+    }
     if ($pRules->flushRules() && $pRules->setFirewallDeactivated(true) && $pRules->setFirstTime()) {
         issabelFwAudit::log('firewall.disable', 'ok');
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"), _tr("The firewall has been desactivated")));
@@ -1344,6 +1408,24 @@ function desactivateFirewall($smarty, $module_name, $local_templates_dir, &$pDB,
         $msg = ($pRules->errMsg !== '') ? $pRules->errMsg : 'the firewall could not be deactivated';
         issabelFwAudit::log('firewall.disable', 'error', array('msg' => $msg));
         $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), _tr("The firewall could not be desactivated")));
+    }
+    return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
+}
+
+/**
+ * Restaura el ruleset completo desde el botón de Safe Mode.
+ */
+function restoreFirewall($smarty, $module_name, $local_templates_dir, &$pDB, $arrConf)
+{
+    $pRules = new paloSantoRules($pDB);
+    if ($pRules->restoreSafeMode()) {
+        issabelFwAudit::log('firewall.safemode.end', 'ok');
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('success', _tr("Message"),
+            _tr("The full firewall ruleset has been restored")));
+    } else {
+        $msg = ($pRules->errMsg !== '') ? $pRules->errMsg : 'the ruleset could not be restored';
+        issabelFwAudit::log('firewall.safemode.end', 'error', array('msg' => $msg));
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $msg));
     }
     return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
 }
@@ -1403,6 +1485,7 @@ function getAction()
     else if($isPost && getParameter("delete"))     return "delete";
     else if($isPost && getParameter("activatefirewall")) return "activatefirewall";
     else if($isPost && getParameter("desactivatefirewall")) return "desactivatefirewall";
+    else if($isPost && getParameter("restorefirewall")) return "restorefirewall";
     else if($isPost && getParameter("enableipv6")) return "enableipv6";
     else if($isPost && getParameter("disableipv6")) return "disableipv6";
     else if($isPost && getParameter("activate"))   return "activate";

@@ -31,6 +31,11 @@ Six domain-validation methods are available:
 | DNS-01 (OVH) | The CA reads a TXT record created through the OVH API | Not needed | Yes |
 | DNS-01 (RFC 2136) | The CA reads a TXT record created with a TSIG-signed dynamic update | Not needed | Yes |
 
+**Port 80 only while validating.** HTTP-01 does not need port 80 open
+permanently. The firewall keeps the `issabel_leports` port set empty and
+`ssl_certbot` adds port 80 only around the certbot run (issuance, dry-run and
+renewal), then flushes it. If the firewall is off, this is a no-op.
+
 DNS-01 is the right choice when the PBX is behind NAT, the provider blocks
 inbound port 80, or the certificate has to cover `*.example.com`. Each DNS
 provider asks only for the credentials its API needs; OVH additionally asks for

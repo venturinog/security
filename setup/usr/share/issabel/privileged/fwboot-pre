@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+# Safe Mode de Issabel.
+#
+# Se ejecuta como ExecStartPre de iptables.service. Si detecta dos arranques
+# en menos de 5 minutos, sustituye /etc/sysconfig/iptables por un ruleset
+# mínimo (SSH y HTTPS) durante 5 minutos y programa la restauración. Así un
+# cambio de reglas que deje al administrador fuera no lo deja fuera tras un
+# reinicio: puede entrar por SSH/HTTPS y arreglarlo.
+#
+# No se toca IPv6: /etc/sysconfig/ip6tables se restaura como siempre y sigue
+# filtrando. Safe Mode sólo relaja IPv4.
+#
+# No crea ninguna unidad permanente: la restauración se programa con
+# systemd-run (unidad transitoria).
+
+set -u
+
+STATE_DIR=/var/lib/issabel/firewall
+BOOTS_FILE="$STATE_DIR/boots"
+FULL_RULES="$STATE_DIR/full.rules"
+FLAG=/run/issabel-fw-safemode
+AUDIT=/var/log/issabel/audit.log
+MIN_RULES=/etc/sysconfig/iptables
+WINDOW=300
+
+mkdir -p "$STATE_DIR" 2>/dev/null || true
+touch "$BOOTS_FILE" 2>/dev/null || true
+
+now=$(date +%s)
+
+# Conserva sólo los arranques de la última hora y añade el actual.
+tmp=$(mktemp) || exit 0
+awk -v now="$now" '$1 ~ /^[0-9]+$/ && now - $1 <= 3600 { print $1 }' "$BOOTS_FILE" > "$tmp" 2>/dev/null || true
+echo "$now" >> "$tmp"
+mv "$tmp" "$BOOTS_FILE" 2>/dev/null || true
+
+# Cuenta los arranques dentro de la ventana (incluido el actual).
+recent=$(awk -v now="$now" -v w="$WINDOW" '$1 ~ /^[0-9]+$/ && now - $1 <= w { n++ } END { print n+0 }' "$BOOTS_FILE")
+
+if [ "${recent:-0}" -lt 2 ]; then
+    exit 0
+fi
+
+# Si ya estamos en Safe Mode, no se pisa el ruleset completo guardado.
+if [ ! -f "$FLAG" ] && [ -f "$MIN_RULES" ]; then
+    cp -f "$MIN_RULES" "$FULL_RULES" 2>/dev/null || true
+fi
+
+cat > "$MIN_RULES" <<'EOF'
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -p tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp --dport 443 -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+COMMIT
+EOF
+
+touch "$FLAG" 2>/dev/null || true
+
+# Restauración automática a los 5 minutos. Es una unidad transitoria, no un
+# servicio instalado.
+/usr/bin/systemd-run --unit=issabel-fw-restore-$(date +%s) --on-active=5min --description="Issabel Safe Mode restore" \
+    /usr/share/issabel/privileged/fwrestore >/dev/null 2>&1 || true
+
+if [ -d "$(dirname "$AUDIT")" ]; then
+    printf '%s FIREWALL system: firewall.safemode result=ok from local.\n' "$(date '+%Y-%m-%d %H:%M:%S')" >> "$AUDIT" 2>/dev/null || true
+fi
+
+exit 0

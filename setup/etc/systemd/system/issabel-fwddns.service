@@ -1,0 +1,6 @@
+[Unit]
+Description=Resolve Issabel whitelist DDNS hostnames
+
+[Service]
+Type=oneshot
+ExecStart=/usr/share/issabel/privileged/fwconfig --resolve_wl

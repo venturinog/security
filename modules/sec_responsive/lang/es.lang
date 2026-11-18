@@ -1,0 +1,26 @@
+<?php
+global $arrLangModule;
+$arrLangModule = array(
+    'Responsive Firewall' => 'Firewall Responsive',
+    'Enable' => 'Activar',
+    'Disable' => 'Desactivar',
+    'Save' => 'Guardar',
+    'Flush allowed IPs' => 'Vaciar IPs permitidas',
+    'Allow timeout (seconds)' => 'Tiempo de permiso (segundos)',
+    'SIP port (UDP)' => 'Puerto SIP (UDP)',
+    'RTP start' => 'Inicio RTP',
+    'RTP end' => 'Fin RTP',
+    'Probation packets/minute' => 'Paquetes de prueba/minuto',
+    'Probation burst' => 'Ráfaga de prueba',
+    'Allowed IPs' => 'IPs permitidas',
+    'No IPs are currently allowed' => 'No hay IPs permitidas ahora',
+    'Service' => 'Servicio',
+    'The responsive firewall is a SIP/PJSIP UDP feature. It does not open SSH, HTTPS or the web interface.' => 'El firewall responsive es una función para SIP/PJSIP por UDP. No abre SSH, HTTPS ni la interfaz web.',
+    'Settings saved' => 'Configuración guardada',
+    'Invalid responsive settings' => 'Configuración responsive inválida',
+    'Responsive firewall enabled' => 'Firewall responsive activado',
+    'Responsive firewall disabled' => 'Firewall responsive desactivado',
+    'Allowed IPs flushed' => 'IPs permitidas vaciadas',
+    'ERROR' => 'Error',
+    'Message' => 'Mensaje',
+);

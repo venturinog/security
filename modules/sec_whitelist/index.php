@@ -92,7 +92,7 @@ function reportwhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $ar
     );
     $oGrid->setURL($url);
 
-    $arrColumns = array("",_tr("IP Address"),_tr("Note"),_tr("Options"));
+    $arrColumns = array("",_tr("IP Address"),_tr("Hostname (DDNS)"),_tr("Note"),_tr("Options"));
     $oGrid->setColumns($arrColumns);
 
     $total   = $pwhitelist->getNumwhitelist();
@@ -115,8 +115,9 @@ function reportwhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $ar
             $ip = htmlspecialchars($value['ip_address'], ENT_COMPAT, 'UTF-8');
             $arrTmp[0] = "<input type='checkbox' name='del_x[]' value='".$ip."'>";
             $arrTmp[1] = $ip;
-            $arrTmp[2] = htmlspecialchars($value['note'], ENT_COMPAT, 'UTF-8');
-            $arrTmp[3] = "&nbsp;<a href='?menu=$module_name&action=view&id=".urlencode($value['ip_address'])."'>"._tr('View')."</a>";
+            $arrTmp[2] = htmlspecialchars(isset($value['hostname']) ? (string)$value['hostname'] : '', ENT_COMPAT, 'UTF-8');
+            $arrTmp[3] = htmlspecialchars($value['note'], ENT_COMPAT, 'UTF-8');
+            $arrTmp[4] = "&nbsp;<a href='?menu=$module_name&action=view&id=".urlencode($value['ip_address'])."'>"._tr('View')."</a>";
             $arrData[] = $arrTmp;
         }
     }
@@ -138,13 +139,13 @@ function newwhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrCo
         $id = getParameter('id');
         $row = $pwhitelist->getwhitelistByIp($id);
         if (is_array($row)) {
-            $data = array('ip_address' => $row['ip_address'], 'note' => $row['note'], 'id' => $row['ip_address']);
+            $data = array('ip_address' => $row['ip_address'], 'hostname' => isset($row['hostname']) ? $row['hostname'] : '', 'note' => $row['note'], 'id' => $row['ip_address']);
         }
     }
 
     $arrFormNew = createFieldForm();
     // Recuadro rojo por campo (conservando form-control).
-    foreach (array('ip_address','note') as $f) {
+    foreach (array('ip_address','hostname','note') as $f) {
         if (!isset($errors[$f])) continue;
         if (!isset($arrFormNew[$f]['INPUT_EXTRA_PARAM']) || !is_array($arrFormNew[$f]['INPUT_EXTRA_PARAM']))
             $arrFormNew[$f]['INPUT_EXTRA_PARAM'] = array();
@@ -165,8 +166,8 @@ function newwhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrCo
     $smarty->assign("SAVE", _tr("Save"));
     $smarty->assign("MODE", $action);
     $smarty->assign("icon", "images/list.png");
-    $smarty->assign("ERRORS", array_merge(array('ip_address' => '', 'note' => ''), $errors));
-    $smarty->assign("VALUES", array_merge(array('ip_address' => '', 'note' => '', 'id' => ''), $data));
+    $smarty->assign("ERRORS", array_merge(array('ip_address' => '', 'hostname' => '', 'note' => ''), $errors));
+    $smarty->assign("VALUES", array_merge(array('ip_address' => '', 'hostname' => '', 'note' => '', 'id' => ''), $data));
 
     $htmlForm = $oForm->fetchForm("$local_templates_dir/form.tpl", $titulo, $data);
     $contenidoModulo = "<form method='POST' style='margin-bottom:0;' action='?menu=$module_name'>".$htmlForm."</form>";
@@ -220,6 +221,7 @@ function savewhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     $oIssa->checkTable();
 
     $ip_address = isset($_POST['ip_address']) ? trim((string)$_POST['ip_address']) : '';
+    $hostname   = isset($_POST['hostname']) ? trim((string)$_POST['hostname']) : '';
     $note       = isset($_POST['note']) ? trim((string)$_POST['note']) : '';
     $old_ip     = isset($_POST['id']) ? trim((string)$_POST['id']) : '';
     $action     = $isEdit ? 'edit' : 'new';
@@ -229,11 +231,24 @@ function savewhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     if ($ip_address !== '') $ip_address = $oIssa->normalizeEntry($ip_address);
 
     $errors = array();
-    if ($ip_address === '') {
+    if ($hostname !== '') {
+        if (!filter_var($hostname, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
+            $errors['hostname'] = sprintf(_tr('%s is invalid'), _tr('Hostname (DDNS)'));
+        } else {
+            $resolved = resolveHostname($hostname);
+            if (count($resolved) === 0) {
+                $errors['hostname'] = _tr('The hostname could not be resolved');
+            } else {
+                $ip_address = $oIssa->normalizeEntry($resolved[0]);
+            }
+        }
+    }
+
+    if (count($errors) === 0 && $ip_address === '') {
         $errors['ip_address'] = sprintf(_tr('%s is required'), _tr('IP Address'));
-    } else if ($oIssa->validateIpOrMask($ip_address) !== '') {
+    } else if (count($errors) === 0 && $oIssa->validateIpOrMask($ip_address) !== '') {
         $errors['ip_address'] = sprintf(_tr('%s is invalid'), _tr('IP Address'));
-    } else {
+    } else if (count($errors) === 0) {
         $existing = $oIssa->getwhitelistByIp($ip_address);
         if (is_array($existing) && ($isEdit === false || $existing['ip_address'] !== $old_ip)) {
             $errors['ip_address'] = _tr("This IP address had already been defined");
@@ -243,18 +258,19 @@ function savewhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     if (count($errors) > 0) {
         // Re-render de la misma página, sin redirigir y sin perder lo escrito.
         return newwhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf, $action, $errors,
-            array('ip_address' => $ip_address, 'note' => $note, 'id' => $old_ip));
+            array('ip_address' => $ip_address, 'hostname' => $hostname, 'note' => $note, 'id' => $old_ip));
     }
 
     $ok = $isEdit
-        ? $oIssa->updatewhitelist($old_ip, $ip_address, $note)
-        : $oIssa->savewhitelist($ip_address, $note);
+        ? $oIssa->updatewhitelist($old_ip, $ip_address, $note, $hostname)
+        : $oIssa->savewhitelist($ip_address, $note, $hostname);
 
     // Las dos variantes tocan el firewall (fwconfig --add_wl / --remove_wl).
     $auditDetails = array(
         'ip'  => $ip_address,
         'msg' => $ok ? '' : $oIssa->errMsg,
     );
+    if ($hostname !== '') $auditDetails['hostname'] = $hostname;
     if ($isEdit) $auditDetails['old'] = $old_ip;
     issabelFwAudit::log($isEdit ? 'whitelist.update' : 'whitelist.add',
         $ok ? 'ok' : 'error', $auditDetails);
@@ -269,8 +285,36 @@ function savewhitelist($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     return reportwhitelist($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
 }
 
+function resolveHostname($hostname)
+{
+    $ips = array();
+    $records = @dns_get_record($hostname, DNS_A | DNS_AAAA);
+    if (is_array($records)) {
+        foreach ($records as $r) {
+            if (isset($r['ip']) && filter_var($r['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                $ips[] = $r['ip'];
+            } elseif (isset($r['ipv6']) && filter_var($r['ipv6'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                $ips[] = $r['ipv6'];
+            }
+        }
+    }
+    if (count($ips) === 0) {
+        $v4 = gethostbyname($hostname);
+        if ($v4 !== $hostname && filter_var($v4, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $ips[] = $v4;
+        }
+    }
+    return array_values(array_unique($ips));
+}
+
 function createFieldForm(){
     $arrFormElements = array(
+        "hostname" => array("LABEL"                  => _tr("Hostname (DDNS)"),
+                              "REQUIRED"               => "no",
+                              "INPUT_TYPE"             => "TEXT",
+                              "INPUT_EXTRA_PARAM"      => array("class" => "form-control", "placeholder" => "oficina.ddns.net"),
+                              "VALIDATION_TYPE"        => "text",
+                              "VALIDATION_EXTRA_PARAM" => ""),
         "ip_address" => array("LABEL"                  => _tr("IP Address"),
                               "REQUIRED"               => "yes",
                               "INPUT_TYPE"             => "TEXT",

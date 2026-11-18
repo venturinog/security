@@ -22,17 +22,17 @@
   +----------------------------------------------------------------------+
   $Id: anonymoussip.php, Fri 14 Sep 2018 12:01:47 PM EDT, nicolas@issabel.com
 */
-require_once 'Console/Getopt.php';
-
 define('PASSWD_PATH', '/etc/issabel.conf');
 
-// Parse command-line options
-$opt = Console_Getopt::getopt($argv, '', array(
-    'enable',       // set allowguest=yes explicitly
-    'disable',      // set allowguest=no explicitly
-    'conddisable',  // add allowguest=no if allowguest is not set, else noop
-));
-if (PEAR::isError($opt)) error_exit($opt->getMessage()."\n");
+// Parse command-line options. No se usa Console_Getopt (PEAR): en EL10 puede
+// no estar instalado y el spec no lo declara (B1).
+$opt = array(array(), array());
+foreach (array_slice($argv, 1) as $arg) {
+    if (!in_array($arg, array('--enable', '--disable', '--conddisable'), TRUE)) {
+        error_exit("Unknown option $arg\n");
+    }
+    $opt[0][] = array($arg, NULL);
+}
 //validateOptions($opt);
 foreach ($opt[0] as $option) switch ($option[0]) {
 case '--enable':

@@ -100,6 +100,12 @@ class paloSantoRules {
              $query = "ALTER TABLE tmp_execute ADD COLUMN ipv6_enabled INTEGER NOT NULL DEFAULT 0";
              $result = $this->_DB->genQuery($query,array());
          }
+         // Mismo esquema que el version_sql 6.0.0-34->35. Guarda para que la
+         // pagina siga funcionando si el script quedo diferido en firstboot.
+         if($this->hasField('filter','priority')==0) {
+             $query = "ALTER TABLE filter ADD COLUMN priority varchar(10) NOT NULL DEFAULT 'normal'";
+             $result = $this->_DB->genQuery($query,array());
+         }
      }
 
     /**
@@ -318,6 +324,11 @@ class paloSantoRules {
         $id_ip     = ($arrValues['id_ip'] == null)         ? "" : $arrValues['id_ip'];
         $state     = isset($arrValues['state'])            ? $arrValues['state'] : '';
         $target    = ($arrValues['target'] == null)        ? "" : $arrValues['target'];
+        $priority  = isset($arrValues['priority'])         ? (string)$arrValues['priority'] : 'normal';
+        if ($priority !== 'high') $priority = 'normal';
+        if ($target !== 'ACCEPT' || !in_array($traffic, array('INPUT','FORWARD'), true)) {
+            $priority = 'normal';
+        }
         $geoipcountries  = (is_array($arrValues['geoipcountries'])) ? implode(",",$arrValues['geoipcountries']) : "";
         $geoipcontinents  = (is_array($arrValues['geoipcontinents'])) ? implode(",",$arrValues['geoipcontinents']) : "";
 
@@ -343,9 +354,9 @@ class paloSantoRules {
         }
 
         $query = "INSERT INTO filter(traffic, eth_in, eth_out, ip_source, ip_destiny, protocol, ".
-                                    "sport, dport, icmp_type, number_ip, target, rule_order, activated, state, countries, continents, family) ".
-                 "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?)";
-        $arrParam = array($traffic,$eth_in,$eth_out,$source,$destino,$protocol,$port_in,$port_out,$type_icmp,$id_ip,$target,$order,$state,$geoipcountries,$geoipcontinents,$family);
+                                    "sport, dport, icmp_type, number_ip, target, rule_order, activated, state, countries, continents, family, priority) ".
+                 "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?,?)";
+        $arrParam = array($traffic,$eth_in,$eth_out,$source,$destino,$protocol,$port_in,$port_out,$type_icmp,$id_ip,$target,$order,$state,$geoipcountries,$geoipcontinents,$family,$priority);
         $result = $this->_DB->genQuery($query,$arrParam);
 
         if( $result == FALSE )
@@ -412,14 +423,19 @@ class paloSantoRules {
         $state     =  $arrValues['state'];
         $target    = ($arrValues['target'] == null)        ? "" : $arrValues['target'];
         $orden     = ($arrValues['orden'] == null)         ?  0 : $arrValues['orden'];
+        $priority  = isset($arrValues['priority'])         ? (string)$arrValues['priority'] : 'normal';
+        if ($priority !== 'high') $priority = 'normal';
+        if ($target !== 'ACCEPT' || !in_array($traffic, array('INPUT','FORWARD'), true)) {
+            $priority = 'normal';
+        }
 
         $geoipcountries  = ($arrValues['geoipcountries'] == null)   ? "" : implode(",",$arrValues['geoipcountries']);
         $geoipcontinents = ($arrValues['geoipcontinents'] == null)  ? "" : implode(",",$arrValues['geoipcontinents']);
 
         $family = $this->normalizeFamily(isset($arrValues['family']) ? $arrValues['family'] : 'inet');
 
-        $query = "UPDATE filter SET traffic = ?, eth_in = ?, eth_out = ?, ip_source = ?, ip_destiny = ?, protocol = ?, sport = ?, dport = ?, icmp_type = ?, number_ip = ?, target = ?, rule_order = ?, state = ?, countries = ?, continents = ?, family = ?  WHERE id = ?";
-        $arrParam = array($traffic,$eth_in,$eth_out,$source,$destino,$protocol,$port_in,$port_out,$type_icmp,$id_ip,$target,$orden,$state,$geoipcountries,$geoipcontinents,$family,$id);
+        $query = "UPDATE filter SET traffic = ?, eth_in = ?, eth_out = ?, ip_source = ?, ip_destiny = ?, protocol = ?, sport = ?, dport = ?, icmp_type = ?, number_ip = ?, target = ?, rule_order = ?, state = ?, countries = ?, continents = ?, family = ?, priority = ?  WHERE id = ?";
+        $arrParam = array($traffic,$eth_in,$eth_out,$source,$destino,$protocol,$port_in,$port_out,$type_icmp,$id_ip,$target,$orden,$state,$geoipcountries,$geoipcontinents,$family,$priority,$id);
         $result = $this->_DB->genQuery($query,$arrParam);
 
         if( $result == FALSE )
@@ -701,6 +717,55 @@ class paloSantoRules {
         $sComando = '/usr/bin/issabel-helper fwconfig --flush 2>&1';
         $output = $ret = NULL;
         exec($sComando, $output, $ret);
+        if ($ret != 0) {
+            $this->errMsg = implode('', $output);
+            return FALSE;
+        }
+        return TRUE;
+    }
+
+    /**
+     * Comprobación de integridad de las cadenas. Devuelve el JSON de fwconfig
+     * --check como array; si no se puede ejecutar, ok=false.
+     */
+    function checkIntegrity()
+    {
+        $output = $ret = NULL;
+        exec('/usr/bin/issabel-helper fwconfig --check 2>&1', $output, $ret);
+        $json = json_decode(implode("\n", $output), true);
+        if (!is_array($json)) {
+            return array('ok' => false, 'problems' => array('the integrity check could not be executed'));
+        }
+        return $json;
+    }
+
+    /**
+     * El firewall está bloqueado para apagarse desde la web (flag root-owned).
+     */
+    function isLocked()
+    {
+        $output = $ret = NULL;
+        exec('/usr/bin/issabel-helper fwconfig --islocked 2>&1', $output, $ret);
+        return $ret == 0;
+    }
+
+    /**
+     * Safe Mode: el arranque detectó dos reinicios seguidos y sólo dejó
+     * SSH/HTTPS. El flag vive en /run, así que desaparece al reiniciar.
+     */
+    function isSafeMode()
+    {
+        return file_exists('/run/issabel-fw-safemode');
+    }
+
+    /**
+     * Restaura el ruleset completo y borra el flag de Safe Mode.
+     */
+    function restoreSafeMode()
+    {
+        $this->errMsg = '';
+        $output = $ret = NULL;
+        exec('/usr/bin/issabel-helper fwrestore 2>&1', $output, $ret);
         if ($ret != 0) {
             $this->errMsg = implode('', $output);
             return FALSE;

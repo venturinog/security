@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 34
+Release: 44
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -127,6 +127,8 @@ chmod 755 $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d/issabel-portknock
 mkdir -p $RPM_BUILD_ROOT%{_bindir}/
 mv setup/usr/bin/issabel-portknock* $RPM_BUILD_ROOT%{_bindir}/
 chmod 755 $RPM_BUILD_ROOT%{_bindir}/issabel-portknock*
+mv setup/usr/bin/issabel-firewall $RPM_BUILD_ROOT%{_bindir}/
+chmod 755 $RPM_BUILD_ROOT%{_bindir}/issabel-firewall
 rmdir setup/usr/bin
 
 rmdir setup/usr/share/issabel setup/usr/share setup/usr
@@ -136,6 +138,29 @@ rmdir setup/usr/share/issabel setup/usr/share setup/usr
 mkdir -p    $RPM_BUILD_ROOT%{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
 mv setup/   $RPM_BUILD_ROOT%{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
 mv menu.xml $RPM_BUILD_ROOT%{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
+
+# Safe Mode: drop-in de iptables.service (sin unidad nueva)
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/systemd/system/iptables.service.d
+cp setup/etc/systemd/system/iptables.service.d/issabel-safemode.conf \
+   $RPM_BUILD_ROOT%{_sysconfdir}/systemd/system/iptables.service.d/
+chmod 644 $RPM_BUILD_ROOT%{_sysconfdir}/systemd/system/iptables.service.d/issabel-safemode.conf
+
+# Reglas propias del operador
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/issabel/firewall.d
+cp setup/etc/issabel/firewall.d/README $RPM_BUILD_ROOT%{_sysconfdir}/issabel/firewall.d/
+cp setup/etc/issabel/firewall.d/10-custom.rules.sample $RPM_BUILD_ROOT%{_sysconfdir}/issabel/firewall.d/
+chmod 644 $RPM_BUILD_ROOT%{_sysconfdir}/issabel/firewall.d/*
+
+# Chequeo periodico de integridad
+mkdir -p $RPM_BUILD_ROOT%{_unitdir}
+cp setup/etc/systemd/system/issabel-fwcheck.service $RPM_BUILD_ROOT%{_unitdir}/
+cp setup/etc/systemd/system/issabel-fwcheck.timer $RPM_BUILD_ROOT%{_unitdir}/
+cp setup/etc/systemd/system/issabel-fwddns.service $RPM_BUILD_ROOT%{_unitdir}/
+cp setup/etc/systemd/system/issabel-fwddns.timer $RPM_BUILD_ROOT%{_unitdir}/
+cp setup/etc/systemd/system/issabel-fwresponsive.service $RPM_BUILD_ROOT%{_unitdir}/
+chmod 644 $RPM_BUILD_ROOT%{_unitdir}/issabel-fwcheck.service $RPM_BUILD_ROOT%{_unitdir}/issabel-fwcheck.timer
+chmod 644 $RPM_BUILD_ROOT%{_unitdir}/issabel-fwddns.service $RPM_BUILD_ROOT%{_unitdir}/issabel-fwddns.timer
+chmod 644 $RPM_BUILD_ROOT%{_unitdir}/issabel-fwresponsive.service
 
 %pre
 mkdir -p %{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
@@ -221,6 +246,9 @@ chmod g+w /etc/fail2ban/jail.d
 chown asterisk.asterisk /etc/fail2ban/jail.d/issabel.conf
 systemctl enable fail2ban
 systemctl enable ipset
+systemctl daemon-reload >/dev/null 2>&1 || true
+systemctl enable issabel-fwcheck.timer >/dev/null 2>&1 || true
+systemctl enable issabel-fwddns.timer >/dev/null 2>&1 || true
 
 mkdir -p /etc/sysconfig/ipset.d
 echo "create issabel_whitelist hash:net family inet hashsize 1024 maxelem 65536" >/etc/sysconfig/ipset.d/issabel_whitelist.set
@@ -246,6 +274,7 @@ chown asterisk.asterisk /etc/asterisk/keys -R
 
 %postun
 sed -i '/#START issabel/,/#END issabel/d' /etc/fail2ban/jail.local
+systemctl daemon-reload >/dev/null 2>&1 || true
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -259,6 +288,11 @@ if [ $1 -eq 0 ] ; then # Validation for desinstall this rpm
 
   echo "Dump and delete %{name} databases"
   issabel-dbprocess "delete" "$pathModule/setup/db"
+
+  systemctl disable issabel-fwcheck.timer >/dev/null 2>&1 || true
+  systemctl disable issabel-fwddns.timer >/dev/null 2>&1 || true
+  systemctl disable --now issabel-fwresponsive >/dev/null 2>&1 || true
+  systemctl daemon-reload >/dev/null 2>&1 || true
 fi
 
 %files
@@ -271,6 +305,16 @@ fi
 %{_sysconfdir}/fail2ban/filter.d/asterisk-ami.conf
 %{_sysconfdir}/fail2ban/filter.d/issabel-gui.conf
 %{_sysconfdir}/fail2ban/action.d/iptables-multiport-issabel.conf
+%dir %attr(0755, root, root) %{_sysconfdir}/systemd/system/iptables.service.d
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/systemd/system/iptables.service.d/issabel-safemode.conf
+%dir %attr(0755, root, root) %{_sysconfdir}/issabel/firewall.d
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/issabel/firewall.d/README
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/issabel/firewall.d/10-custom.rules.sample
+%attr(0644, root, root) %{_unitdir}/issabel-fwcheck.service
+%attr(0644, root, root) %{_unitdir}/issabel-fwcheck.timer
+%attr(0644, root, root) %{_unitdir}/issabel-fwddns.service
+%attr(0644, root, root) %{_unitdir}/issabel-fwddns.timer
+%attr(0644, root, root) %{_unitdir}/issabel-fwresponsive.service
 %{_datadir}/issabel/letsencrypt/providers.php
 %dir %attr(0755, root, root) %{_sysconfdir}/letsencrypt/hooks
 %config(noreplace) %attr(0644, root, root) %{_sysconfdir}/letsencrypt/hooks/hooks.json
@@ -284,11 +328,101 @@ fi
 %{_sysconfdir}/cron.daily/purgeattacks
 %{_bindir}/issabel-portknock-cleanup
 %{_bindir}/issabel-portknock-validate
+%{_bindir}/issabel-firewall
 
 %config
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-44
+- Add the simple Responsive Firewall (PJSIP UDP): toggle default off,
+  issabel_responsive{,6} ipset with timeout, ISSABEL_RESPONSIVE chain with the
+  set ACCEPT and a hashlimit probation, AMI user issabel-firewall and the
+  fwresponsive daemon. `fwconfig --responsive on|off|flush|status|apply`
+  manages it atomically; the sec_responsive page and `issabel-firewall
+  responsive` expose it. It only opens SIP and RTP, never SSH/HTTPS.
+
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-43
+- Add the Discovery module (sec_discovery) and the fwdiscover helper: they
+  read the generated PJSIP/chan_sip/IAX/RTP configuration and suggest ports
+  and static peers. The page can add a port to the catalog, add a peer to the
+  whitelist, or create a disabled ACCEPT rule; every action is POST + CSRF
+  and audited.
+
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-42
+- Whitelist entries can be a hostname/DDNS name. The form resolves it at save
+  time and stores the effective IP in ip_address, keeping the hostname for
+  display. fwconfig --resolve_wl re-resolves every hostname and updates the
+  ipset when the address changes; issabel-fwddns.timer runs it every 5
+  minutes and whitelist.resolve is audited.
+
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-41
+- Add the Let's Encrypt port filter (`issabel_leports`, bitmap:port). The
+  firewall accepts the ports in the set before the final REJECT, and
+  `fwconfig --le-open/--le-close` manage it.
+- ssl_certbot opens port 80 only around HTTP-01 issuance, dry-run and
+  renewal, closes it in a finally block, cleans a stale set at the start of
+  renewcertificate and audits letsencrypt.http01.open/close.
+- `fwconfig --load` closes a stale set unless a certbot process is running.
+
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-40
+- Add `fwconfig --check`: JSON integrity report for the INPUT order
+  (whitelist, F2B_INPUT, ISSABEL_PRE, F2B_RBL, ISSABEL_INPUT), missing sets,
+  fail2ban, packetbl NFQUEUE placement and new interfaces. It writes an audit
+  line when something is wrong.
+- Add the `issabel-fwcheck.timer` (every 15 minutes) and show the integrity
+  problems as an error banner on the rules page.
+
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-39
+- Add custom firewall rules in /etc/issabel/firewall.d (*.rules for IPv4,
+  *.rules6 for IPv6). fwconfig validates them with iptables-restore --test,
+  requires root:root and non-world-writable files, rejects symlinks, and
+  applies them with --noflush before the normal rules so they are not placed
+  behind the final REJECT.
+
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-38
+- Add the `issabel-firewall` CLI: status (plain/JSON), enable/disable
+  (respecting the lock unless --force), apply, list whitelist/blocklist,
+  trust/untrust, blocklist add/del, check and safemode status/apply.
+  It writes its own audit lines and keeps the database and ipset in sync.
+
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-37
+- Move the fail2ban `jails` table to setup/db and seed one row per real jail
+  (15) instead of four groups. The version_sql expands the old groups and
+  drops the `apache` group row.
+- Add `findtime` to the jails table and the Admin page (seconds).
+- F2BUpdateJails no longer truncates jail.d/issabel.conf when the table is
+  empty or missing; it updates only the managed keys of the sections that
+  already exist in the file, preserving the rest.
+- The install seed no longer opens SSH/HTTPS/SIP/RTP/IAX/MGCP to the world:
+  those rules are created inactive. The firstboot profile whitelists the
+  management IP, so SSH/HTTPS keep working from it while everything else is
+  denied by default.
+
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-36
+- Add Safe Mode without a new service: a drop-in of iptables.service runs
+  fwboot-pre, which detects two boots within 5 minutes, writes a minimal
+  IPv4 ruleset (SSH/HTTPS only) and schedules fwrestore with a transient
+  systemd unit. IPv6 keeps its full ruleset.
+- Add the firewall lock: fwconfig --lock on|off, --islocked and --force.
+  The rules page hides the deactivate button and rejects the POST when the
+  lock is present; the console can still override it with --force.
+- Add the Safe Mode banner and "Apply now" action to the rules page.
+
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-35
+- Add the Block List module (sec_blocklist), a mirror of the White List:
+  persistent ipset blocklist for IPv4/IPv6, `fwconfig --add_bl/--remove_bl/
+  --save_bl`, its own chain ISSABEL_BLOCK and audit events.
+- Add the priority field to firewall rules. An ACCEPT rule can be Normal
+  (default) or High; High rules are emitted in ISSABEL_HIGH/
+  ISSABEL_HIGH_FORWARD and evaluated after fail2ban bans and before packetbl,
+  GeoIP and Block List. Only INPUT/FORWARD ACCEPT rules can be High.
+- Reorder the INPUT/FORWARD chains: whitelist, F2B_INPUT (bans), ISSABEL_PRE
+  (High + Block List), F2B_RBL (packetbl) and ISSABEL_INPUT/FORWARD.
+- Keep F2B_INPUT for fail2ban bans only; packetbl moves to F2B_RBL so a High
+  rule cannot bypass fail2ban.
+- Fix B13: the fail2ban actionstop now removes the real `INPUT -j F2B_INPUT`
+  jump instead of the nonexistent `INPUT_F2B`.
 * Fri Nov 13 2026 Issabel Foundation <info@issabel.org> - 6.0.0-34
 - Add IPv6 filtering to the firewall engine. `filter` gets a `family` column
   (`inet` by default, so every existing rule and the whole IPv4 behaviour stay

@@ -1,0 +1,6 @@
+[Unit]
+Description=Issabel firewall integrity check
+
+[Service]
+Type=oneshot
+ExecStart=-/usr/share/issabel/privileged/fwconfig --check

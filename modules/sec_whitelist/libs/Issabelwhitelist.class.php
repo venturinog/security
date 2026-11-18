@@ -110,13 +110,14 @@ class Issabelwhitelist{
 
     }
 
-    function savewhitelist($ip_address,$note)
+    function savewhitelist($ip_address,$note,$hostname = '')
     {
         // La base guarda siempre la forma canónica (ver normalizeEntry()).
         $ip_address = $this->normalizeEntry($ip_address);
-        $query = "INSERT INTO whitelist (ip_address,note) VALUES ( ?, ? )";
+        $hostname = trim((string)$hostname);
+        $query = "INSERT INTO whitelist (ip_address,note,hostname,resolved_at) VALUES ( ?, ?, ?, datetime('now') )";
 
-        $result = $this->_DB->genQuery($query,array($ip_address, $note));
+        $result = $this->_DB->genQuery($query,array($ip_address, $note, $hostname === '' ? null : $hostname));
 
         if($result==FALSE){
             $this->errMsg = $this->_DB->errMsg;
@@ -146,12 +147,13 @@ class Issabelwhitelist{
      * La comparación es canónica: `2001:DB8::1` y `2001:db8::1` son la misma
      * dirección y no deben provocar un alta y una baja del mismo elemento.
      */
-    function updatewhitelist($old_ip, $ip_address, $note)
+    function updatewhitelist($old_ip, $ip_address, $note, $hostname = '')
     {
         $ip_address = $this->normalizeEntry($ip_address);
+        $hostname = trim((string)$hostname);
         if ($this->normalizeEntry($old_ip) === $ip_address) {
-            $query = "UPDATE whitelist SET note=? WHERE ip_address=?";
-            $result = $this->_DB->genQuery($query, array($note, $old_ip));
+            $query = "UPDATE whitelist SET note=?, hostname=?, resolved_at=datetime('now') WHERE ip_address=?";
+            $result = $this->_DB->genQuery($query, array($note, $hostname === '' ? null : $hostname, $old_ip));
             if ($result == FALSE) {
                 $this->errMsg = $this->_DB->errMsg;
                 return FALSE;
@@ -161,7 +163,7 @@ class Issabelwhitelist{
 
         // Primero se añade la nueva IP: si falla, la entrada anterior sigue
         // intacta y el firewall no queda a medias.
-        if ($this->savewhitelist($ip_address, $note) === FALSE) {
+        if ($this->savewhitelist($ip_address, $note, $hostname) === FALSE) {
             return FALSE;
         }
         if ($this->deletewhitelist($old_ip) === FALSE) {
@@ -226,13 +228,27 @@ class Issabelwhitelist{
     public function checkTable() {
         if(!$this->tableExists()) {
             $this->createTable();
+            return;
+        }
+        // Bases anteriores al version_sql 6.0.0-42: anade las columnas si el
+        // script quedo diferido en firstboot.
+        $cols = $this->_DB->fetchTable("PRAGMA table_info(whitelist)", true, array());
+        $names = array();
+        foreach ($cols as $c) if (isset($c['name'])) $names[$c['name']] = true;
+        if (!isset($names['hostname'])) {
+            $this->_DB->genQuery("ALTER TABLE whitelist ADD COLUMN hostname text", array());
+        }
+        if (!isset($names['resolved_at'])) {
+            $this->_DB->genQuery("ALTER TABLE whitelist ADD COLUMN resolved_at text", array());
         }
     }
 
     private function createTable() {
         $query = "CREATE TABLE whitelist(
             ip_address TEXT NOT NULL UNIQUE, 
-            note TEXT
+            note TEXT,
+            hostname TEXT,
+            resolved_at TEXT
         )";
         return $this->_DB->genExec($query);
     }

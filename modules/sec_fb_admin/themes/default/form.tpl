@@ -30,6 +30,10 @@
                 <span class="iss-field__label">{$bantime.LABEL}</span>
                 <span class="iss-field__control iss-field__value">{$VALUES.bantime|escape}</span>
             </div>
+            <div class="iss-field">
+                <span class="iss-field__label">{$findtime.LABEL}</span>
+                <span class="iss-field__control iss-field__value">{$VALUES.findtime|escape}</span>
+            </div>
             <div class="iss-field iss-field--full">
                 <span class="iss-field__label">{$ignoreip.LABEL}</span>
                 <span class="iss-field__control iss-field__value">{if $VALUES.ignoreip eq ''}&mdash;{else}{$VALUES.ignoreip|escape}{/if}</span>
@@ -57,6 +61,11 @@
                 <span class="iss-field__control">{$bantime.INPUT}</span>
                 {if $ERRORS.bantime}<div class="invalid-feedback d-block">{$ERRORS.bantime}</div>{/if}
             </div>
+            <div class="iss-field">
+                <span class="iss-field__label">{$findtime.LABEL}&nbsp;<span class="iss-required">*</span></span>
+                <span class="iss-field__control">{$findtime.INPUT}</span>
+                {if $ERRORS.findtime}<div class="invalid-feedback d-block">{$ERRORS.findtime}</div>{/if}
+            </div>
             <div class="iss-field iss-field--full">
                 <span class="iss-field__label">{$ignoreip.LABEL}</span>
                 <span class="iss-field__control">{$ignoreip.INPUT}</span>
@@ -79,6 +88,7 @@
 IssabelValidate.attach(document.querySelector('form'), {
     maxretry: function (v) { return /^[0-9]+$/.test(v) && parseInt(v, 10) >= 1; },
     bantime: function (v) { return /^[0-9]+$/.test(v) && parseInt(v, 10) >= 1; },
+    findtime: function (v) { return /^[0-9]+$/.test(v) && parseInt(v, 10) >= 1; },
     ignoreip: function (v) {
         v = (v || '').trim();
         if (v === '') return true;

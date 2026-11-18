@@ -31,6 +31,11 @@
                 <span class="iss-field__control">{$target.INPUT}</span>
                 {if !empty($ERRORS.target)}<div class="invalid-feedback d-block">{$ERRORS.target}</div>{/if}
             </div>
+            <div class="iss-field fw-col-2 fw-g-2" id="id_priority">
+                <span class="iss-field__label">{$priority.LABEL}</span>
+                <span class="iss-field__control">{$priority.INPUT}</span>
+                {if !empty($ERRORS.priority)}<div class="invalid-feedback d-block">{$ERRORS.priority}</div>{/if}
+            </div>
 
             <div class="iss-field fw-col-2 fw-g-3" id="id_interface_in">
                 <span class="iss-field__label">{$interface_in.LABEL}</span>
@@ -128,8 +133,11 @@
     var traffic = document.querySelector('[name="id_traffic"]');
     var protocol = document.querySelector('[name="id_protocol"]');
     var family = document.querySelector('[name="family"]');
+    var target = document.querySelector('[name="target"]');
     if (traffic) showElementByTraffic();
     if (family) showElementByFamily();
+    if (target) target.addEventListener('change', showPriority);
+    showPriority();
 
     function ip(v) {
         if (v === '') return true;
