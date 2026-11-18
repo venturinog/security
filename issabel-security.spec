@@ -133,12 +133,6 @@ rmdir setup/usr/bin
 
 rmdir setup/usr/share/issabel setup/usr/share setup/usr
 
-# The following folder should contain all the data that is required by the installer,
-# that cannot be handled by RPM.
-mkdir -p    $RPM_BUILD_ROOT%{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
-mv setup/   $RPM_BUILD_ROOT%{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
-mv menu.xml $RPM_BUILD_ROOT%{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
-
 # Safe Mode: drop-in de iptables.service (sin unidad nueva)
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/systemd/system/iptables.service.d
 cp setup/etc/systemd/system/iptables.service.d/issabel-safemode.conf \
@@ -151,7 +145,7 @@ cp setup/etc/issabel/firewall.d/README $RPM_BUILD_ROOT%{_sysconfdir}/issabel/fir
 cp setup/etc/issabel/firewall.d/10-custom.rules.sample $RPM_BUILD_ROOT%{_sysconfdir}/issabel/firewall.d/
 chmod 644 $RPM_BUILD_ROOT%{_sysconfdir}/issabel/firewall.d/*
 
-# Chequeo periodico de integridad
+# Chequeo periodico de integridad y DDNS, servicio del responsive
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 cp setup/etc/systemd/system/issabel-fwcheck.service $RPM_BUILD_ROOT%{_unitdir}/
 cp setup/etc/systemd/system/issabel-fwcheck.timer $RPM_BUILD_ROOT%{_unitdir}/
@@ -161,6 +155,12 @@ cp setup/etc/systemd/system/issabel-fwresponsive.service $RPM_BUILD_ROOT%{_unitd
 chmod 644 $RPM_BUILD_ROOT%{_unitdir}/issabel-fwcheck.service $RPM_BUILD_ROOT%{_unitdir}/issabel-fwcheck.timer
 chmod 644 $RPM_BUILD_ROOT%{_unitdir}/issabel-fwddns.service $RPM_BUILD_ROOT%{_unitdir}/issabel-fwddns.timer
 chmod 644 $RPM_BUILD_ROOT%{_unitdir}/issabel-fwresponsive.service
+
+# The following folder should contain all the data that is required by the installer,
+# that cannot be handled by RPM.
+mkdir -p    $RPM_BUILD_ROOT%{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
+mv setup/   $RPM_BUILD_ROOT%{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
+mv menu.xml $RPM_BUILD_ROOT%{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
 
 %pre
 mkdir -p %{_datadir}/issabel/module_installer/%{name}-%{version}-%{release}/
