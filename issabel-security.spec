@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 44
+Release: 45
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -334,6 +334,28 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-45
+- Fix firewall activation: `fwconfig --load` flushed the built-in chains and
+  then inserted ISSABEL_PRE at position 3 of an empty INPUT, so iptables
+  aborted with "Index of insertion too big", the whitelist and the rest of the
+  hooks were never installed and the page reported a broken integrity. The
+  insertion position is now clamped to the end of the chain; fail2ban and
+  packetbl reinsert their jumps at 2 and 4 on restart and leave the intended
+  order (whitelist, F2B_INPUT, ISSABEL_PRE, F2B_RBL, ISSABEL_INPUT).
+- A failed first activation rolls first_time back, so the page keeps offering
+  "Activate firewall" instead of showing a half-applied state.
+- The integrity check now also reports an F2B_RBL chain that is not hooked
+  into INPUT when the packetbl action is installed.
+- The install seed keeps SSH, HTTP and HTTPS active, so the first activation
+  cannot lock the administrator out.
+- `issabel-firewall enable|apply|disable` now update first_time, deactivated
+  and exec_in_sys (and save the snapshot on success), matching the web page.
+  Previously `enable` reported success without loading anything on a firewall
+  that had never been activated.
+- Use the dark-mode brand token for the IPv4 family chip, the INPUT traffic
+  icon, the active family filter and the edit/apply accents, which were
+  unreadable on the dark surface.
+
 * Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-44
 - Add the simple Responsive Firewall (PJSIP UDP): toggle default off,
   issabel_responsive{,6} ipset with timeout, ISSABEL_RESPONSIVE chain with the

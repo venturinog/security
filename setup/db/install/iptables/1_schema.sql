@@ -109,12 +109,16 @@ INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dp
 INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','UDP','ANY','13','','','ACCEPT',7,0);
 INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','UDP','16','ANY','','','ACCEPT',8,1);
 INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','UDP','ANY','17','','','ACCEPT',9,1);
-INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','5','','','ACCEPT',10,0);
+-- Perfil por defecto de la instalacion limpia: SSH (puerto 5), HTTP (1) y
+-- HTTPS (2) quedan activos para que la primera activacion del firewall, desde
+-- el primer arranque o desde la GUI, no deje fuera al administrador. El resto
+-- de servicios del catalogo se crea inactivo y se abre a demanda.
+INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','5','','','ACCEPT',10,1);
 INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','6','','','ACCEPT',11,0);
-INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','1','','','ACCEPT',12,0);
+INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','1','','','ACCEPT',12,1);
 INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','3','','','ACCEPT',13,0);
 INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','10','','','ACCEPT',14,0);
-INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','2','','','ACCEPT',15,0);
+INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','2','','','ACCEPT',15,1);
 INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','4','','','ACCEPT',16,0);
 INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','7','','','ACCEPT',17,0);
 INSERT INTO filter(traffic,eth_in,eth_out,ip_source,ip_destiny,protocol,sport,dport,icmp_type,number_ip,target,rule_order,activated) VALUES ('INPUT','ANY','','0.0.0.0/0','0.0.0.0/0','TCP','ANY','8','','','ACCEPT',18,0);

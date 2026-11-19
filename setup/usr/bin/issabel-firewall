@@ -87,6 +87,69 @@ function db_count($table)
     }
 }
 
+/**
+ * Estado del firewall en tmp_execute: first_time, deactivated y exec_in_sys.
+ * En una base anterior a la columna `deactivated` se asume 0.
+ */
+function fw_state()
+{
+    $default = array(1, 0, 0);
+    if (!is_file(DB_PATH)) return $default;
+    try {
+        $db = db();
+        $row = @$db->querySingle(
+            'SELECT first_time, deactivated, exec_in_sys FROM tmp_execute LIMIT 1', true);
+        if (!is_array($row) || count($row) === 0) {
+            $row = @$db->querySingle(
+                'SELECT first_time, exec_in_sys FROM tmp_execute LIMIT 1', true);
+            if (!is_array($row) || count($row) === 0) {
+                $db->close();
+                return $default;
+            }
+            $row['deactivated'] = 0;
+        }
+        $db->close();
+        return array((int)$row['first_time'], (int)$row['deactivated'], (int)$row['exec_in_sys']);
+    } catch (Exception $e) {
+        return $default;
+    }
+}
+
+function fw_set_state($first, $deact, $exec)
+{
+    if (!is_file(DB_PATH)) return false;
+    try {
+        $db = db();
+        $ok = @$db->exec('UPDATE tmp_execute SET first_time='.(int)$first
+            .', deactivated='.(int)$deact
+            .', exec_in_sys='.(int)$exec);
+        if ($ok === false) {
+            // Base anterior a la columna `deactivated`.
+            $ok = @$db->exec('UPDATE tmp_execute SET first_time='.(int)$first
+                .', exec_in_sys='.(int)$exec);
+        }
+        $db->close();
+        return $ok !== false;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+/** Copia el estado aplicado, base de "Descartar cambios" en la GUI. */
+function fw_snapshot()
+{
+    if (!is_file(DB_PATH)) return false;
+    try {
+        $db = db();
+        $ok = @$db->exec('DROP TABLE IF EXISTS filter_snapshot');
+        if ($ok !== false) $ok = @$db->exec('CREATE TABLE filter_snapshot AS SELECT * FROM filter');
+        $db->close();
+        return $ok !== false;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
 function status($asJson)
 {
     $active = run(FWCONFIG . ' --isactive');
@@ -219,7 +282,17 @@ case 'status':
     exit(status(in_array('--json', $argv, true)));
 
 case 'enable':
-    if (!run(FWCONFIG . ' --load', $out, $ret)) fail(implode("\n", $out), 'cli.enable');
+    // fwconfig --load solo construye las cadenas con first_time=0 y no toca
+    // la bandera de desactivacion: se sube antes de cargar y se restaura si
+    // la carga falla, para no dejar la base diciendo "activo" sin firewall.
+    $prev = fw_state();
+    if (!fw_set_state(0, 0, 0)) fail('Could not update the firewall state in the database', 'cli.enable');
+    if (!run(FWCONFIG . ' --load', $out, $ret)) {
+        fw_set_state($prev[0], $prev[1], $prev[2]);
+        fail(implode("\n", $out), 'cli.enable');
+    }
+    fw_set_state(0, 0, 1);
+    fw_snapshot();
     audit('cli.enable', 'ok');
     echo "Firewall enabled\n";
     exit(0);
@@ -230,12 +303,20 @@ case 'disable':
     }
     $cmdline = FWCONFIG . ' --flush' . ($force ? ' --force' : '');
     if (!run($cmdline, $out, $ret)) fail(implode("\n", $out), 'cli.disable');
+    fw_set_state(1, 1, 0);
     audit('cli.disable', 'ok');
     echo "Firewall disabled\n";
     exit(0);
 
 case 'apply':
-    if (!run(FWCONFIG . ' --load', $out, $ret)) fail(implode("\n", $out), 'cli.apply');
+    $prev = fw_state();
+    if (!fw_set_state(0, 0, 0)) fail('Could not update the firewall state in the database', 'cli.apply');
+    if (!run(FWCONFIG . ' --load', $out, $ret)) {
+        fw_set_state($prev[0], $prev[1], $prev[2]);
+        fail(implode("\n", $out), 'cli.apply');
+    }
+    fw_set_state(0, 0, 1);
+    fw_snapshot();
     audit('cli.apply', 'ok');
     echo "Rules applied\n";
     exit(0);

@@ -757,7 +757,25 @@ function _fwInitAuxChains($family)
 
 function _ipt_insert_at($chain, $pos, $rule, $family = 'inet')
 {
-    exec(_ipt_bin($family).' -w -I '.$chain.' '.(int)$pos.' '.$rule.' 2>&1', $out, $ret);
+    $bin = _ipt_bin($family);
+    $out = $ret = NULL;
+    // `iptables -I CADENA N` falla con "Index of insertion too big" si la
+    // cadena tiene menos de N-1 reglas. --load vacia las cadenas antes de
+    // engancharlas, asi que la posicion 3 de INPUT (despues de la whitelist y
+    // de F2B_INPUT) todavia no existe en la primera activacion. Se limita a
+    // "al final": fail2ban y packetbl reinsertan sus saltos en 2 y 4 al
+    // reiniciarse y dejan el orden definitivo.
+    exec($bin.' -S '.$chain.' 2>/dev/null', $out, $ret);
+    if ($ret == 0) {
+        $count = 0;
+        foreach ($out as $line) {
+            if (strncmp(ltrim($line), '-A ', 3) === 0) $count++;
+        }
+        $pos = min((int)$pos, $count + 1);
+    }
+    if ((int)$pos < 1) $pos = 1;
+
+    exec($bin.' -w -I '.$chain.' '.(int)$pos.' '.$rule.' 2>&1', $out, $ret);
     if ($ret != 0) {
         fwrite(STDERR, implode("\n", $out)."\n");
         return false;
@@ -1836,6 +1854,8 @@ function action_check()
             $problems[] = 'packetbl NFQUEUE is in F2B_INPUT; it must be in F2B_RBL';
 
         if (is_file('/etc/fail2ban/action.d/iptables-multiport-issabelrbl.conf')) {
+            if ($rbl === NULL)
+                $problems[] = 'INPUT -j F2B_RBL is missing';
             $f2bRbl = (string)shell_exec('/usr/sbin/iptables -S F2B_RBL 2>/dev/null');
             if (strpos($f2bRbl, 'NFQUEUE') === false)
                 $problems[] = 'F2B_RBL does not contain the packetbl NFQUEUE rule';

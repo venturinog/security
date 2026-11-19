@@ -1343,8 +1343,15 @@ function activateFirewall($smarty, $module_name, $local_templates_dir, &$pDB, $a
     $event = $bFirstTime ? 'firewall.enable' : 'rules.apply';
     $pRules->noMoreFirstTime();
     if (!$pRules->activateRules()) {
-        issabelFwAudit::log($event, 'error', array('msg' => $pRules->errMsg));
-        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"), $pRules->errMsg));
+        $err = $pRules->errMsg;
+        issabelFwAudit::log($event, 'error', array('msg' => $err));
+        // Si era la primera activacion, se vuelve a "no activado": la carga
+        // pudo dejar cadenas creadas pero sin enganchar, y la pagina pasaria
+        // de "nunca activado" a un aviso de integridad enganoso.
+        if ($bFirstTime) $pRules->setFirstTime();
+        if ($err === '') $err = _tr('The firewall could not be activated');
+        $smarty->assign("SECURITY_ALERT", issabel_alert_html('error', _tr("ERROR"),
+            nl2br(htmlspecialchars($err, ENT_COMPAT, 'UTF-8')), array('html' => true)));
         return showRulesPage($smarty, $module_name, $local_templates_dir, $pDB, $arrConf);
     }
     issabelFwAudit::log($event, 'ok');

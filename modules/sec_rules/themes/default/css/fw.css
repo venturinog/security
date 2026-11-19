@@ -41,7 +41,9 @@
 }
 
 /* Chip de familia en la grilla. Las dos familias comparten la misma tabla:
-   esto es lo que dice a cuál pertenece cada fila. */
+   esto es lo que dice a cuál pertenece cada fila. El color de texto usa
+   --iss-brand-ink, que el tema aclara en modo oscuro: --iss-primary es
+   ilegible como texto sobre una superficie oscura. */
 .fw-family {
     display: inline-block;
     padding: 1px 8px;
@@ -53,8 +55,8 @@
 }
 
 .fw-family--inet {
-    color: var(--iss-primary);
-    background: color-mix(in srgb, var(--iss-primary) 12%, transparent);
+    color: var(--iss-brand-ink, var(--iss-primary, #572364));
+    background: color-mix(in srgb, var(--iss-brand-ink, var(--iss-primary, #572364)) 12%, transparent);
 }
 
 .fw-family--inet6 {
@@ -90,9 +92,9 @@
 }
 
 .fw-segmented__item--active {
-    color: var(--iss-primary);
+    color: var(--iss-brand-ink, var(--iss-primary, #572364));
     font-weight: 600;
-    background: color-mix(in srgb, var(--iss-primary) 10%, transparent);
+    background: color-mix(in srgb, var(--iss-brand-ink, var(--iss-primary, #572364)) 10%, transparent);
 }
 
 /* Switch de IPv6 en la barra de acciones. */
@@ -131,7 +133,7 @@
 }
 
 .fw-traffic--input .ti {
-    color: var(--iss-primary);
+    color: var(--iss-brand-ink, var(--iss-primary, #572364));
 }
 
 .fw-traffic--output .ti {
@@ -202,7 +204,7 @@
 
 .fw-edit:hover,
 .fw-edit:focus {
-    color: var(--iss-primary);
+    color: var(--iss-brand-ink, var(--iss-primary, #572364));
 }
 
 .fw-dragging {
@@ -255,7 +257,7 @@
     display: inline-block;
     font-size: 1.75rem;
     line-height: 1;
-    color: var(--iss-primary);
+    color: var(--iss-brand-ink, var(--iss-primary, #572364));
 }
 
 .fw-apply-title {

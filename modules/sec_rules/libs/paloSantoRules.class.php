@@ -718,7 +718,7 @@ class paloSantoRules {
         $output = $ret = NULL;
         exec($sComando, $output, $ret);
         if ($ret != 0) {
-            $this->errMsg = implode('', $output);
+            $this->errMsg = implode("\n", $output);
             return FALSE;
         }
         return TRUE;
@@ -767,7 +767,7 @@ class paloSantoRules {
         $output = $ret = NULL;
         exec('/usr/bin/issabel-helper fwrestore 2>&1', $output, $ret);
         if ($ret != 0) {
-            $this->errMsg = implode('', $output);
+            $this->errMsg = implode("\n", $output);
             return FALSE;
         }
         return TRUE;
@@ -785,7 +785,7 @@ class paloSantoRules {
         $output = $ret = NULL;
         exec($sComando, $output, $ret);
         if ($ret != 0) {
-            $this->errMsg = implode('', $output);
+            $this->errMsg = implode("\n", $output);
             return FALSE;
         }
         return TRUE;
