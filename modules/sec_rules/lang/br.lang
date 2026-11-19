@@ -150,4 +150,6 @@ $arrLangModule = array(
     'The firewall is in Safe Mode: only SSH and HTTPS are open for 5 minutes.' => 'The firewall is in Safe Mode: only SSH and HTTPS are open for 5 minutes.',
     'Firewall integrity' => 'Firewall integrity',
     'The running firewall does not match the expected configuration: %s' => 'The running firewall does not match the expected configuration: %s',
+    'IPv4 and IPv6 are separate rule sets: the order applies only within each family and traffic chain.' => 'IPv4 e IPv6 são conjuntos de regras separados: a ordem se aplica apenas dentro de cada família e cadeia de tráfego.',
+    'Only ACCEPT rules in INPUT or FORWARD can be High. High rules are evaluated after fail2ban bans but before packetbl, GeoIP and the Block List, so they can accept traffic those would otherwise block. Normal is the default.' => 'Somente regras ACCEPT em INPUT ou FORWARD podem ser Alta. Regras Altas são avaliadas depois dos bloqueios do fail2ban, mas antes do packetbl, GeoIP e da Block List, portanto podem aceitar tráfego que esses mecanismos bloqueariam. Normal é o padrão.',
 );

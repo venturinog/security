@@ -32,7 +32,10 @@
                 {if !empty($ERRORS.target)}<div class="invalid-feedback d-block">{$ERRORS.target}</div>{/if}
             </div>
             <div class="iss-field fw-col-2 fw-g-2" id="id_priority">
-                <span class="iss-field__label">{$priority.LABEL}</span>
+                <span class="iss-field__label">{$priority.LABEL}
+                    <i class="ti ti-info-circle fw-help" role="img" tabindex="0"
+                       aria-label="{$PRIORITY_HELP|escape}" title="{$PRIORITY_HELP|escape}"></i>
+                </span>
                 <span class="iss-field__control">{$priority.INPUT}</span>
                 {if !empty($ERRORS.priority)}<div class="invalid-feedback d-block">{$ERRORS.priority}</div>{/if}
             </div>

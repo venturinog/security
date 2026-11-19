@@ -241,7 +241,14 @@ function renderFamilyFilter($module_name, $family)
                . ($active ? ' aria-current="true"' : '')
                . '>'.htmlspecialchars($label, ENT_COMPAT, 'UTF-8').'</a>';
     }
-    return $html.'</div>';
+    $html .= '</div>';
+    // El número global de la vista "Todas" no es un orden de traversal único:
+    // IPv4 e IPv6 son tablas del kernel distintas y cada `traffic` es una
+    // cadena distinta. Solo compiten las filas de la misma familia y cadena.
+    $html .= '<span class="fw-order-hint">'
+           . htmlspecialchars(_tr('IPv4 and IPv6 are separate rule sets: the order applies only within each family and traffic chain.'), ENT_COMPAT, 'UTF-8')
+           . '</span>';
+    return $html;
 }
 
 /**
@@ -634,6 +641,9 @@ function constructForm($smarty, $module_name, $local_templates_dir, &$pDB, $arrC
     $smarty->assign("protocol_label", _tr("Protocol"));
     // Cabecera de la tarjeta que agrupa los campos propios del protocolo.
     $smarty->assign("protocol_detail", _tr("PROTOCOL DETAILS"));
+    // Explicación del campo Priority (icono de ayuda junto a la etiqueta).
+    $smarty->assign("PRIORITY_HELP", _tr(
+        'Only ACCEPT rules in INPUT or FORWARD can be High. High rules are evaluated after fail2ban bans but before packetbl, GeoIP and the Block List, so they can accept traffic those would otherwise block. Normal is the default.'));
     $smarty->assign("MODE", $action === 'edit' ? 'edit' : 'new');
     $smarty->assign("VALUES", $arrValues);
 

@@ -3,7 +3,7 @@
 Summary: Issabel Security
 Name: issabel-security
 Version: 6.0.0
-Release: 45
+Release: 46
 License: GPL
 Group:   Applications/System
 Source0: issabel-%{modname}-%{version}.tar.gz
@@ -334,6 +334,17 @@ fi
 %{_sysconfdir}/fail2ban/jail.d/issabel.conf
 
 %changelog
+* Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-46
+- Explain the rule order in the family filter: IPv4 and IPv6 are separate
+  tables in the kernel and each traffic value is its own chain, so the global
+  order of the "All" view only decides the position within the same family and
+  chain.
+- Add a help icon with a native tooltip to the Priority field of the rule
+  form. It explains that only INPUT/FORWARD ACCEPT rules can be High and that
+  High rules are evaluated after fail2ban bans but before packetbl, GeoIP and
+  the Block List.
+- Translate both strings to Spanish and Brazilian Portuguese.
+
 * Wed Nov 18 2026 Issabel Foundation <info@issabel.org> - 6.0.0-45
 - Fix firewall activation: `fwconfig --load` flushed the built-in chains and
   then inserted ISSABEL_PRE at position 3 of an empty INPUT, so iptables
